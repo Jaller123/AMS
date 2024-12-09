@@ -1,13 +1,12 @@
-import { useState } from "react";
+import React from "react";
+import ReqForm from "./components/ReqForm";
 
-import "./App.css";
-
-function App() {
+const App = () => {
   return (
-    <>
-      <div>Hello</div>
-    </>
+    <div>
+      <ReqForm />
+    </div>
   );
-}
+};
 
 export default App;
