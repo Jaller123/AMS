@@ -8,6 +8,7 @@ const ReqForm = () => {
       <div className={styles.formGroup}>
         <label htmlFor="reqUrl">URL</label>
         <input
+         data-test-id="input-url"
           type="text"
           id="reqUrl"
           name="reqUrl"
@@ -29,6 +30,7 @@ const ReqForm = () => {
         <label htmlFor="reqHeaders">Headers (JSON format)</label>
 
         <textarea
+        data-test-id="input-field"
           id="reqHeaders"
           name="reqHeaders"
           rows="4"
