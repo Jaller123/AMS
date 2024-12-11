@@ -3,7 +3,7 @@ import styles from "./ReqForm.module.css";
 
 const ReqForm = () => {
   return (
-    <section className={StyleSheet.section}>
+    <section className={styles.section}>
       <h2>Request</h2>
       <div className={styles.formGroup}>
         <label htmlFor="reqUrl">URL</label>
