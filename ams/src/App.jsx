@@ -6,6 +6,7 @@ const App = () => {
   const [response, setResponse] = useState({});
 
   const handleRequestData = async (data) => {
+    console.log("Payload to send:", data);
     try {
       const payload = {
         request: {
@@ -19,14 +20,19 @@ const App = () => {
         }
       };
 
+      console.log("Payload for WireMock:", payload);
+
       const res = await fetch("http://localhost:8088/__admin/mappings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
 
+      console.log("Fetch response:", res);
+
       if (res.ok) {
         const responseBody = await res.text();
+        console.log("Response Body:", responseBody);
         console.log(responseBody);
         setResponse({
           status: res.status,

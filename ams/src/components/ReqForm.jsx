@@ -26,10 +26,12 @@ const ReqForm = ({ onRequestChange }) => {
         headers: parsedHeaders,
         body: parsedBody
       };
-  
+      
+      console.log("Request Data:", requestData);
       onRequestChange(requestData);
     } catch (error) {
       alert("Invalid JSON format in Headers or Body.");
+      console.error("Parsing Error:", error);
     }
   };
   

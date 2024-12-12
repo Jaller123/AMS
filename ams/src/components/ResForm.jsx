@@ -12,7 +12,8 @@ const ResForm = ({ response }) => {
           id="reqBody"
           name="reqBody"
           rows="1"
-          placeholder="200, OK"
+          readOnly
+          value={response?.status || "No status received"}
           className={styles.textarea}
         />
       </div>
