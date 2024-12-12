@@ -9,8 +9,8 @@ const App = () => {
   return (
     <div>
       <ReqForm />
-      <Button />
       <ResForm />
+      <Button />
     </div>
   );
 };
