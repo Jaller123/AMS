@@ -1,24 +1,64 @@
-import react from "react";
+import React, { useState } from "react";
 import styles from "./ReqForm.module.css";
 
-const ReqForm = () => {
+const ReqForm = ({ onRequestChange }) => {
+  const [url, setUrl] = useState("");
+  const [method, setMethod] = useState("GET");
+  const [headers, setHeaders] = useState("");
+  const [body, setBody] = useState("");
+
+ 
+  const handleSubmit = () => {
+    
+    if (!url || !method || !headers || !body) {
+      alert("All fields are required.");
+      return;
+    }
+  
+    try {
+      
+      const parsedHeaders = JSON.parse(headers);
+      const parsedBody = JSON.parse(body);
+  
+      const requestData = {
+        method,
+        url,
+        headers: parsedHeaders,
+        body: parsedBody
+      };
+  
+      onRequestChange(requestData);
+    } catch (error) {
+      alert("Invalid JSON format in Headers or Body.");
+    }
+  };
+  
+  
+
   return (
     <section className={styles.section}>
       <h2>Request</h2>
       <div className={styles.formGroup}>
         <label htmlFor="reqUrl">URL</label>
         <input
-         data-test-id="input-url"
-          type="text"
+        
           id="reqUrl"
           name="reqUrl"
+          type="text"
           placeholder="Enter the request URL"
+          onChange={(e) => setUrl(e.target.value)}
           className={styles.input}
         />
       </div>
+
       <div className={styles.formGroup}>
         <label htmlFor="reqMethod">Method</label>
-        <select id="reqMethod" name="reqMethod" className={styles.input}>
+        <select
+          id="reqMethod"
+          name="reqMethod"
+          onChange={(e) => setMethod(e.target.value)}
+          className={styles.input}
+        >
           <option value="GET">GET</option>
           <option value="POST">POST</option>
           <option value="PUT">PUT</option>
@@ -26,18 +66,19 @@ const ReqForm = () => {
           <option value="PATCH">PATCH</option>
         </select>
       </div>
+
       <div className={styles.formGroup}>
         <label htmlFor="reqHeaders">Headers (JSON format)</label>
-
         <textarea
-        data-test-id="input-field"
           id="reqHeaders"
           name="reqHeaders"
           rows="4"
           placeholder='{"Content-Type": "application/json"}'
+          onChange={(e) => setHeaders(e.target.value)}
           className={styles.textarea}
         ></textarea>
       </div>
+
       <div className={styles.formGroup}>
         <label htmlFor="reqBody">Body (JSON format)</label>
         <textarea
@@ -45,10 +86,14 @@ const ReqForm = () => {
           name="reqBody"
           rows="4"
           placeholder='{"key": "value"}'
+          onChange={(e) => setBody(e.target.value)}
           className={styles.textarea}
         ></textarea>
       </div>
+
+      <button onClick={handleSubmit}>Send Request</button>
     </section>
   );
 };
+
 export default ReqForm;
