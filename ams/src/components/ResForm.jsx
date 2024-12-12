@@ -1,5 +1,5 @@
 import React from "react";
-import styles from "./ResForm.module.css";
+import styles from "./Resform.module.css";
 
 const ResForm = ({ response }) => {
   return (
