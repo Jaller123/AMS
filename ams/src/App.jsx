@@ -39,7 +39,7 @@ const App = () => {
         console.error("Error details:", errorBody);
       }
     } catch (error) {
-      console.error("Request failed!", error);
+      console.error("Request failed!!", error);
     }
   };
 
