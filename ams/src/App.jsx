@@ -45,8 +45,14 @@ const App = () => {
 
   return (
     <div>
+<<<<<<< HEAD
       <ReqForm onRequestChange={handleRequestData} />
       <ResForm response={response} />
+=======
+      <ReqForm />
+      <ResForm />
+      <Button />
+>>>>>>> 2ba4369f9db74a24e1d741177a8d298391f7f7d8
     </div>
   );
 };
