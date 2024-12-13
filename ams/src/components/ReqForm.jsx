@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styles from "./ReqForm.module.css";
+import Button from "./Button";
 
 const ReqForm = ({ onRequestChange }) => {
   const [url, setUrl] = useState("");
@@ -7,43 +8,12 @@ const ReqForm = ({ onRequestChange }) => {
   const [headers, setHeaders] = useState("");
   const [body, setBody] = useState("");
 
- 
-  const handleSubmit = () => {
-    
-    if (!url || !method || !headers || !body) {
-      alert("All fields are required.");
-      return;
-    }
-  
-    try {
-      
-      const parsedHeaders = JSON.parse(headers);
-      const parsedBody = JSON.parse(body);
-  
-      const requestData = {
-        method,
-        url,
-        headers: parsedHeaders,
-        body: parsedBody
-      };
-      
-      console.log("Request Data:", requestData);
-      onRequestChange(requestData);
-    } catch (error) {
-      alert("Invalid JSON format in Headers or Body.");
-      console.error("Parsing Error:", error);
-    }
-  };
-  
-  
-
   return (
     <section className={styles.section}>
       <h2>Request</h2>
       <div className={styles.formGroup}>
         <label htmlFor="reqUrl">URL</label>
         <input
-        
           id="reqUrl"
           name="reqUrl"
           type="text"
@@ -93,7 +63,14 @@ const ReqForm = ({ onRequestChange }) => {
         ></textarea>
       </div>
 
-      <button onClick={handleSubmit}>Send Request</button>
+    
+      <Button
+        url={url}
+        method={method}
+        headers={headers}
+        body={body}
+        onRequestChange={onRequestChange}
+      />
     </section>
   );
 };
