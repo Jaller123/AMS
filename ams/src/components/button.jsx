@@ -1,10 +1,6 @@
 import React from "react";
 import styles from "./Button.module.css";
 
-const Button = ({ onClick, label }) => {
-  return (
-    <button className={styles.button} onClick={onClick}>
-      {label}
 const Button = ({ url, method, headers, body, onRequestChange }) => {
   
   const handleSubmit = () => {
