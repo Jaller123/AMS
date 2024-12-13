@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import ReqForm from "./components/ReqForm";
+import Button from "./components/button";
 import ResForm from "./components/ResForm";
+import Navbar from "./components/Navbar";
 
 const App = () => {
   const [response, setResponse] = useState({});
@@ -50,6 +52,8 @@ const App = () => {
 
   return (
     <div>
+      <Navbar />
+      <Button />
       <ReqForm onRequestChange={handleRequestData} />
       <ResForm response={response} />
     </div>
