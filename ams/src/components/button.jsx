@@ -1,12 +1,10 @@
 import React from "react";
 import styles from "./Button.module.css";
 
-<<<<<<< HEAD
 const Button = ({ onClick, label }) => {
   return (
     <button className={styles.button} onClick={onClick}>
       {label}
-=======
 const Button = ({ url, method, headers, body, onRequestChange }) => {
   
   const handleSubmit = () => {
@@ -37,7 +35,6 @@ const Button = ({ url, method, headers, body, onRequestChange }) => {
   return (
     <button onClick={handleSubmit} className={styles.button}>
       Send Mapping
->>>>>>> dc0ffac1e3568fe01476a176b506dc6610059f8e
     </button>
   );
 };
