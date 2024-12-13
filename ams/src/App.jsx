@@ -13,13 +13,13 @@ const App = () => {
       const payload = {
         request: {
           method: data.method,
-          url: data.url
+          url: data.url,
         },
         response: {
           status: 200,
           headers: data.headers ? data.headers : {},
-          body: data.body ? JSON.stringify(data.body) : ""
-        }
+          body: data.body ? JSON.stringify(data.body) : "",
+        },
       };
 
       console.log("Payload for WireMock:", payload);
@@ -27,7 +27,7 @@ const App = () => {
       const res = await fetch("http://localhost:8088/__admin/mappings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
 
       console.log("Fetch response:", res);
@@ -38,7 +38,7 @@ const App = () => {
         console.log(responseBody);
         setResponse({
           status: res.status,
-          body: responseBody
+          body: responseBody,
         });
       } else {
         console.error("WireMock responded with error status:", res.status);
@@ -61,4 +61,3 @@ const App = () => {
 };
 
 export default App;
-

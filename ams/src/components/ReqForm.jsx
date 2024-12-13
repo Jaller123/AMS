@@ -7,26 +7,23 @@ const ReqForm = ({ onRequestChange }) => {
   const [headers, setHeaders] = useState("");
   const [body, setBody] = useState("");
 
- 
   const handleSubmit = () => {
-    
     if (!url || !method || !headers || !body) {
       alert("All fields are required.");
       return;
     }
-  
+
     try {
-      
       const parsedHeaders = JSON.parse(headers);
       const parsedBody = JSON.parse(body);
-  
+
       const requestData = {
         method,
         url,
         headers: parsedHeaders,
-        body: parsedBody
+        body: parsedBody,
       };
-      
+
       console.log("Request Data:", requestData);
       onRequestChange(requestData);
     } catch (error) {
@@ -34,8 +31,6 @@ const ReqForm = ({ onRequestChange }) => {
       console.error("Parsing Error:", error);
     }
   };
-  
-  
 
   return (
     <section className={styles.section}>
@@ -43,7 +38,6 @@ const ReqForm = ({ onRequestChange }) => {
       <div className={styles.formGroup}>
         <label htmlFor="reqUrl">URL</label>
         <input
-        
           id="reqUrl"
           name="reqUrl"
           type="text"
