@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styles from "./ReqForm.module.css";
+import Button from "./Button";
 
 const ReqForm = ({ onRequestChange }) => {
   const [url, setUrl] = useState("");
@@ -87,7 +88,14 @@ const ReqForm = ({ onRequestChange }) => {
         ></textarea>
       </div>
 
-      <button onClick={handleSubmit}>Send Request</button>
+    
+      <Button
+        url={url}
+        method={method}
+        headers={headers}
+        body={body}
+        onRequestChange={onRequestChange}
+      />
     </section>
   );
 };
