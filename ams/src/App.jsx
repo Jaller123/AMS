@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import ReqForm from "./components/ReqForm";
-import Button from "./components/Button";
-import ResForm from "./components/ResForm";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
+import ReqForm from "./components/ReqForm";
+import ResForm from "./components/ResForm";
+import MappingsPage from "./components/MappingsPage";
 
 const App = () => {
   const [response, setResponse] = useState({});
+  const [mappings, setMappings] = useState([]); // Sparade mappningar
 
   const handleRequestData = async (data) => {
     console.log("Payload to send:", data);
@@ -30,20 +32,18 @@ const App = () => {
         body: JSON.stringify(payload),
       });
 
-      console.log("Fetch response:", res);
-
       if (res.ok) {
         const responseBody = await res.text();
         console.log("Response Body:", responseBody);
-        console.log(responseBody);
         setResponse({
           status: res.status,
           body: responseBody,
         });
+
+        // Spara mappningen i state
+        setMappings((prevMappings) => [...prevMappings, payload]);
       } else {
         console.error("WireMock responded with error status:", res.status);
-        const errorBody = await res.text();
-        console.error("Error details:", errorBody);
       }
     } catch (error) {
       console.error("Request failed!", error);
@@ -51,12 +51,26 @@ const App = () => {
   };
 
   return (
-    <div>
+    <Router>
       <Navbar />
-      <Button />
-      <ReqForm onRequestChange={handleRequestData} />
-      <ResForm response={response} />
-    </div>
+      <Routes>
+        {/* Defaultvy med formulär och respons */}
+        <Route
+          path="/"
+          element={
+            <div>
+              <ReqForm onRequestChange={handleRequestData} />
+              <ResForm response={response} />
+            </div>
+          }
+        />
+        {/* Vy för sparade mappningar */}
+        <Route
+          path="/mappings"
+          element={<MappingsPage mappings={mappings} />}
+        />
+      </Routes>
+    </Router>
   );
 };
 

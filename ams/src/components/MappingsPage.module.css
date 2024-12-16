@@ -1,0 +1,25 @@
+.section {
+  margin: 20px auto;
+  padding: 20px;
+  max-width: 800px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.mappingList {
+  list-style-type: none;
+  padding: 0;
+}
+
+.mappingItem {
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+}
+
+.mappingItem strong {
+  font-weight: bold;
+}
