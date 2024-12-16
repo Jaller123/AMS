@@ -40,7 +40,6 @@ const App = () => {
           body: responseBody,
         });
 
-        // Spara mappningen i state
         setMappings((prevMappings) => [...prevMappings, payload]);
       } else {
         console.error("WireMock responded with error status:", res.status);
@@ -54,7 +53,6 @@ const App = () => {
     <Router>
       <Navbar />
       <Routes>
-        {/* Defaultvy med formulär och respons */}
         <Route
           path="/"
           element={
@@ -64,13 +62,15 @@ const App = () => {
             </div>
           }
         />
-        {/* Vy för sparade mappningar */}
         <Route
           path="/mappings"
           element={<MappingsPage mappings={mappings} />}
         />
       </Routes>
     </Router>
+      <ReqForm onRequestChange={handleRequestData} />
+      <ResForm response={response} />
+    </div>
   );
 };
 
