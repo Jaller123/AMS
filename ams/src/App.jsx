@@ -53,7 +53,6 @@ const App = () => {
   return (
     <div>
       <Navbar />
-      <Button />
       <ReqForm onRequestChange={handleRequestData} />
       <ResForm response={response} />
     </div>
