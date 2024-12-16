@@ -17,8 +17,14 @@ const ResForm = ({ response }) => {
           className={styles.textarea}
         />
       </div>
-
-      <div className={styles.formGroup}></div>
+      <div className={styles.formGroup}>
+        <label>Headers</label>
+        <textarea
+          rows="5"
+          readOnly
+          value={JSON.stringify(response?.headers)}
+        ></textarea>
+      </div>
 
       <div className={styles.formGroup}>
         <label>Body</label>
