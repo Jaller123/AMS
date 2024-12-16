@@ -7,7 +7,7 @@ import MappingsPage from "./components/MappingsPage";
 
 const App = () => {
   const [response, setResponse] = useState({});
-  const [mappings, setMappings] = useState([]); // Sparade mappningar
+  const [mappings, setMappings] = useState([]);
 
   const handleRequestData = async (data) => {
     console.log("Payload to send:", data);
@@ -62,15 +62,13 @@ const App = () => {
             </div>
           }
         />
+
         <Route
           path="/mappings"
           element={<MappingsPage mappings={mappings} />}
         />
       </Routes>
     </Router>
-      <ReqForm onRequestChange={handleRequestData} />
-      <ResForm response={response} />
-    </div>
   );
 };
 
