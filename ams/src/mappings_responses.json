@@ -7,7 +7,19 @@
       "headers": {
         "Content-Type":"text/plain"
       },
-      "body": "Hello world!"
+      "body": "Mapping sent."
+    }
+  },
+
+  {
+    "id": 2,
+    "reqId": 1,
+    "resJson": {
+      "status": 200,
+      "headers": {
+        "Content-Type":"text/plain"
+      },
+      "body": "Mapping has already been sent!"
     }
   }
 ]

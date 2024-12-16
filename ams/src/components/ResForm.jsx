@@ -22,13 +22,13 @@ const ResForm = ({ response }) => {
         <textarea
           rows="5"
           readOnly
-          value={JSON.stringify(response?.headers)}
+          value={response?.headers ? JSON.stringify(response.headers, null, 2) : "No headers received"}
         ></textarea>
       </div>
 
       <div className={styles.formGroup}>
         <label>Body</label>
-        <textarea rows="5" readOnly value={JSON.stringify(response?.body)} />
+        <textarea rows="5" readOnly  value={response?.body ? JSON.stringify(response.body, null, 2) : "No body received"} />
       </div>
     </section>
   );
