@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import ReqForm from "./components/ReqForm";
-import Button from "./components/button";
+import Button from "./components/Button";
 import ResForm from "./components/ResForm";
 import Navbar from "./components/Navbar";
 
