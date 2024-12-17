@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import ReqForm from "./components/ReqForm";
@@ -9,7 +9,15 @@ import MappingsPage from "./components/MappingsPage";
 
 const App = () => {
   const [response, setResponse] = useState({});
-  const [mappings, setMappings] = useState([]);
+  const [mappings, setMappings] = useState(() => {
+    const savedMappings = localStorage.getItem("mappings");
+    return savedMappings ? JSON.parse(savedMappings) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem("mappings", JSON.stringify(mappings));
+  }, [mappings]);
+
 
   const handleDelete = (url) => {
 
