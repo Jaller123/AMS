@@ -15,6 +15,12 @@ const __dirname = path.dirname(__filename);
 const requestsFile = path.join(__dirname, "./mappings_requests.json");
 const responseFile = path.join(__dirname, "./mappings_responses.json");
 
+const getNextId = (mappings) => {
+  if (mappings.length === 0) return 1
+  const maxId = Math.max(...mappings.map((item) => item.id))
+  return maxId + 1
+}
+
 app.get("/mappings", (req, res) => {
   const requests = JSON.parse(fs.readFileSync(requestsFile, "utf-8"))
   const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"))
@@ -26,7 +32,7 @@ app.post("/mappings", (req, res) => {
   const requests = JSON.parse(fs.readFileSync(requestsFile, "utf-8"))
   const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"))
 
-  const newId = request.length ? requests[requests.length -1].id +1 : 1
+  const newId = getNextId(requests)
 
   const newRequest = { id: newId, resJson: request }
   const newResponse = { id: newId, reqId: newId, resJson: response }

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import FormField from "./FormField";
 import styles from "./ResForm.module.css";
@@ -75,4 +74,3 @@ const ResForm = ({ setResponseData }) => {
 };
 
 export default ResForm;
-
