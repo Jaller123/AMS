@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import ReqForm from "./components/ReqForm";
 import ResForm from "./components/ResForm";
-import mappingsRequests from "./mappings_requests.json";
-import mappingsResponses from "./mappings_responses.json";
 import MappingsPage from "./components/MappingsPage";
 
 const App = () => {
@@ -14,95 +12,105 @@ const App = () => {
     return savedMappings ? JSON.parse(savedMappings) : [];
   });
 
+  const [requests, setRequests] = useState([]);
+  const [responses, setResponses] = useState([]);
+
+  // Fetch all mappings from backend
+  const fetchMappings = useCallback(async () => {
+    try {
+      const res = await fetch("http://localhost:8080/mappings");
+      const data = await res.json();
+
+      setRequests(data.requests);
+      setResponses(data.responses);
+
+      const combinedMappings = data.requests.map((req) => {
+        const resObj = data.responses.find((res) => res.reqId === req.id);
+        return { request: req.reqJson, response: resObj.resJson };
+      });
+
+      setMappings(combinedMappings);
+    } catch (error) {
+      console.error("Error fetching mappings:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchMappings();
+  }, [fetchMappings]);
+
   useEffect(() => {
     localStorage.setItem("mappings", JSON.stringify(mappings));
   }, [mappings]);
 
-
-  const handleDelete = (url) => {
-
-    // Letar efter request mappningen.
-    const requestToDelete = mappingsRequests.find(
-      (request) => request.reqJson.url === url
-    )
-
-    if (requestToDelete) {
-      
-      // Tar bort mappningen.
-      const updatedRequests = mappingsRequests.filter(
-        (request) => request.id !== requestToDelete.id
-      )
-
-      // Tar bort Response mappningen.
-      const updatedResponses = mappingsResponses.filter(
-        (response) => response.reqId !== requestToDelete.id
-      )
-
-        // Uppdatera mappings state
-      const updatedMappings = mappings.filter(
-        (mapping) => mapping.request.url !== url
-      )
-      setMappings(updatedMappings)
-
-      alert(`Mapping for ${url} has been deleted.`)
-    } else {
-      alert(`Mapping for ${url} is not found.`)
-    }
-  }
-
   const handleRequestData = async (data) => {
     console.log("Payload to send:", data);
     try {
-    // Generera en unik ID för nya mappings
-    const newRequestId = mappingsRequests.length
-    ? mappingsRequests[mappingsRequests.length - 1].id + 1
-    : 1;
+      const newRequestId = requests.length
+        ? requests[requests.length - 1].id + 1
+        : 1;
 
-    const newRequest = {
-      id: newRequestId,
-      reqJson: data,
-    };
+      const newRequest = {
+        id: newRequestId,
+        reqJson: data,
+      };
 
-    // Skapar en ny Response Objekt
-    const newResponse = {
-      id: newRequestId,
-      reqId: newRequestId,
-      resJson: {
-        status: 200,
-        headers: data.headers, 
-        body: data.body,       
-      },
-    };
+      const newResponse = {
+        id: newRequestId,
+        reqId: newRequestId,
+        resJson: {
+          status: 200,
+          headers: data.headers,
+          body: data.body,
+        },
+      };
 
-    mappingsRequests.push(newRequest);
-    mappingsResponses.push(newResponse);
+      // Send data to backend
+      const res = await fetch("http://localhost:8080/mappings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ request: newRequest.reqJson, response: newResponse.resJson }),
+      });
 
-    console.log("New mapping saved to requests.json and responses.json:", newRequest, newResponse);
+      const result = await res.json();
+      console.log("New mapping saved:", result);
 
-    // Updatera responsen so det visar i ResForm.
-    setResponse(newResponse.resJson);
+      // Update state
+      setRequests((prev) => [...prev, newRequest]);
+      setResponses((prev) => [...prev, newResponse]);
+      setMappings((prevMappings) => [
+        ...prevMappings,
+        { request: newRequest.reqJson, response: newResponse.resJson },
+      ]);
 
-    // Uppdatera mappings state för MappingsPage.
-    setMappings((prevMappings) => [
-      ...prevMappings,
-      { request: newRequest.reqJson, response: newResponse.resJson },
-    ]);
-  } catch (error) {
-    console.error("Error handling request data:", error);
+      setResponse(newResponse.resJson);
+    } catch (error) {
+      console.error("Error handling request data:", error);
+      setResponse({
+        status: 500,
+        body: "Error sending request: " + error.message,
+      });
+    }
+  };
 
-    // Visar felmeddelanden.
-    setResponse({
-      status: 500,
-      body: "Error sending request: " + error.message,
-      requestDetails: {
-        method: data.method,
-        url: data.url,
-        headers: data.headers,
-        body: data.body,
-      },
-    });
-  }
-};
+  const handleDelete = async (url) => {
+    try {
+      const res = await fetch(`http://localhost:8080/mappings/${url}`, {
+        method: "DELETE",
+      });
+
+      const result = await res.json();
+
+      if (result.success) {
+        alert(`Mapping for ${url} has been deleted.`);
+        fetchMappings(); // Refresh mappings
+      } else {
+        alert(`Error: ${result.message}`);
+      }
+    } catch (error) {
+      console.error("Error deleting mapping:", error);
+    }
+  };
 
   return (
     <Router>
@@ -117,10 +125,9 @@ const App = () => {
             </div>
           }
         />
-
         <Route
           path="/mappings"
-          element={<MappingsPage mappings={mappings} handleDelete={handleDelete}/>}
+          element={<MappingsPage mappings={mappings} handleDelete={handleDelete} />}
         />
       </Routes>
     </Router>

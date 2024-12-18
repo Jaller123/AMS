@@ -5,19 +5,18 @@
     "resJson": {
       "status": 200,
       "headers": {
-        "Content-Type":"text/plain"
+        "Content-Type": "text/plain"
       },
       "body": "Mapping sent."
     }
   },
-
   {
     "id": 2,
     "reqId": 1,
     "resJson": {
       "status": 200,
       "headers": {
-        "Content-Type":"text/plain"
+        "Content-Type": "text/plain"
       },
       "body": "Mapping has already been sent!"
     }
