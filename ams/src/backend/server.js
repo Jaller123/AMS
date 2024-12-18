@@ -46,6 +46,27 @@ app.post("/mappings", (req, res) => {
   res.json({ success: true, newRequest, newResponse })
 })
 
+app.delete("/mappings/:id", (req, res) => {
+  const { id } = req.params
+  if (!id) {
+    return res.status(400).json({ success: false, message: "Invalid ID" })
+  }
+
+  console.log(`Deleting mapping with ID: ${id}`);
+
+  const requests = JSON.parse(fs.readFileSync(requestsFile, "utf-8"))
+  const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"))
+
+  const updatedRequests = requests.filter((req) => req.id !== parseInt(id, 10))
+  const updatedResponses = responses.filter((res) => res.reqId !== parseInt(id, 10))
+
+  fs.writeFileSync(requestsFile, JSON.stringify(updatedRequests, null, 2))
+  fs.writeFileSync(responseFile, JSON.stringify(updatedResponses, null, 2))
+
+  res.json({ success: true })
+});
+
+
 app.listen(8080, () => {
   console.log("Server running on http://localhost:8080")
 })

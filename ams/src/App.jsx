@@ -5,7 +5,7 @@ import ReqForm from "./components/ReqForm";
 import ResForm from "./components/ResForm";
 import MappingsPage from "./components/MappingsPage";
 import Button from "./components/Button";
-import { fetchMappings, saveMapping } from "./backend/api.js";
+import { fetchMappings, saveMapping, deleteMapping } from "./backend/api.js";
 
 const App = () => {
   const [mappings, setMappings] = useState([]);
@@ -26,7 +26,10 @@ const App = () => {
     if (requestData && responseData) {
       try {
         const newMapping = await saveMapping({ request: requestData, response: responseData });
-        setMappings((prevMappings) => [...prevMappings, newMapping]);
+        setMappings((prevMappings) => [
+          ...prevMappings,
+          { id: newMapping.id, ...newMapping }
+        ]);
         setRequestData(null); // Reset request data
         setResponseData(null); // Reset response data
       } catch (error) {
@@ -36,6 +39,29 @@ const App = () => {
       alert("Both request and response data are required.");
     }
   };
+
+  const handleDeleteMapping = async (id) => {
+    if (!id) {
+      console.error("Invalid ID for deletion:", id);
+      alert("Failed to delete mapping. Invalid ID.");
+      return;
+    }
+  
+    try {
+      console.log(`Deleting mapping with ID: ${id}`);
+      const success = await deleteMapping(id);
+      if (success) {
+        setMappings((prevMappings) =>
+          prevMappings.filter((mapping) => mapping?.id !== id)
+        );
+        alert("Mapping deleted successfully!");
+      }
+    } catch (error) {
+      alert("Failed to delete mapping. Please try again.");
+    }
+  };
+  
+  
 
   return (
     <Router>
@@ -53,7 +79,7 @@ const App = () => {
         />
         <Route
           path="/mappings"
-          element={<MappingsPage mappings={mappings} />}
+          element={<MappingsPage mappings={mappings} handleDelete={handleDeleteMapping} />}
         />
       </Routes>
     </Router>
