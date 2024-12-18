@@ -1,73 +1,30 @@
-import React, { useState } from "react";
+// src/components/ReqForm.js
+import React, { useEffect } from "react";
+import FormField from "./FormField";
 import styles from "./ReqForm.module.css";
-import Button from "./Button";
 
-const ReqForm = ({ onRequestChange }) => {
-  const [url, setUrl] = useState("");
-  const [method, setMethod] = useState("GET");
-  const [headers, setHeaders] = useState("");
-  const [body, setBody] = useState("");
+const ReqForm = ({ setRequestData }) => {
+  const [url, setUrl] = React.useState("");
+  const [method, setMethod] = React.useState("GET");
+
+  useEffect(() => {
+    setRequestData({ url, method });
+  }, [url, method, setRequestData]);
 
   return (
     <section className={styles.section}>
       <h2>Request</h2>
-      <div className={styles.formGroup}>
-        <label htmlFor="reqUrl">URL</label>
-        <input
-          id="reqUrl"
-          name="reqUrl"
-          type="text"
-          placeholder="Enter the request URL"
-          onChange={(e) => setUrl(e.target.value)}
-          className={styles.input}
-        />
-      </div>
-
-      <div className={styles.formGroup}>
-        <label htmlFor="reqMethod">Method</label>
-        <select
-          id="reqMethod"
-          name="reqMethod"
-          onChange={(e) => setMethod(e.target.value)}
-          className={styles.input}
-        >
-          <option value="GET">GET</option>
-          <option value="POST">POST</option>
-          <option value="PUT">PUT</option>
-          <option value="DELETE">DELETE</option>
-          <option value="PATCH">PATCH</option>
-        </select>
-      </div>
-      <div className={styles.formGroup}>
-        <label htmlFor="reqHeaders">Headers (JSON format)</label>
-        <textarea
-          id="reqHeaders"
-          name="reqHeaders"
-          rows="4"
-          placeholder='{"Content-Type": "application/json"}'
-          onChange={(e) => setHeaders(e.target.value)}
-          className={styles.textarea}
-        ></textarea>
-      </div>
-
-      <div className={styles.formGroup}>
-        <label htmlFor="reqBody">Body (JSON format)</label>
-        <textarea
-          id="reqBody"
-          name="reqBody"
-          rows="4"
-          placeholder='{"key": "value"}'
-          onChange={(e) => setBody(e.target.value)}
-          className={styles.textarea}
-        ></textarea>
-      </div>
-
-      <Button
-        url={url}
-        method={method}
-        headers={headers}
-        body={body}
-        onRequestChange={onRequestChange}
+      <FormField
+        label="URL"
+        value={url}
+        onChange={setUrl}
+        placeholder="Enter the request URL"
+      />
+      <FormField
+        label="Method"
+        value={method}
+        onChange={setMethod}
+        type="select"
       />
     </section>
   );
