@@ -1,7 +1,8 @@
+// src/components/MappingsPage.js
 import React from "react";
 import styles from "./MappingsPage.module.css";
 
-const MappingsPage = ({ mappings, handleDelete }) => {
+const MappingsPage = ({ mappings }) => {
   return (
     <section className={styles.section}>
       <h2>Saved Mappings</h2>
@@ -11,13 +12,10 @@ const MappingsPage = ({ mappings, handleDelete }) => {
         <ul className={styles.mappingList}>
           {mappings.map((mapping, index) => (
             <li key={index} className={styles.mappingItem}>
-              <pre>{JSON.stringify(mapping, null, 2)}</pre>
-              <button
-                className={styles.deleteButton}
-                onClick={() => handleDelete(mapping.request.url)}
-              >
-                Delete
-              </button>
+              <h3>Request</h3>
+              <pre>{JSON.stringify(mapping.request, null, 2)}</pre>
+              <h3>Response</h3>
+              <pre>{JSON.stringify(mapping.response, null, 2)}</pre>
             </li>
           ))}
         </ul>
