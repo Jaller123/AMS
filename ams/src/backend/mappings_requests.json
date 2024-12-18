@@ -9,5 +9,19 @@
       },
       "body": {}
     }
+  },
+  {
+    "id": 1,
+    "resJson": {
+      "url": "/user/login",
+      "method": "POST"
+    }
+  },
+  {
+    "id": 1,
+    "resJson": {
+      "url": "user/reg",
+      "method": "GET"
+    }
   }
 ]

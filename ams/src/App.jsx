@@ -1,24 +1,56 @@
-// src/App.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import ReqForm from "./components/ReqForm";
 import ResForm from "./components/ResForm";
 import MappingsPage from "./components/MappingsPage";
 import Button from "./components/Button";
-import useMappingState from "./hooks/useMappingState";
 
 const App = () => {
-  const { requestData, responseData, setRequestData, setResponseData } =
-    useMappingState();
   const [mappings, setMappings] = useState([]);
+  const [requestData, setRequestData] = useState(null);
+  const [responseData, setResponseData] = useState(null);
 
+  // Fetch existing mappings from the backend
+  useEffect(() => {
+    fetch("http://localhost:8080/mappings")
+      .then((response) => response.json())
+      .then(({ requests, responses }) => {
+        const mergedMappings = requests.map((req) => {
+          const matchingResponse = responses.find(
+            (res) => res.reqId === req.id
+          );
+          return {
+            request: req.resJson,
+            response: matchingResponse?.resJson || {},
+          };
+        });
+        setMappings(mergedMappings);
+      })
+      .catch((error) => console.error("Error fetching mappings:", error));
+  }, []);
+
+  // Save new mappings to the backend
   const handleSaveMapping = () => {
     if (requestData && responseData) {
-      const newMapping = { request: requestData, response: responseData };
-      setMappings((prevMappings) => [...prevMappings, newMapping]);
-      setRequestData(null); // Reset request data after save
-      setResponseData(null); // Reset response data after save
+      const mapping = { request: requestData, response: responseData };
+
+      fetch("http://localhost:8080/mappings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(mapping),
+      })
+        .then((response) => response.json())
+        .then(({ newRequest, newResponse }) => {
+          const newMapping = {
+            request: newRequest.resJson,
+            response: newResponse.resJson,
+          };
+          setMappings((prevMappings) => [...prevMappings, newMapping]);
+          setRequestData(null); // Reset request data
+          setResponseData(null); // Reset response data
+        })
+        .catch((error) => console.error("Error saving mapping:", error));
     } else {
       alert("Both request and response data are required.");
     }

@@ -20,5 +20,31 @@
       },
       "body": "Mapping has already been sent!"
     }
+  },
+  {
+    "id": 1,
+    "reqId": 1,
+    "resJson": {
+      "status": "200",
+      "headers": {
+        "Content-Type": "text/plain"
+      },
+      "body": {
+        "message": "OK"
+      }
+    }
+  },
+  {
+    "id": 1,
+    "reqId": 1,
+    "resJson": {
+      "status": "200",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "message": "Hello"
+      }
+    }
   }
 ]
