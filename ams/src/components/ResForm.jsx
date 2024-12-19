@@ -32,7 +32,6 @@ const ResForm = ({ setResponseData }) => {
       });
       setErrors({ headers: false, body: false });
     } else {
-      // Set errors for invalid fields
       setErrors({
         headers: !headersValid,
         body: !bodyValid,

@@ -5,6 +5,7 @@ import ReqForm from "./components/ReqForm";
 import ResForm from "./components/ResForm";
 import MappingsPage from "./components/MappingsPage";
 import Button from "./components/Button";
+import { fetchMappings, saveMapping, deleteMapping } from "./backend/api.js";
 
 const App = () => {
   const [mappings, setMappings] = useState([]);
@@ -13,48 +14,54 @@ const App = () => {
 
   // Fetch existing mappings from the backend
   useEffect(() => {
-    fetch("http://localhost:8080/mappings")
-      .then((response) => response.json())
-      .then(({ requests, responses }) => {
-        const mergedMappings = requests.map((req) => {
-          const matchingResponse = responses.find(
-            (res) => res.reqId === req.id
-          );
-          return {
-            request: req.resJson,
-            response: matchingResponse?.resJson || {},
-          };
-        });
-        setMappings(mergedMappings);
-      })
-      .catch((error) => console.error("Error fetching mappings:", error));
+    const loadMappings = async () => {
+      const data = await fetchMappings();
+      setMappings(data);
+    };
+    loadMappings();
   }, []);
 
   // Save new mappings to the backend
-  const handleSaveMapping = () => {
+  const handleSaveMapping = async () => {
     if (requestData && responseData) {
-      const mapping = { request: requestData, response: responseData };
-
-      fetch("http://localhost:8080/mappings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(mapping),
-      })
-        .then((response) => response.json())
-        .then(({ newRequest, newResponse }) => {
-          const newMapping = {
-            request: newRequest.resJson,
-            response: newResponse.resJson,
-          };
-          setMappings((prevMappings) => [...prevMappings, newMapping]);
-          setRequestData(null); // Reset request data
-          setResponseData(null); // Reset response data
-        })
-        .catch((error) => console.error("Error saving mapping:", error));
+      try {
+        const newMapping = await saveMapping({ request: requestData, response: responseData });
+        setMappings((prevMappings) => [
+          ...prevMappings,
+          { id: newMapping.id, ...newMapping }
+        ]);
+        setRequestData(null); // Reset request data
+        setResponseData(null); // Reset response data
+      } catch (error) {
+        alert("Failed to save mapping. Please try again.");
+      }
     } else {
       alert("Both request and response data are required.");
     }
   };
+
+  const handleDeleteMapping = async (id) => {
+    if (!id) {
+      console.error("Invalid ID for deletion:", id);
+      alert("Failed to delete mapping. Invalid ID.");
+      return;
+    }
+  
+    try {
+      console.log(`Deleting mapping with ID: ${id}`);
+      const success = await deleteMapping(id);
+      if (success) {
+        setMappings((prevMappings) =>
+          prevMappings.filter((mapping) => mapping?.id !== id)
+        );
+        alert("Mapping deleted successfully!");
+      }
+    } catch (error) {
+      alert("Failed to delete mapping. Please try again.");
+    }
+  };
+  
+  
 
   return (
     <Router>
@@ -72,7 +79,7 @@ const App = () => {
         />
         <Route
           path="/mappings"
-          element={<MappingsPage mappings={mappings} />}
+          element={<MappingsPage mappings={mappings} handleDelete={handleDeleteMapping} />}
         />
       </Routes>
     </Router>
