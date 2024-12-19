@@ -1,1 +1,30 @@
-[]
+[
+  {
+    "id": 2,
+    "resJson": {
+      "url": "/user/login",
+      "method": "GET"
+    }
+  },
+  {
+    "id": 3,
+    "resJson": {
+      "url": "/user/login",
+      "method": "GET"
+    }
+  },
+  {
+    "id": 4,
+    "resJson": {
+      "url": "/user/reg",
+      "method": "POST"
+    }
+  },
+  {
+    "id": 5,
+    "resJson": {
+      "url": "/user/login",
+      "method": "POST"
+    }
+  }
+]

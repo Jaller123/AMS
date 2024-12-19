@@ -25,13 +25,17 @@ const App = () => {
   const handleSaveMapping = async () => {
     if (requestData && responseData) {
       try {
-        const newMapping = await saveMapping({ request: requestData, response: responseData });
+        const newMapping = await saveMapping({
+          request: requestData,
+          response: responseData,
+        });
         setMappings((prevMappings) => [
           ...prevMappings,
-          { id: newMapping.id, ...newMapping }
+          { id: newMapping.id, ...newMapping },
         ]);
         setRequestData(null); // Reset request data
         setResponseData(null); // Reset response data
+        alert("Mapping saved successfully");
       } catch (error) {
         alert("Failed to save mapping. Please try again.");
       }
@@ -46,7 +50,7 @@ const App = () => {
       alert("Failed to delete mapping. Invalid ID.");
       return;
     }
-  
+
     try {
       console.log(`Deleting mapping with ID: ${id}`);
       const success = await deleteMapping(id);
@@ -60,12 +64,11 @@ const App = () => {
       alert("Failed to delete mapping. Please try again.");
     }
   };
-  
-  
 
   return (
     <Router>
       <Navbar />
+
       <Routes>
         <Route
           path="/"
@@ -79,7 +82,12 @@ const App = () => {
         />
         <Route
           path="/mappings"
-          element={<MappingsPage mappings={mappings} handleDelete={handleDeleteMapping} />}
+          element={
+            <MappingsPage
+              mappings={mappings}
+              handleDelete={handleDeleteMapping}
+            />
+          }
         />
       </Routes>
     </Router>
