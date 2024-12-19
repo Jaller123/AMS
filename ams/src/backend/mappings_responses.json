@@ -46,5 +46,18 @@
         "message": "Hello"
       }
     }
+  },
+  {
+    "id": 1,
+    "reqId": 1,
+    "resJson": {
+      "status": "200",
+      "headers": {
+        "Content-Type": "text/plain"
+      },
+      "body": {
+        "name": "Ferrooo"
+      }
+    }
   }
 ]

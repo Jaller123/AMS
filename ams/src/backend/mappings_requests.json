@@ -23,5 +23,12 @@
       "url": "user/reg",
       "method": "GET"
     }
+  },
+  {
+    "id": 1,
+    "resJson": {
+      "url": "user/loginnnn",
+      "method": "GET"
+    }
   }
 ]
