@@ -1,15 +1,19 @@
-// src/components/ReqForm.js
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import FormField from "./FormField";
 import styles from "./ReqForm.module.css";
 
 const ReqForm = ({ setRequestData }) => {
-  const [url, setUrl] = React.useState("");
-  const [method, setMethod] = React.useState("GET");
+  const [url, setUrl] = useState("");
+  const [method, setMethod] = useState("GET");
+  const [id, setId] = useState(""); 
 
   useEffect(() => {
-    setRequestData({ url, method });
-  }, [url, method, setRequestData]);
+    const requestData = { url, method };
+    if (method === "DELETE" && id) {
+      requestData.id = id; 
+    }
+    setRequestData(requestData);
+  }, [url, method, id, setRequestData]);
 
   return (
     <section className={styles.section}>
@@ -20,12 +24,27 @@ const ReqForm = ({ setRequestData }) => {
         onChange={setUrl}
         placeholder="Enter the request URL"
       />
-      <FormField
-        label="Method"
-        value={method}
-        onChange={setMethod}
-        type="select"
-      />
+      <div className={styles.formGroup}>
+        <label>Method</label>
+        <select
+          value={method}
+          onChange={(e) => setMethod(e.target.value)}
+          className={styles.input}
+        >
+          <option value="GET">GET</option>
+          <option value="POST">POST</option>
+          <option value="PUT">PUT</option>
+          <option value="DELETE">DELETE</option>
+        </select>
+      </div>
+      {method === "DELETE" && (
+        <FormField
+          label="ID"
+          value={id}
+          onChange={setId}
+          placeholder="Enter the ID to delete"
+        />
+      )}
     </section>
   );
 };
