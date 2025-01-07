@@ -34,15 +34,15 @@
   {
     "id": 6,
     "resJson": {
-      "url": "/user/tja",
-      "method": "GET",
+      "url": "/reg/user",
+      "method": "POST",
       "headers": {
-        "Content-Type": "text/plain"
+        "Content-Type": "application/json"
       },
       "body": {
-        "body": "Hello world"
+        "body": "hello world"
       }
     },
-    "timestamp": "2025-01-07T10:07:34.207Z"
+    "timestamp": "2025-01-07T10:31:08.722Z"
   }
 ]

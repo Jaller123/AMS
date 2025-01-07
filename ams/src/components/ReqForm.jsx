@@ -37,15 +37,6 @@ const ReqForm = ({ setRequestData }) => {
       });
     }
   }, [url, method, headers, body, setRequestData]);
-  const [id, setId] = useState(""); 
-
-  useEffect(() => {
-    const requestData = { url, method };
-    if (method === "DELETE" && id) {
-      requestData.id = id; 
-    }
-    setRequestData(requestData);
-  }, [url, method, id, setRequestData]);
 
   return (
     <section className={styles.section}>
@@ -82,27 +73,6 @@ const ReqForm = ({ setRequestData }) => {
         placeholder='{"key": "value"}'
       />
       {errors.body && <p className={styles.errorText}>Invalid JSON in body.</p>}
-      <div className={styles.formGroup}>
-        <label>Method</label>
-        <select
-          value={method}
-          onChange={(e) => setMethod(e.target.value)}
-          className={styles.input}
-        >
-          <option value="GET">GET</option>
-          <option value="POST">POST</option>
-          <option value="PUT">PUT</option>
-          <option value="DELETE">DELETE</option>
-        </select>
-      </div>
-      {method === "DELETE" && (
-        <FormField
-          label="ID"
-          value={id}
-          onChange={setId}
-          placeholder="Enter the ID to delete"
-        />
-      )}
     </section>
   );
 };

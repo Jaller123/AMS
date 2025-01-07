@@ -55,12 +55,12 @@
     "id": 6,
     "reqId": 6,
     "resJson": {
-      "status": "202",
+      "status": "204",
       "headers": {
         "Content-Type": "application/json"
       },
       "body": {
-        "message": "OKEY"
+        "body": "hello there"
       }
     }
   }
