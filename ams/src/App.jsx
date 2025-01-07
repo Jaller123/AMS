@@ -21,7 +21,7 @@ const App = () => {
   }, []);
 
   const handleSaveMapping = async () => {
-    if (requestData && responseData) {
+    if (requestData) {
       try {
         const newMapping = await saveMapping({
           request: requestData,
@@ -34,13 +34,41 @@ const App = () => {
         setRequestData(null);
         setResponseData(null);
         alert("Mapping saved successfully");
+        if (requestData.method === "DELETE") {
+         
+          if (!requestData.id) {
+            alert("Please enter an ID to delete.");
+            return;
+          }
+          await handleDeleteMapping(requestData.id); 
+        } else if (requestData.method === "PUT") {
+          const updatedMapping = await saveMapping({
+            id: requestData.id,
+            request: requestData,
+            response: responseData,
+          });
+          setMappings((prevMappings) =>
+            prevMappings.map((mapping) =>
+              mapping.id === updatedMapping.id ? updatedMapping : mapping
+            )
+          );
+        } else {
+          const newMapping = await saveMapping({
+            request: requestData,
+            response: responseData,
+          });
+          setMappings((prevMappings) => [...prevMappings, newMapping]);
+        }
+        setRequestData(null);
+        setResponseData(null);
       } catch (error) {
         alert("Failed to save mapping. Please try again.");
       }
     } else {
-      alert("Both request and response data are required.");
+      alert("Request data is required.");
     }
   };
+  
 
   const handleDeleteMapping = async (id) => {
     try {
