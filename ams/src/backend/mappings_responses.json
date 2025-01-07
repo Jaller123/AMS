@@ -3,12 +3,12 @@
     "id": 2,
     "reqId": 2,
     "resJson": {
-      "status": "200",
+      "status": "201",
       "headers": {
         "Content-Type": "text/plain"
       },
       "body": {
-        "message": "ok"
+        "message": "Hello there"
       }
     }
   },
@@ -21,7 +21,7 @@
         "Content-Type": "text/plain"
       },
       "body": {
-        "body": "hello regent"
+        "message": "hello"
       }
     }
   },
@@ -29,12 +29,12 @@
     "id": 4,
     "reqId": 4,
     "resJson": {
-      "status": "200",
+      "status": "201",
       "headers": {
         "Content-Type": "text/plain"
       },
       "body": {
-        "message": "NO"
+        "name": "hello"
       }
     }
   },
@@ -44,10 +44,23 @@
     "resJson": {
       "status": "200",
       "headers": {
+        "Content-Type": "text/plain"
+      },
+      "body": {
+        "message": "OK"
+      }
+    }
+  },
+  {
+    "id": 6,
+    "reqId": 6,
+    "resJson": {
+      "status": "202",
+      "headers": {
         "Content-Type": "application/json"
       },
       "body": {
-        "body": "hello there"
+        "message": "OKEY"
       }
     }
   }

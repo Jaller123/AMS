@@ -15,13 +15,16 @@ const MappingsPage = ({ mappings, handleDelete }) => {
               <pre>{JSON.stringify(mapping.request, null, 2)}</pre>
               <h3>Response</h3>
               <pre>{JSON.stringify(mapping.response, null, 2)}</pre>
+              <p>
+                <strong>Timestamp:</strong>{" "}
+                {mapping.timestamp || "No timestamp available"}
+              </p>
               <button
-  onClick={() => handleDelete(mapping.id)}
-  className={styles.deleteButton}
-    >
-  Delete
-  </button>
-
+                onClick={() => handleDelete(mapping.id)}
+                className={styles.deleteButton}
+              >
+                Delete
+              </button>
             </li>
           ))}
         </ul>

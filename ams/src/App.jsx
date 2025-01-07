@@ -12,7 +12,6 @@ const App = () => {
   const [requestData, setRequestData] = useState(null);
   const [responseData, setResponseData] = useState(null);
 
-  // Fetch existing mappings from the backend
   useEffect(() => {
     const loadMappings = async () => {
       const data = await fetchMappings();
@@ -21,7 +20,6 @@ const App = () => {
     loadMappings();
   }, []);
 
-  // Save new mappings to the backend
   const handleSaveMapping = async () => {
     if (requestData && responseData) {
       try {
@@ -33,8 +31,8 @@ const App = () => {
           ...prevMappings,
           { id: newMapping.id, ...newMapping },
         ]);
-        setRequestData(null); // Reset request data
-        setResponseData(null); // Reset response data
+        setRequestData(null);
+        setResponseData(null);
         alert("Mapping saved successfully");
       } catch (error) {
         alert("Failed to save mapping. Please try again.");
@@ -45,18 +43,11 @@ const App = () => {
   };
 
   const handleDeleteMapping = async (id) => {
-    if (!id) {
-      console.error("Invalid ID for deletion:", id);
-      alert("Failed to delete mapping. Invalid ID.");
-      return;
-    }
-
     try {
-      console.log(`Deleting mapping with ID: ${id}`);
       const success = await deleteMapping(id);
       if (success) {
         setMappings((prevMappings) =>
-          prevMappings.filter((mapping) => mapping?.id !== id)
+          prevMappings.filter((mapping) => mapping.id !== id)
         );
         alert("Mapping deleted successfully!");
       }
@@ -68,25 +59,24 @@ const App = () => {
   return (
     <Router>
       <Navbar />
-
       <Routes>
         <Route
           path="/"
+          element={
+            <MappingsPage
+              mappings={mappings}
+              handleDelete={handleDeleteMapping}
+            />
+          }
+        />
+        <Route
+          path="/mappings"
           element={
             <div>
               <ReqForm setRequestData={setRequestData} />
               <ResForm setResponseData={setResponseData} />
               <Button onClick={handleSaveMapping}>Save Mapping</Button>
             </div>
-          }
-        />
-        <Route
-          path="/mappings"
-          element={
-            <MappingsPage
-              mappings={mappings}
-              handleDelete={handleDeleteMapping}
-            />
           }
         />
       </Routes>
