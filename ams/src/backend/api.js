@@ -4,20 +4,25 @@ export const fetchMappings = async () => {
   try {
     const response = await fetch(`${API_BASE_URL}/mappings`);
     const { requests, responses } = await response.json();
-    return requests.map((req) => {
-      const matchingResponse = responses.find((res) => res.reqId === req.id);
-      return {
+
+    return {
+      requests: requests.map((req) => ({
         id: req.id,
-        request: req.resJson,
-        response: matchingResponse?.resJson || {},
-        timestamp: req.timestamp,
-      };
-    });
+        request: req.resJson, // Ensure `request` matches what the frontend expects
+      })),
+      responses: responses.map((res) => ({
+        id: res.id,
+        reqId: res.reqId,
+        resJson: res.resJson,
+        timestamp: res.timestamp,
+      })),
+    };
   } catch (error) {
     console.error("Error fetching mappings:", error);
-    return [];
+    return { requests: [], responses: [] };
   }
 };
+
 
 export const saveMapping = async (mapping) => {
   try {
