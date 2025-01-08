@@ -19,16 +19,14 @@ const ResForm = ({ setResponseData }) => {
   const [errors, setErrors] = useState({ headers: false, body: false });
 
   useEffect(() => {
-    // Validate headers and body
     const headersValid = isValidJson(headers);
     const bodyValid = isValidJson(body);
 
-    // If valid, update the response data
     if (status && headersValid && bodyValid) {
       setResponseData({
         status,
-        headers: JSON.parse(headers),
-        body: JSON.parse(body),
+        headers: headers ? JSON.parse(headers) : {},
+        body: body ? JSON.parse(body) : {},
       });
       setErrors({ headers: false, body: false });
     } else {

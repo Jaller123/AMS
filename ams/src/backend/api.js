@@ -10,6 +10,7 @@ export const fetchMappings = async () => {
         id: req.id,
         request: req.resJson,
         response: matchingResponse?.resJson || {},
+        timestamp: req.timestamp,
       };
     });
   } catch (error) {
@@ -41,16 +42,16 @@ export const deleteMapping = async (id) => {
   try {
     const response = await fetch(`${API_BASE_URL}/mappings/${id}`, {
       method: "DELETE",
-    })
+    });
     console.log("Response status:", response.status);
     if (!response.ok) {
       throw new Error(`Failed to delete mapping. Status: ${response.status}`);
     }
 
-    const result = await response.json()
-    return result.success
+    const result = await response.json();
+    return result.success;
   } catch (error) {
     console.error("Error deleting mapping:", error);
-    throw error
+    throw error;
   }
-}
+};
