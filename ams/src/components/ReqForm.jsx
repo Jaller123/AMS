@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import FormField from "./FormField";
 import styles from "./ReqForm.module.css";
 
-// Helper function to validate JSON
 const isValidJson = (jsonString) => {
   try {
     JSON.parse(jsonString);
