@@ -32,19 +32,36 @@ app.post("/mappings", (req, res) => {
   const requests = JSON.parse(fs.readFileSync(requestsFile, "utf-8"))
   const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"))
 
-  const newId = getNextId(requests)
+  //existingRequest kollar om request redan finns inann det skickar mapping
+  const existingRequest = requests.find(
+    (req) => JSON.stringify(req.resJson) === JSON.stringify(request)
+  );
 
-  const newRequest = { id: newId, resJson: request }
-  const newResponse = { id: newId, reqId: newId, resJson: response }
+  let requestId
+  if (existingRequest) {
+    //Om det finns, använder den samma ID
+    requestId = existingRequest.id
+  } else {
+    //Ifall det inte finns, lägg till en ny ID
+    requestId = getNextId(requests)
+    requests.push({ id: requestId, resJson: request })
+    fs.writeFileSync(requestsFile, JSON.stringify(requests, null, 2))
+  }
 
-  requests.push(newRequest)
+  //Detta är för att hantera ID Logiken för REQ och RES
+  const matchingResponses = responses.filter((res) => res.reqId === requestId)
+  const responseId = `${requestId}.${matchingResponses.length + 1}` // Skapa en ny decimal för respons ID
+  
+  const newResponse = { id: responseId, reqId: requestId, resJson: response }
   responses.push(newResponse)
 
   fs.writeFileSync(requestsFile, JSON.stringify(requests, null, 2))
   fs.writeFileSync(responseFile, JSON.stringify(responses, null, 2))
 
-  res.json({ success: true, newRequest, newResponse })
+  res.json({ success: true, newRequest: { id: requestId, resJson: request }, newResponse })
 })
+
+
 
 app.delete("/mappings/:id", (req, res) => {
   const { id } = req.params
@@ -56,9 +73,12 @@ app.delete("/mappings/:id", (req, res) => {
 
   const requests = JSON.parse(fs.readFileSync(requestsFile, "utf-8"))
   const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"))
-
-  const updatedRequests = requests.filter((req) => req.id !== parseInt(id, 10))
-  const updatedResponses = responses.filter((res) => res.reqId !== parseInt(id, 10))
+  
+  const updatedResponses = responses.filter((res) => res.id !== id)
+  const remainingResponseIds = updatedResponses.map((res) => res.reqId);
+  const updatedRequests = requests.filter((req) =>
+    remainingResponseIds.includes(req.id)
+  );
 
   fs.writeFileSync(requestsFile, JSON.stringify(updatedRequests, null, 2))
   fs.writeFileSync(responseFile, JSON.stringify(updatedResponses, null, 2))
