@@ -4,6 +4,7 @@ import Navbar from "./components/Navbar";
 import ReqForm from "./components/ReqForm";
 import ResForm from "./components/ResForm";
 import MappingsPage from "./components/MappingsPage";
+import MappingDetailPage from "./components/MappingDetailPage";
 import Button from "./components/Button";
 import { fetchMappings, saveMapping, deleteMapping } from "./backend/api.js";
 
@@ -13,16 +14,14 @@ const App = () => {
   const [requestData, setRequestData] = useState(null);
   const [responseData, setResponseData] = useState(null);
 
-  // Fetch existing mappings and responses from the backend
   useEffect(() => {
     const loadMappingsAndResponses = async () => {
       const data = await fetchMappings();
-      setMappings(data.requests || []); // Ensure it's always an array
-      setResponses(data.responses || []); // Ensure it's always an array
+      setMappings(data.requests || []);
+      setResponses(data.responses || []);
     };
     loadMappingsAndResponses();
   }, []);
-  
 
   const handleSaveMapping = async () => {
     if (requestData && responseData) {
@@ -31,21 +30,26 @@ const App = () => {
           request: requestData,
           response: responseData,
         });
-  
+
         const { id, request, response } = newMapping;
-  
+
         setMappings((prevMappings) => {
-          // Check if the mapping already exists by `id`
           const exists = prevMappings.some((mapping) => mapping.id === id);
           if (exists) return prevMappings;
           return [...prevMappings, { id, request }];
         });
-  
+
         setResponses((prevResponses) => [
           ...prevResponses,
-          { id: `${id}.${prevResponses.filter((r) => r.reqId === id).length + 1}`, reqId: id, resJson: response },
+          {
+            id: `${id}.${
+              prevResponses.filter((r) => r.reqId === id).length + 1
+            }`,
+            reqId: id,
+            resJson: response,
+          },
         ]);
-  
+
         setRequestData(null);
         setResponseData(null);
         alert("Mapping saved successfully");
@@ -57,8 +61,6 @@ const App = () => {
       alert("Both request and response data are required.");
     }
   };
-  
-  
 
   const handleDeleteMapping = async (id) => {
     try {
@@ -73,13 +75,73 @@ const App = () => {
       alert("Failed to delete mapping. Please try again.");
     }
   };
-  
-  
-  
 
-  
-  
-  
+  const handleUpdateMapping = (id, updatedRequest, updatedResponse) => {
+    setMappings((prevMappings) =>
+      prevMappings.map((mapping) =>
+        mapping.id === id ? { ...mapping, request: updatedRequest } : mapping
+      )
+    );
+    setResponses((prevResponses) =>
+      prevResponses.map((response) =>
+        response.reqId === id
+          ? { ...response, resJson: updatedResponse }
+          : response
+      )
+    );
+  };
+
+  const handleUpdateRequest = async (requestId, updatedRequest) => {
+    try {
+      const res = await fetch(`http://localhost:8080/requests/${requestId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ resJson: updatedRequest }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to update request.");
+      }
+
+      const { updatedRequest: updatedRequestFromServer } = await res.json();
+
+      setMappings((prevMappings) =>
+        prevMappings.map((mapping) =>
+          mapping.id === requestId
+            ? { ...mapping, request: updatedRequestFromServer.resJson }
+            : mapping
+        )
+      );
+    } catch (error) {
+      console.error("Error updating request:", error);
+      alert("Failed to update request. Please try again.");
+    }
+  };
+
+  const handleUpdateResponse = async (responseId, updatedResponse) => {
+    try {
+      const res = await fetch(`http://localhost:8080/responses/${responseId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ resJson: updatedResponse }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to update response.");
+      }
+
+      const { updatedResponse: updatedResponseFromServer } = await res.json();
+
+      setResponses((prevResponses) =>
+        prevResponses.map((response) =>
+          response.id === responseId ? updatedResponseFromServer : response
+        )
+      );
+    } catch (error) {
+      console.error("Error updating response:", error);
+      alert("Failed to update response. Please try again.");
+    }
+  };
 
   return (
     <Router>
@@ -103,6 +165,19 @@ const App = () => {
               <ResForm setResponseData={setResponseData} />
               <Button onClick={handleSaveMapping}>Save Mapping</Button>
             </div>
+          }
+        />
+        <Route
+          path="/mapping/:mappingId"
+          element={
+            <MappingDetailPage
+              mappings={mappings}
+              responses={responses}
+              handleUpdate={handleUpdateMapping}
+              handleUpdateRequest={handleUpdateRequest}
+              handleUpdateResponse={handleUpdateResponse}
+              handleDelete={handleDeleteMapping}
+            />
           }
         />
       </Routes>

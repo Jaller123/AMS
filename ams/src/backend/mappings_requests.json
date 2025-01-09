@@ -1,8 +1,8 @@
 [
   {
-    "id": 1,
+    "id": "1",
     "resJson": {
-      "url": "/user",
+      "url": "/login",
       "method": "GET",
       "headers": {
         "Content-Type": "text/plain"
@@ -13,4 +13,3 @@
     }
   }
 ]
-[]

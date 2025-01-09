@@ -15,45 +15,45 @@ const __dirname = path.dirname(__filename);
 const requestsFile = path.join(__dirname, "./mappings_requests.json");
 const responseFile = path.join(__dirname, "./mappings_responses.json");
 
+// Helper för nästa ID
 const getNextId = (mappings) => {
-  if (mappings.length === 0) return 1;
-  const maxId = Math.max(...mappings.map((item) => item.id));
-  return maxId + 1;
+  if (mappings.length === 0) return "1"; // Return as string
+  const maxId = Math.max(...mappings.map((item) => parseInt(item.id, 10)));
+  return String(maxId + 1); // Increment and return as string
 };
 
+// Hämta alla mappings
 app.get("/mappings", (req, res) => {
   const requests = JSON.parse(fs.readFileSync(requestsFile, "utf-8"));
   const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"));
   res.json({ requests, responses });
 });
 
+// Skapa ny mapping
 app.post("/mappings", (req, res) => {
   const { request, response } = req.body;
 
   const requests = JSON.parse(fs.readFileSync(requestsFile, "utf-8"));
   const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"));
 
-  // Check if the request already exists
+  // Kontrollera om request redan finns
   const existingRequest = requests.find(
     (req) => JSON.stringify(req.resJson) === JSON.stringify(request)
   );
 
   let requestId;
   if (existingRequest) {
-    // Use existing ID if found
     requestId = existingRequest.id;
   } else {
-    // Add a new request if it doesn't exist
     requestId = getNextId(requests);
     requests.push({ id: requestId, resJson: request });
     fs.writeFileSync(requestsFile, JSON.stringify(requests, null, 2));
   }
 
-  // Create a new response ID
+  // Skapa nytt response-ID
   const matchingResponses = responses.filter((res) => res.reqId === requestId);
   const responseId = `${requestId}.${matchingResponses.length + 1}`;
 
-  // Create and add new response
   const timestamp = new Date().toLocaleString("sv-SE", {
     timeZone: "Europe/Stockholm",
   });
@@ -75,22 +75,75 @@ app.post("/mappings", (req, res) => {
   });
 });
 
+// Uppdatera en request
+app.put("/requests/:id", (req, res) => {
+  const { id } = req.params;
+  const { resJson } = req.body;
+
+  if (!id || !resJson) {
+    return res
+      .status(400)
+      .json({ success: false, message: "ID and request data are required." });
+  }
+
+  const requests = JSON.parse(fs.readFileSync(requestsFile, "utf-8"));
+  const requestIndex = requests.findIndex(
+    (req) => String(req.id) === String(id)
+  );
+
+  if (requestIndex === -1) {
+    return res
+      .status(404)
+      .json({ success: false, message: "Request not found." });
+  }
+
+  // Uppdatera requesten
+  requests[requestIndex].resJson = resJson;
+  fs.writeFileSync(requestsFile, JSON.stringify(requests, null, 2));
+
+  res.json({ success: true, updatedRequest: requests[requestIndex] });
+});
+
+// Uppdatera en respons
+app.put("/responses/:id", (req, res) => {
+  const { id } = req.params;
+  const { resJson } = req.body;
+
+  if (!id || !resJson) {
+    return res
+      .status(400)
+      .json({ success: false, message: "ID and response data are required." });
+  }
+
+  const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"));
+  const responseIndex = responses.findIndex((res) => res.id === id);
+
+  if (responseIndex === -1) {
+    return res
+      .status(404)
+      .json({ success: false, message: "Response not found." });
+  }
+
+  // Uppdatera responsen
+  responses[responseIndex].resJson = resJson;
+  fs.writeFileSync(responseFile, JSON.stringify(responses, null, 2));
+
+  res.json({ success: true, updatedResponse: responses[responseIndex] });
+});
+
+// Ta bort mapping
 app.delete("/mappings/:id", (req, res) => {
   const { id } = req.params;
   if (!id) {
     return res.status(400).json({ success: false, message: "Invalid ID" });
   }
 
-  console.log(`Deleting mapping with ID: ${id}`);
-
   const requests = JSON.parse(fs.readFileSync(requestsFile, "utf-8"));
   const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"));
 
-  // Filter out the responses and requests
-  const updatedResponses = responses.filter((res) => res.reqId !== parseInt(id, 10));
-  const remainingResponseIds = updatedResponses.map((res) => res.reqId);
-  const updatedRequests = requests.filter((req) =>
-    remainingResponseIds.includes(req.id)
+  const updatedResponses = responses.filter((res) => res.reqId !== id);
+  const updatedRequests = requests.filter(
+    (req) => !updatedResponses.find((res) => res.reqId === req.id)
   );
 
   fs.writeFileSync(requestsFile, JSON.stringify(updatedRequests, null, 2));

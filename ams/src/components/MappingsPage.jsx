@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./MappingsPage.module.css";
 
 const MappingsPage = ({ mappings = [], responses = [], handleDelete }) => {
   const [selectedResponses, setSelectedResponses] = useState({});
+  const navigate = useNavigate();
 
-  // Reinitialize `selectedResponses` whenever `mappings` or `responses` change
   useEffect(() => {
     const initialSelections = {};
     mappings.forEach((mapping) => {
@@ -23,6 +24,10 @@ const MappingsPage = ({ mappings = [], responses = [], handleDelete }) => {
       ...prev,
       [reqId]: responseId,
     }));
+  };
+
+  const goToDetails = (mappingId) => {
+    navigate(`/mapping/${mappingId}`);
   };
 
   return (
@@ -76,6 +81,12 @@ const MappingsPage = ({ mappings = [], responses = [], handleDelete }) => {
                 ) : (
                   <pre>No responses</pre>
                 )}
+                <button
+                  onClick={() => goToDetails(mapping.id)}
+                  className={styles.detailsButton}
+                >
+                  View Details
+                </button>
                 <button
                   onClick={() => handleDelete(mapping.id)}
                   className={styles.deleteButton}
