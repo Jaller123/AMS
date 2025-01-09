@@ -1,2 +1,15 @@
-
-[]
+[
+  {
+    "id": 1,
+    "resJson": {
+      "url": "/user",
+      "method": "GET",
+      "headers": {
+        "Content-Type": "text/plain"
+      },
+      "body": {
+        "body": "req1"
+      }
+    }
+  }
+]
