@@ -46,6 +46,12 @@ const MappingsPage = ({ mappings = [], responses = [], handleDelete }) => {
               <li key={index} className={styles.mappingItem}>
                 <h3>Request</h3>
                 <pre>{JSON.stringify(mapping.request, null, 2)}</pre>
+                <button
+                  onClick={() => navigate(`/request/${mapping.id}`)}
+                  className={styles.detailsButton}
+                >
+                  View Request
+                </button>
                 <h3>Response</h3>
                 {relevantResponses.length > 0 ? (
                   <div>

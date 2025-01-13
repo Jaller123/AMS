@@ -5,6 +5,7 @@ import ReqForm from "./components/ReqForm";
 import ResForm from "./components/ResForm";
 import MappingsPage from "./components/MappingsPage";
 import MappingDetailPage from "./components/MappingDetailPage";
+import ReqDetailPage from "./components/ReqDetailPage";
 import Button from "./components/Button";
 import { fetchMappings, saveMapping, deleteMapping } from "./backend/api.js";
 
@@ -22,6 +23,17 @@ const App = () => {
     };
     loadMappingsAndResponses();
   }, []);
+
+  const handleSaveResponse = (reqId, newResponse) => {
+    const updatedResponse = {
+      id: `${reqId}.${responses.filter((res) => res.reqId === reqId).length + 1}`,
+      reqId,
+      resJson: newResponse,
+      timestamp: new Date().toISOString(),
+    };
+  
+    setResponses((prevResponses) => [...prevResponses, updatedResponse]);
+  };
 
   const handleSaveMapping = async () => {
     if (requestData && responseData) {
@@ -167,20 +179,26 @@ const App = () => {
             </div>
           }
         />
-        <Route
-          path="/mapping/:mappingId"
-          element={
-            <MappingDetailPage
-              mappings={mappings}
-              responses={responses}
-              handleUpdate={handleUpdateMapping}
-              handleUpdateRequest={handleUpdateRequest}
-              handleUpdateResponse={handleUpdateResponse}
-              handleDelete={handleDeleteMapping}
-            />
-          }
+      <Route
+      path="/mapping/:mappingId"
+      element={
+        <MappingDetailPage
+          mappings={mappings}
+          responses={responses}
+          handleUpdateMapping={handleUpdateMapping}
         />
-      </Routes>
+      }
+    />
+    <Route
+      path="/request/:mappingId"
+      element={
+        <ReqDetailPage
+          mappings={mappings}
+          handleSaveResponse={handleSaveResponse}
+        />
+      }
+    />
+  </Routes>
     </Router>
   );
 };
