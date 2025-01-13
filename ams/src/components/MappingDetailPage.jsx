@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import styles from "./MappingDetailPage.module.css";
 
@@ -12,36 +12,44 @@ const MappingDetailPage = ({
   const { mappingId } = useParams();
   const navigate = useNavigate();
 
-  const mapping = mappings.find((m) => String(m.id) === String(mappingId));
+  const mapping = mappings.find((m) => String(m.id) === String(mappingId)) || null;
   const relevantResponses = responses.filter(
     (res) => String(res.reqId) === String(mappingId)
   );
 
-  if (!mapping) {
-    return <p>No mapping found for ID: {mappingId}</p>;
-  }
-
-  const [selectedResponse, setSelectedResponse] = useState(
-    relevantResponses.length > 0 ? relevantResponses[0] : null
-  );
-
-  // States for editing request and response
+  const [selectedResponse, setSelectedResponse] = useState(null);
   const [isEditingRequest, setIsEditingRequest] = useState(false);
-  const [editedRequest, setEditedRequest] = useState(mapping.request);
-
+  const [editedRequest, setEditedRequest] = useState("");
   const [isEditingResponse, setIsEditingResponse] = useState(false);
-  const [editedResponse, setEditedResponse] = useState(
-    selectedResponse ? selectedResponse.resJson : null
-  );
+  const [editedResponse, setEditedResponse] = useState("");
+
+  // Initialize state values on the first render or when mappingId changes
+  useEffect(() => {
+    if (mapping) {
+      setEditedRequest((prev) => prev || JSON.stringify(mapping.request, null, 2));
+    }
+    if (relevantResponses.length > 0) {
+      setSelectedResponse((prev) => prev || relevantResponses[0]);
+      setEditedResponse(
+        (prev) =>
+          prev || JSON.stringify(relevantResponses[0]?.resJson || {}, null, 2)
+      );
+    }
+  }, [mapping, relevantResponses]);
 
   const handleEditRequestClick = () => {
     setIsEditingRequest(true);
   };
 
   const handleSaveRequestClick = () => {
-    handleUpdateRequest(mapping.id, editedRequest);
-    setIsEditingRequest(false);
-    alert("Request updated successfully!");
+    try {
+      const parsedRequest = JSON.parse(editedRequest);
+      handleUpdateRequest(mapping.id, parsedRequest);
+      setIsEditingRequest(false);
+      alert("Request updated successfully!");
+    } catch {
+      alert("Invalid JSON format in the request.");
+    }
   };
 
   const handleEditResponseClick = () => {
@@ -49,10 +57,15 @@ const MappingDetailPage = ({
   };
 
   const handleSaveResponseClick = () => {
-    if (selectedResponse && editedResponse) {
-      handleUpdateResponse(selectedResponse.id, editedResponse);
-      setIsEditingResponse(false);
-      alert("Response updated successfully!");
+    try {
+      const parsedResponse = JSON.parse(editedResponse);
+      if (selectedResponse) {
+        handleUpdateResponse(selectedResponse.id, parsedResponse);
+        setIsEditingResponse(false);
+        alert("Response updated successfully!");
+      }
+    } catch {
+      alert("Invalid JSON format in the response.");
     }
   };
 
@@ -60,6 +73,10 @@ const MappingDetailPage = ({
     handleDelete(mappingId);
     navigate("/");
   };
+
+  if (!mapping) {
+    return <p>No mapping found for ID: {mappingId}</p>;
+  }
 
   return (
     <div className={styles.container}>
@@ -69,8 +86,8 @@ const MappingDetailPage = ({
         {isEditingRequest ? (
           <textarea
             className={styles.textarea}
-            value={JSON.stringify(editedRequest, null, 2)}
-            onChange={(e) => setEditedRequest(JSON.parse(e.target.value))}
+            value={editedRequest}
+            onChange={(e) => setEditedRequest(e.target.value)} // Allow free typing
           />
         ) : (
           <pre>{JSON.stringify(mapping.request, null, 2)}</pre>
@@ -89,8 +106,8 @@ const MappingDetailPage = ({
         {isEditingResponse ? (
           <textarea
             className={styles.textarea}
-            value={JSON.stringify(editedResponse, null, 2)}
-            onChange={(e) => setEditedResponse(JSON.parse(e.target.value))}
+            value={editedResponse}
+            onChange={(e) => setEditedResponse(e.target.value)} // Allow free typing
           />
         ) : (
           <pre>{JSON.stringify(selectedResponse?.resJson, null, 2)}</pre>

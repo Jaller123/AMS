@@ -26,5 +26,19 @@
       }
     },
     "timestamp": "2025-01-10 10:44:11"
+  },
+  {
+    "id": "2.1",
+    "reqId": "2",
+    "resJson": {
+      "status": "200",
+      "headers": {
+        "Content-Type": "text/plain"
+      },
+      "body": {
+        "body": "hello world"
+      }
+    },
+    "timestamp": "2025-01-13T14:22:57.292Z"
   }
 ]
