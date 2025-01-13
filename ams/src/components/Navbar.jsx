@@ -1,17 +1,18 @@
 import React from "react";
 import { Link } from "react-router-dom"; // Använd Link istället för <a>
 import styles from "./Navbar.module.css";
+import logo from "../assets/AMSlogo.png";
 
 const Navbar = () => {
   return (
     <nav className={styles.navbar}>
-      <div className={styles.navbarBrand}>AMS</div>
+      <div className={styles.navbarBrand}><img src={logo} alt="AMS" className={styles.logo} /></div>
       <ul className={styles.navbarMenu}>
         <li className={styles.menuItem}>
-          <Link to="/">Home</Link> {/* Länk till startsidan */}
+          <Link to="/" className={styles.link}>Home</Link> {/* Länk till startsidan */}
         </li>
         <li className={styles.menuItem}>
-          <Link to="/mappings">Mappings</Link> {/* Länk till mappningar */}
+          <Link to="/mappings" className={styles.link}>Mappings</Link> {/* Länk till mappningar */}
         </li>
       </ul>
     </nav>
