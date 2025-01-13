@@ -1,14 +1,14 @@
 [
   {
-    "id": "1",
+    "id": "2",
     "resJson": {
-      "url": "/login",
-      "method": "GET",
+      "url": "/login/user",
+      "method": "POST",
       "headers": {
-        "Content-Type": "text/plain"
+        "Content-Type": "req5"
       },
       "body": {
-        "body": "req1"
+        "body": "hello world"
       }
     }
   }
