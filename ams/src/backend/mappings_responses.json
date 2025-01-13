@@ -14,20 +14,6 @@
     "timestamp": "2025-01-10 10:24:24"
   },
   {
-    "id": "2.1",
-    "reqId": "2",
-    "resJson": {
-      "status": "200",
-      "headers": {
-        "Content-Type": "req5"
-      },
-      "body": {
-        "body": "OK"
-      }
-    },
-    "timestamp": "2025-01-10 10:42:49"
-  },
-  {
     "id": "1.2",
     "reqId": "1",
     "resJson": {

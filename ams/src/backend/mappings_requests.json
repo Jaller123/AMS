@@ -1,18 +1,5 @@
 [
   {
-    "id": "1",
-    "resJson": {
-      "url": "/login",
-      "method": "GET",
-      "headers": {
-        "Content-Type": "text/plain"
-      },
-      "body": {
-        "body": "hello world"
-      }
-    }
-  },
-  {
     "id": "2",
     "resJson": {
       "url": "/login/user",
