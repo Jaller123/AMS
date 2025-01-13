@@ -8,7 +8,20 @@
         "Content-Type": "text/plain"
       },
       "body": {
-        "body": "req1"
+        "body": "hello world"
+      }
+    }
+  },
+  {
+    "id": "2",
+    "resJson": {
+      "url": "/login/user",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "req5"
+      },
+      "body": {
+        "body": "hello world"
       }
     }
   }
