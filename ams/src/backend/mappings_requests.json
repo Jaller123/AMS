@@ -5,7 +5,7 @@
       "url": "/login/user",
       "method": "POST",
       "headers": {
-        "Content-Type": "req5"
+        "Content-Type": "text/plain"
       },
       "body": {
         "body": "hello world"

@@ -43,6 +43,26 @@ export const saveMapping = async (mapping) => {
   }
 };
 
+export const saveResponse = async (response) => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/responses`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(response),
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to save the response.");
+    }
+
+    const data = await res.json();
+    return data.newResponse;
+  } catch (error) {
+    console.error("Error saving response:", error);
+    throw error;
+  }
+};
+
 export const deleteMapping = async (id) => {
   try {
     const response = await fetch(`${API_BASE_URL}/mappings/${id}`, {
@@ -57,6 +77,44 @@ export const deleteMapping = async (id) => {
     return result.success;
   } catch (error) {
     console.error("Error deleting mapping:", error);
+    throw error;
+  }
+};
+
+export const updateRequest = async (requestId, updatedRequest) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/requests/${requestId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ resJson: updatedRequest }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to update request.");
+    }
+
+    return await response.json(); // Return updated request
+  } catch (error) {
+    console.error("Error updating request:", error);
+    throw error;
+  }
+};
+
+export const updateResponse = async (responseId, updatedResponse) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/responses/${responseId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ resJson: updatedResponse }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to update response.");
+    }
+
+    return await response.json(); // Return updated response
+  } catch (error) {
+    console.error("Error updating response:", error);
     throw error;
   }
 };

@@ -75,6 +75,33 @@ app.post("/mappings", (req, res) => {
   });
 });
 
+app.post("/responses", (req, res) => {
+  const { reqId, resJson, timestamp } = req.body;
+
+  if (!reqId || !resJson) {
+    return res.status(400).json({ success: false, message: "Invalid data." });
+  }
+
+  const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"));
+
+  // Skapa ny Response ID
+  const matchingResponses = responses.filter((response) => response.reqId === reqId);
+  const responseId = `${reqId}.${matchingResponses.length + 1}`;
+
+  const newResponse = {
+    id: responseId,
+    reqId,
+    resJson,
+    timestamp,
+  };
+
+  responses.push(newResponse);
+
+  fs.writeFileSync(responseFile, JSON.stringify(responses, null, 2));
+
+  res.json({ success: true, newResponse });
+});
+
 // Uppdatera en request
 app.put("/requests/:id", (req, res) => {
   const { id } = req.params;

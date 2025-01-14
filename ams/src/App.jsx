@@ -7,7 +7,7 @@ import MappingsPage from "./components/MappingsPage";
 import MappingDetailPage from "./components/MappingDetailPage";
 import ReqDetailPage from "./components/ReqDetailPage";
 import Button from "./components/Button";
-import { fetchMappings, saveMapping, deleteMapping } from "./backend/api.js";
+import { fetchMappings, saveMapping, deleteMapping, saveResponse } from "./backend/api.js";
 
 const App = () => {
   const [mappings, setMappings] = useState([]);
@@ -24,15 +24,21 @@ const App = () => {
     loadMappingsAndResponses();
   }, []);
 
-  const handleSaveResponse = (reqId, newResponse) => {
-    const updatedResponse = {
-      id: `${reqId}.${responses.filter((res) => res.reqId === reqId).length + 1}`,
+  const handleSaveResponse = async (reqId, newResponse) => {
+    const responseToSave = {
       reqId,
       resJson: newResponse,
       timestamp: new Date().toISOString(),
     };
   
-    setResponses((prevResponses) => [...prevResponses, updatedResponse]);
+    try {
+      const savedResponse = await saveResponse(responseToSave);
+      setResponses((prevResponses) => [...prevResponses, savedResponse]);
+      alert("Response saved successfully!");
+    } catch (error) {
+      console.error("Failed to save response:", error);
+      alert("Failed to save response. Please try again.");
+    }
   };
 
   const handleSaveMapping = async () => {
@@ -179,26 +185,29 @@ const App = () => {
             </div>
           }
         />
-      <Route
-      path="/mapping/:mappingId"
-      element={
-        <MappingDetailPage
-          mappings={mappings}
-          responses={responses}
-          handleUpdateMapping={handleUpdateMapping}
+  <Route
+          path="/mapping/:mappingId"
+          element={
+            <MappingDetailPage
+              mappings={mappings}
+              responses={responses}
+              handleUpdate={handleUpdateMapping}
+              handleUpdateRequest={handleUpdateRequest}
+              handleUpdateResponse={handleUpdateResponse}
+              handleDelete={handleDeleteMapping}
+            />
+          }
         />
-      }
-    />
-    <Route
-      path="/request/:mappingId"
-      element={
-        <ReqDetailPage
-          mappings={mappings}
-          handleSaveResponse={handleSaveResponse}
+        <Route
+          path="/request/:mappingId"
+          element={
+            <ReqDetailPage
+              mappings={mappings}
+              handleSaveResponse={handleSaveResponse}
+            />
+          }
         />
-      }
-    />
-  </Routes>
+      </Routes>
     </Router>
   );
 };
