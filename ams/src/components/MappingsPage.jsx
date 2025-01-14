@@ -32,6 +32,7 @@ const MappingsPage = ({
         url: mapping.request.url || "",
         headers: JSON.stringify(mapping.request.headers || {}, null, 2),
         body: JSON.stringify(mapping.request.body || {}, null, 2),
+        title: mapping.request.title || "", 
       };
 
       if (relevantResponses.length > 0) {
@@ -73,6 +74,7 @@ const MappingsPage = ({
   const saveEditedRequest = (reqId) => {
     try {
       const updatedRequest = {
+        title: editedRequests[reqId].title,
         url: editedRequests[reqId].url,
         headers: editedRequests[reqId].headers
           ? JSON.parse(editedRequests[reqId].headers)
@@ -145,7 +147,17 @@ const MappingsPage = ({
 
             return (
               <li key={index} className={styles.mappingItem}>
-                <h3>Request</h3>
+               <h3>Request</h3>
+              <div>
+                 <strong>Titel:</strong> {editedRequest.title}
+                  <pre>{JSON.stringify(
+                 (({ title, ...rest }) => rest)(mapping.request), 
+                   null, 
+                  2
+                 )}</pre>
+                </div>
+
+
                 {isEditingRequest[mapping.id] ? (
                   <div>
                     <label>URL</label>
@@ -179,7 +191,6 @@ const MappingsPage = ({
                   </div>
                 ) : (
                   <div>
-                    <pre>{JSON.stringify(mapping.request, null, 2)}</pre>
                     <button
                       onClick={() =>
                         setIsEditingRequest((prev) => ({ ...prev, [mapping.id]: true }))
