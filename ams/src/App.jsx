@@ -111,18 +111,18 @@ const App = () => {
 
   const handleUpdateRequest = async (requestId, updatedRequest) => {
     try {
-      const res = await fetch(`http://localhost:8080/requests/${requestId}`, {
+      const response = await fetch(`http://localhost:8080/requests/${requestId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ resJson: updatedRequest }),
       });
-
-      if (!res.ok) {
+  
+      if (!response.ok) {
         throw new Error("Failed to update request.");
       }
-
-      const { updatedRequest: updatedRequestFromServer } = await res.json();
-
+  
+      const { updatedRequest: updatedRequestFromServer } = await response.json();
+  
       setMappings((prevMappings) =>
         prevMappings.map((mapping) =>
           mapping.id === requestId
@@ -135,6 +135,7 @@ const App = () => {
       alert("Failed to update request. Please try again.");
     }
   };
+  
 
   const handleUpdateResponse = async (responseId, updatedResponse) => {
     try {
@@ -159,6 +160,7 @@ const App = () => {
       console.error("Error updating response:", error);
       alert("Failed to update response. Please try again.");
     }
+    
   };
 
   return (
@@ -172,6 +174,8 @@ const App = () => {
               mappings={mappings}
               responses={responses}
               handleDelete={handleDeleteMapping}
+              handleUpdateRequest={handleUpdateRequest}
+              handleUpdateResponse={handleUpdateResponse}
             />
           }
         />
@@ -192,8 +196,6 @@ const App = () => {
               mappings={mappings}
               responses={responses}
               handleUpdate={handleUpdateMapping}
-              handleUpdateRequest={handleUpdateRequest}
-              handleUpdateResponse={handleUpdateResponse}
               handleDelete={handleDeleteMapping}
             />
           }
