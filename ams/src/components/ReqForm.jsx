@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import FormField from "./FormField";
 import styles from "./ReqForm.module.css";
 
+// Kontrollera om en sträng är ett giltigt JSON-objekt
 const isValidJson = (jsonString) => {
   try {
     JSON.parse(jsonString);
@@ -16,14 +17,17 @@ const ReqForm = ({ setRequestData }) => {
   const [method, setMethod] = useState("GET");
   const [headers, setHeaders] = useState("");
   const [body, setBody] = useState("");
+  const [title, setTitle] = useState(""); // Titel state
   const [errors, setErrors] = useState({ headers: false, body: false });
 
+  // Uppdatera JSON-datan när något ändras
   useEffect(() => {
     const headersValid = isValidJson(headers);
     const bodyValid = isValidJson(body);
 
-    if (headersValid && bodyValid) {
+    if (headersValid && bodyValid && title) {
       setRequestData({
+        title, // Lägg till titel till JSON
         url,
         method,
         headers: headers ? JSON.parse(headers) : {},
@@ -35,11 +39,18 @@ const ReqForm = ({ setRequestData }) => {
         body: !bodyValid,
       });
     }
-  }, [url, method, headers, body, setRequestData]);
+  }, [title, url, method, headers, body, setRequestData]);
 
   return (
     <section className={styles.section}>
       <h2>Request</h2>
+      {/* Lägg till inputfält för titel */}
+      <FormField
+        label="Titel"
+        value={title}
+        onChange={setTitle} // Fyller på med inputfält för titel
+        placeholder="Enter request title"
+      />
       <FormField
         label="URL"
         value={url}
