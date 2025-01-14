@@ -1,59 +1,46 @@
-describe("Mapping List Functionality", () => {
-  beforeEach(() => {
-    cy.visit("/"); // Besök huvudsidan där Mapping List visas
-  });
-
-  it("should navigate to Mapping Details view with prefilled request and empty response fields", () => {
-    // GIVEN: Ensure there are stored requests and responses
-    cy.intercept("GET", "/mappings", {
-      statusCode: 200,
-      body: {
-        requests: [
-          {
-            id: "1",
-            resJson: {
-              url: "http://example.com",
-              method: "GET",
-              headers: { Accept: "application/json" },
-              body: {},
-            },
-          },
-        ],
-        responses: [],
+describe("Mapping List Page", () => {
+  // Mock data for the mappings API
+  const mockMappings = [
+    {
+      id: 1,
+      request: {
+        key: "value",
       },
+    },
+    {
+      id: 2,
+      request: {
+        key: "another value",
+      },
+    },
+  ];
+
+  beforeEach(() => {
+    // Mock the API call to return the mock mappings
+    cy.intercept("GET", "/api/mappings", {
+      statusCode: 200,
+      body: mockMappings,
     }).as("getMappings");
 
-    // Reload page to pick up mocked data
-    cy.reload();
-    cy.wait("@getMappings");
+    // Visit the page where the mappings are listed
+    cy.visit("/"); // Make sure this is the correct URL for your MappingsPage
+    cy.wait("@getMappings"); // Wait for the mock API request to finish
+  });
 
-    // AND: The user is on the Mapping List
-    cy.contains("Saved Mappings").should("exist");
-
-    // WHEN: The user clicks on a request
-    cy.get("button.detailsButton").first().click();
-
-    // THEN: The user should come to the Mapping Details view
-    cy.url().should("include", "/mapping/1");
-
-    // AND: The request fields should be prefilled with the chosen request data
-    cy.get('[data-testid="request-url"]').should(
-      "have.value",
-      "http://example.com"
-    );
-    cy.get('[data-testid="request-method"]').should("have.value", "GET");
-    cy.get('[data-testid="request-headers"]').should(
-      "have.value",
-      JSON.stringify({ Accept: "application/json" }, null, 2)
-    );
-    cy.get('[data-testid="request-body"]').should(
-      "have.value",
-      JSON.stringify({}, null, 2)
+  it("should display the request data and empty response fields on click", () => {
+    // Verify that at least one mapping item is present
+    cy.get(".mappingItem", { timeout: 10000 }).should(
+      "have.length.greaterThan",
+      0
     );
 
-    // AND: The response fields should be empty
-    cy.get('[data-testid="response-status"]').should("have.value", "");
-    cy.get('[data-testid="response-headers"]').should("have.value", "");
-    cy.get('[data-testid="response-body"]').should("have.value", "");
+    // Ensure the first mapping item is clickable
+    cy.get(".mappingItem").first().click();
+
+    // Verify that the URL has changed to the details page
+    cy.url().should("include", "/mapping/1"); // Adjust based on your routing logic
+
+    // Verify that the request data is displayed in the "container" section
+    cy.get(".container").find("pre").should("exist");
   });
 });

@@ -7,7 +7,8 @@ const ReqDetailPage = ({ mappings, handleSaveResponse }) => {
   const navigate = useNavigate();
 
   // Find the specific request using the mapping ID
-  const mapping = mappings.find((m) => String(m.id) === String(mappingId)) || null;
+  const mapping =
+    mappings.find((m) => String(m.id) === String(mappingId)) || null;
 
   if (!mapping) {
     return <p>No request found for ID: {mappingId}</p>;
@@ -16,8 +17,8 @@ const ReqDetailPage = ({ mappings, handleSaveResponse }) => {
   // State for creating a new response
   const [newResponse, setNewResponse] = useState({
     status: "",
-    headers: "{}",
-    body: "{}",
+    headers: "",
+    body: "",
   });
 
   const handleSaveNewResponse = () => {
@@ -40,54 +41,54 @@ const ReqDetailPage = ({ mappings, handleSaveResponse }) => {
 
   return (
     <div className={styles.container}>
-    <h2>Request Details</h2>
-    <div>
-      <h3>Request</h3>
-      <pre>{JSON.stringify(mapping.request, null, 2)}</pre>
-    </div>
+      <h2>Request Details</h2>
+      <div>
+        <h3>Request</h3>
+        <pre>{JSON.stringify(mapping.request, null, 2)}</pre>
+      </div>
 
-    <div className={styles.formContainer}>
-      <h3>Create a New Response</h3>
-      <div className={styles.inputGroup}>
-        <label>Status</label>
-        <input
-          type="text"
-          value={newResponse.status}
-          onChange={(e) =>
-            setNewResponse((prev) => ({ ...prev, status: e.target.value }))
-          }
-          placeholder="e.g., 200"
-        />
+      <div className={styles.formContainer}>
+        <h3>Create a New Response</h3>
+        <div className={styles.inputGroup}>
+          <label>Status</label>
+          <input
+            type="text"
+            value={newResponse.status}
+            onChange={(e) =>
+              setNewResponse((prev) => ({ ...prev, status: e.target.value }))
+            }
+            placeholder="e.g., 200"
+          />
+        </div>
+        <div className={styles.inputGroup}>
+          <label>Headers (JSON format)</label>
+          <textarea
+            value={newResponse.headers}
+            onChange={(e) =>
+              setNewResponse((prev) => ({ ...prev, headers: e.target.value }))
+            }
+            placeholder='{"Content-Type": "application/json"}'
+          />
+        </div>
+        <div className={styles.inputGroup}>
+          <label>Body (JSON format)</label>
+          <textarea
+            value={newResponse.body}
+            onChange={(e) =>
+              setNewResponse((prev) => ({ ...prev, body: e.target.value }))
+            }
+            placeholder='{"key": "value"}'
+          />
+        </div>
+        <button onClick={handleSaveNewResponse} className={styles.saveButton}>
+          Save Response
+        </button>
       </div>
-      <div className={styles.inputGroup}>
-        <label>Headers (JSON format)</label>
-        <textarea
-          value={newResponse.headers}
-          onChange={(e) =>
-            setNewResponse((prev) => ({ ...prev, headers: e.target.value }))
-          }
-          placeholder='{"Content-Type": "application/json"}'
-        />
-      </div>
-      <div className={styles.inputGroup}>
-        <label>Body (JSON format)</label>
-        <textarea
-          value={newResponse.body}
-          onChange={(e) =>
-            setNewResponse((prev) => ({ ...prev, body: e.target.value }))
-          }
-          placeholder='{"key": "value"}'
-        />
-      </div>
-      <button onClick={handleSaveNewResponse} className={styles.saveButton}>
-        Save Response
+
+      <button onClick={() => navigate("/")} className={styles.backButton}>
+        Back to Mappings
       </button>
     </div>
-
-    <button onClick={() => navigate("/")} className={styles.backButton}>
-      Back to Mappings
-    </button>
-  </div>
   );
 };
 

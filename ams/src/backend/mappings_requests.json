@@ -11,5 +11,18 @@
         "body": "hello world"
       }
     }
+  },
+  {
+    "id": "3",
+    "resJson": {
+      "url": "/login",
+      "method": "GET",
+      "headers": {
+        "Content-Type": "text/plain"
+      },
+      "body": {
+        "text": "Hello world"
+      }
+    }
   }
 ]
