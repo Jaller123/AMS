@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import styles from "./MappingDetailPage.module.css";
 
 const MappingDetailPage = ({
@@ -11,12 +11,15 @@ const MappingDetailPage = ({
 }) => {
   const { mappingId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+
 
   const mapping = mappings.find((m) => String(m.id) === String(mappingId)) || null;
   const relevantResponses = responses.filter(
     (res) => String(res.reqId) === String(mappingId)
   );
 
+  const initialSelectedResponseId = location.state?.selectedResponseId || null;
   const [selectedResponse, setSelectedResponse] = useState(null);
   const [isEditingRequest, setIsEditingRequest] = useState(false);
   const [editedRequest, setEditedRequest] = useState("");
@@ -28,14 +31,21 @@ const MappingDetailPage = ({
     if (mapping) {
       setEditedRequest((prev) => prev || JSON.stringify(mapping.request, null, 2));
     }
-    if (relevantResponses.length > 0) {
-      setSelectedResponse((prev) => prev || relevantResponses[0]);
-      setEditedResponse(
-        (prev) =>
-          prev || JSON.stringify(relevantResponses[0]?.resJson || {}, null, 2)
+
+    // Set the selected response based on the passed response ID
+    if (initialSelectedResponseId) {
+      const foundResponse = relevantResponses.find(
+        (res) => res.id === initialSelectedResponseId
       );
+      if (foundResponse) {
+        setSelectedResponse(foundResponse);
+        setEditedResponse(JSON.stringify(foundResponse.resJson, null, 2));
+      }
+    } else if (relevantResponses.length > 0) {
+      setSelectedResponse(relevantResponses[0]);
+      setEditedResponse(JSON.stringify(relevantResponses[0]?.resJson || {}, null, 2));
     }
-  }, [mapping, relevantResponses]);
+  }, [mapping, relevantResponses, initialSelectedResponseId]);
 
   const handleEditRequestClick = () => {
     setIsEditingRequest(true);
