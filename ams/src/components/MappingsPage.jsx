@@ -2,32 +2,134 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./MappingsPage.module.css";
 
-const MappingsPage = ({ mappings = [], responses = [], handleDelete }) => {
-  const [selectedResponses, setSelectedResponses] = useState({});
+const MappingsPage = ({
+  mappings = [],
+  responses = [],
+  handleDelete,
+  handleUpdateRequest,
+  handleUpdateResponse,
+}) => {
   const navigate = useNavigate();
 
+  const goToDetails = (mappingId) => {
+    navigate(`/request/${mappingId}`);
+  };
+
+  const [isEditingRequest, setIsEditingRequest] = useState({});
+  const [editedRequests, setEditedRequests] = useState({});
+  const [isEditingResponse, setIsEditingResponse] = useState({});
+  const [editedResponses, setEditedResponses] = useState({});
+  const [selectedResponses, setSelectedResponses] = useState({});
+
   useEffect(() => {
+    const initialEditedRequests = {};
+    const initialEditedResponses = {};
     const initialSelections = {};
+
     mappings.forEach((mapping) => {
-      const relevantResponses = responses.filter(
-        (res) => res.reqId === mapping.id
-      );
+      const relevantResponses = responses.filter((res) => res.reqId === mapping.id);
+      initialEditedRequests[mapping.id] = {
+        url: mapping.request.url || "",
+        headers: JSON.stringify(mapping.request.headers || {}, null, 2),
+        body: JSON.stringify(mapping.request.body || {}, null, 2),
+        title: mapping.request.title || "", 
+      };
+
       if (relevantResponses.length > 0) {
-        initialSelections[mapping.id] = relevantResponses[0].id; // Default to first response
+        const defaultResponse = relevantResponses[0];
+        initialSelections[mapping.id] = defaultResponse.id;
+        initialEditedResponses[mapping.id] = {
+          status: defaultResponse.resJson.status || "",
+          headers: JSON.stringify(defaultResponse.resJson.headers || {}, null, 2),
+          body: JSON.stringify(defaultResponse.resJson.body || {}, null, 2),
+        };
       }
     });
+
+    setEditedRequests(initialEditedRequests);
+    setEditedResponses(initialEditedResponses);
     setSelectedResponses(initialSelections);
   }, [mappings, responses]);
 
-  const handleResponseChange = (reqId, responseId) => {
-    setSelectedResponses((prev) => ({
+  const handleRequestFieldChange = (reqId, field, value) => {
+    setEditedRequests((prev) => ({
       ...prev,
-      [reqId]: responseId,
+      [reqId]: {
+        ...prev[reqId],
+        [field]: value,
+      },
     }));
   };
 
   const goToDetails = (mappingId, selectedResponseId) => {
     navigate(`/mapping/${mappingId}`, { state: { selectedResponseId } });
+  const handleResponseFieldChange = (reqId, field, value) => {
+    setEditedResponses((prev) => ({
+      ...prev,
+      [reqId]: {
+        ...prev[reqId],
+        [field]: value,
+      },
+    }));
+  };
+
+  const saveEditedRequest = (reqId) => {
+    try {
+      const updatedRequest = {
+        title: editedRequests[reqId].title,
+        url: editedRequests[reqId].url,
+        headers: editedRequests[reqId].headers
+          ? JSON.parse(editedRequests[reqId].headers)
+          : {},
+        body: editedRequests[reqId].body
+          ? JSON.parse(editedRequests[reqId].body)
+          : {},
+      };
+      handleUpdateRequest(reqId, updatedRequest);
+      setIsEditingRequest((prev) => ({ ...prev, [reqId]: false }));
+      alert("Request updated successfully!");
+    } catch (error) {
+      console.error("Error parsing request JSON:", error);
+      alert("Invalid JSON format in the request. Please check headers or body.");
+    }
+  };
+
+  const saveEditedResponse = (responseId, reqId) => {
+    try {
+      const updatedResponse = {
+        status: editedResponses[reqId].status,
+        headers: editedResponses[reqId].headers
+          ? JSON.parse(editedResponses[reqId].headers)
+          : {},
+        body: editedResponses[reqId].body
+          ? JSON.parse(editedResponses[reqId].body)
+          : {},
+      };
+      handleUpdateResponse(responseId, updatedResponse);
+      setIsEditingResponse((prev) => ({ ...prev, [reqId]: false }));
+      alert("Response updated successfully!");
+    } catch (error) {
+      console.error("Error parsing response JSON:", error);
+      alert("Invalid JSON format in the response. Please check headers or body.");
+    }
+  };
+
+  const handleResponseSelectionChange = (mappingId, responseId) => {
+    const selectedResponse = responses.find((res) => res.id === responseId);
+    if (selectedResponse) {
+      setEditedResponses((prev) => ({
+        ...prev,
+        [mappingId]: {
+          status: selectedResponse.resJson.status || "",
+          headers: JSON.stringify(selectedResponse.resJson.headers || {}, null, 2),
+          body: JSON.stringify(selectedResponse.resJson.body || {}, null, 2),
+        },
+      }));
+    }
+    setSelectedResponses((prev) => ({
+      ...prev,
+      [mappingId]: responseId,
+    }));
   };
 
   return (
@@ -41,24 +143,78 @@ const MappingsPage = ({ mappings = [], responses = [], handleDelete }) => {
             const relevantResponses = responses.filter(
               (res) => res.reqId === mapping.id
             );
+            const selectedResponseId = selectedResponses[mapping.id] || "";
+            const editedRequest = editedRequests[mapping.id] || {};
+            const editedResponse = editedResponses[mapping.id] || {};
 
             return (
               <li key={index} className={styles.mappingItem}>
                 <h3>Request</h3>
                 <pre>{JSON.stringify(mapping.request, null, 2)}</pre>
+               <h3>Request</h3>
+              <div>
+                 <strong>Titel:</strong> {editedRequest.title}
+                  <pre>{JSON.stringify(
+                 (({ title, ...rest }) => rest)(mapping.request), 
+                   null, 
+                  2
+                 )}</pre>
+                </div>
+
+
+                {isEditingRequest[mapping.id] ? (
+                  <div>
+                    <label>URL</label>
+                    <input
+                      type="text"
+                      value={editedRequest.url}
+                      onChange={(e) =>
+                        handleRequestFieldChange(mapping.id, "url", e.target.value)
+                      }
+                    />
+                    <label>Headers (JSON)</label>
+                    <textarea
+                      value={editedRequest.headers}
+                      onChange={(e) =>
+                        handleRequestFieldChange(mapping.id, "headers", e.target.value)
+                      }
+                    />
+                    <label>Body (JSON)</label>
+                    <textarea
+                      value={editedRequest.body}
+                      onChange={(e) =>
+                        handleRequestFieldChange(mapping.id, "body", e.target.value)
+                      }
+                    />
+                    <button
+                      onClick={() => saveEditedRequest(mapping.id)}
+                      className={styles.saveButton}
+                    >
+                      Save Request
+                    </button>
+                  </div>
+                ) : (
+                  <div>
+                    <button
+                      onClick={() =>
+                        setIsEditingRequest((prev) => ({ ...prev, [mapping.id]: true }))
+                      }
+                      className={styles.editButton}
+                    >
+                      Edit Request
+                    </button>
+                  </div>
+                )}
+
                 <h3>Response</h3>
                 {relevantResponses.length > 0 ? (
                   <div>
-                    <label htmlFor={`response-dropdown-${index}`}>
-                      Select Response:
-                    </label>
                     <select
-                      id={`response-dropdown-${index}`}
-                      className={styles.selectDropdown}
                       onChange={(e) =>
-                        handleResponseChange(mapping.id, e.target.value)
+                        handleResponseSelectionChange(mapping.id, e.target.value)
                       }
-                      value={selectedResponses[mapping.id] || ""}
+                      value={selectedResponseId}
+                      disabled={isEditingRequest[mapping.id] || isEditingResponse[mapping.id]}
                     >
                       {relevantResponses.map((response) => (
                         <option key={response.id} value={response.id}>
@@ -68,24 +224,82 @@ const MappingsPage = ({ mappings = [], responses = [], handleDelete }) => {
                     </select>{" "}
                     <button
                       onClick={() => navigate(`/request/${mapping.id}`)}
+                    </select>
+                    <button
+                      onClick={() => goToDetails(mapping.id)}
                       className={styles.detailsButton}
                     >
                       Add New Response
                     </button>
                     {selectedResponses[mapping.id] && (
+                    {isEditingResponse[mapping.id] ? (
+                      <div>
+                        <label>Status</label>
+                        <input
+                          type="text"
+                          value={editedResponse.status}
+                          onChange={(e) =>
+                            handleResponseFieldChange(mapping.id, "status", e.target.value)
+                          }
+                        />
+                        <label>Headers (JSON)</label>
+                        <textarea
+                          value={editedResponse.headers}
+                          onChange={(e) =>
+                            handleResponseFieldChange(mapping.id, "headers", e.target.value)
+                          }
+                        />
+                        <label>Body (JSON)</label>
+                        <textarea
+                          value={editedResponse.body}
+                          onChange={(e) =>
+                            handleResponseFieldChange(mapping.id, "body", e.target.value)
+                          }
+                        />
+                        <button
+                          onClick={() =>
+                            saveEditedResponse(selectedResponseId, mapping.id)
+                          }
+                          className={styles.saveButton}
+                        >
+                          Save Response
+                        </button>
+                      </div>
+                    ) : (
                       <pre>
                         {JSON.stringify(
                           relevantResponses.find(
-                            (res) => res.id === selectedResponses[mapping.id]
+                            (res) => res.id === selectedResponseId
                           )?.resJson,
                           null,
                           2
                         )}
                       </pre>
                     )}
+                    {!isEditingResponse[mapping.id] && (
+                      <button
+                        onClick={() =>
+                          setIsEditingResponse((prev) => ({
+                            ...prev,
+                            [mapping.id]: true,
+                          }))
+                        }
+                        className={styles.editButton}
+                      >
+                        Edit Response
+                      </button>
+                    )}
                   </div>
                 ) : (
-                  <pre>No responses</pre>
+                  <div>
+                    <p>No responses available</p>
+                    <button
+                      onClick={() => goToDetails(mapping.id)}
+                      className={styles.detailsButton}
+                    >
+                      Add New Response
+                    </button>
+                  </div>
                 )}
                 <button
                   onClick={() =>
@@ -99,7 +313,7 @@ const MappingsPage = ({ mappings = [], responses = [], handleDelete }) => {
                   onClick={() => handleDelete(mapping.id)}
                   className={styles.deleteButton}
                 >
-                  Delete
+                  Delete Mapping
                 </button>
               </li>
             );
