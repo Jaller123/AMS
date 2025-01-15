@@ -26,8 +26,8 @@ const MappingsPage = ({ mappings = [], responses = [], handleDelete }) => {
     }));
   };
 
-  const goToDetails = (mappingId) => {
-    navigate(`/mapping/${mappingId}`);
+  const goToDetails = (mappingId, selectedResponseId) => {
+    navigate(`/mapping/${mappingId}`, { state: { selectedResponseId } });
   };
 
   return (
@@ -46,12 +46,6 @@ const MappingsPage = ({ mappings = [], responses = [], handleDelete }) => {
               <li key={index} className={styles.mappingItem}>
                 <h3>Request</h3>
                 <pre>{JSON.stringify(mapping.request, null, 2)}</pre>
-                <button
-                  onClick={() => navigate(`/request/${mapping.id}`)}
-                  className={styles.detailsButton}
-                >
-                  View Request
-                </button>
                 <h3>Response</h3>
                 {relevantResponses.length > 0 ? (
                   <div>
@@ -71,7 +65,13 @@ const MappingsPage = ({ mappings = [], responses = [], handleDelete }) => {
                           {response.id} - {response.timestamp}
                         </option>
                       ))}
-                    </select>
+                    </select>{" "}
+                    <button
+                      onClick={() => navigate(`/request/${mapping.id}`)}
+                      className={styles.detailsButton}
+                    >
+                      Add New Response
+                    </button>
                     {selectedResponses[mapping.id] && (
                       <pre>
                         {JSON.stringify(
@@ -88,7 +88,9 @@ const MappingsPage = ({ mappings = [], responses = [], handleDelete }) => {
                   <pre>No responses</pre>
                 )}
                 <button
-                  onClick={() => goToDetails(mapping.id)}
+                  onClick={() =>
+                    goToDetails(mapping.id, selectedResponses[mapping.id])
+                  }
                   className={styles.detailsButton}
                 >
                   View Details

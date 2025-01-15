@@ -7,7 +7,12 @@ import MappingsPage from "./components/MappingsPage";
 import MappingDetailPage from "./components/MappingDetailPage";
 import ReqDetailPage from "./components/ReqDetailPage";
 import Button from "./components/Button";
-import { fetchMappings, saveMapping, deleteMapping, saveResponse } from "./backend/api.js";
+import {
+  fetchMappings,
+  saveMapping,
+  deleteMapping,
+  saveResponse,
+} from "./backend/api.js";
 
 const App = () => {
   const [mappings, setMappings] = useState([]);
@@ -30,7 +35,7 @@ const App = () => {
       resJson: newResponse,
       timestamp: new Date().toISOString(),
     };
-  
+
     try {
       const savedResponse = await saveResponse(responseToSave);
       setResponses((prevResponses) => [...prevResponses, savedResponse]);
@@ -185,7 +190,7 @@ const App = () => {
             </div>
           }
         />
-  <Route
+        <Route
           path="/mapping/:mappingId"
           element={
             <MappingDetailPage

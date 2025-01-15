@@ -3,48 +3,14 @@
     "id": "1.1",
     "reqId": "1",
     "resJson": {
-      "status": "200",
+      "status": "201",
       "headers": {
         "Content-Type": "text/plain"
       },
       "body": {
-        "message": "res1"
+        "body": "res1"
       }
     },
-    "timestamp": "2025-01-10 10:24:24"
-  },
-  {
-    "id": "1.2",
-    "reqId": "1",
-    "resJson": {
-      "status": "203",
-      "headers": {
-        "Content-Type": "text/plain"
-      },
-      "body": {
-        "message": "OK"
-      }
-    },
-    "timestamp": "2025-01-10 10:44:11"
-  },
-  {
-    "id": "3.1",
-    "reqId": "3",
-    "id": "2.1",
-    "reqId": "2",
-    "resJson": {
-      "status": "200",
-      "headers": {
-        "Content-Type": "text/plain"
-      },
-      "body": {
-        "message": "OK"
-      }
-    },
-    "timestamp": "2025-01-13 14:36:03"
-        "body": "hello world"
-      }
-    },
-    "timestamp": "2025-01-13T14:22:57.292Z"
+    "timestamp": "2025-01-14 12:57:21"
   }
 ]

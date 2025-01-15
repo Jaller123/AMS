@@ -85,7 +85,9 @@ app.post("/responses", (req, res) => {
   const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"));
 
   // Skapa ny Response ID
-  const matchingResponses = responses.filter((response) => response.reqId === reqId);
+  const matchingResponses = responses.filter(
+    (response) => response.reqId === reqId
+  );
   const responseId = `${reqId}.${matchingResponses.length + 1}`;
 
   const newResponse = {

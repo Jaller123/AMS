@@ -46,7 +46,6 @@
   border-color: #007bff;
 }
 
-
 .deleteButton:hover {
   background-color: #d9363e;
 }
@@ -101,4 +100,63 @@ textarea {
 .backButton:hover {
   background-color: #0056b3;
 }
+.section {
+  padding: 20px;
+  margin: 20px;
+}
 
+.mappingList {
+  list-style-type: none;
+  padding: 0;
+}
+
+.mappingItem {
+  margin-bottom: 20px;
+}
+
+.detailsButton {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.deleteButton {
+  background-color: #f44336;
+  color: white;
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.editButton {
+  background-color: #ffa500;
+  color: white;
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.saveButton {
+  background-color: #2196f3;
+  color: white;
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+textarea {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  font-size: 14px;
+  font-family: monospace;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: #4caf50;
+}
