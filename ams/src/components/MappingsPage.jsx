@@ -82,6 +82,7 @@ const MappingsPage = ({
       const updatedRequest = {
         title: editedRequests[reqId].title,
         url: editedRequests[reqId].url,
+        method: editedRequests[reqId].method,
         headers: editedRequests[reqId].headers
           ? JSON.parse(editedRequests[reqId].headers)
           : {},
@@ -178,11 +179,24 @@ const MappingsPage = ({
                     <label>URL</label>
                     <input
                       type="text"
-                      value={editedRequest.url}
+                      value={editedRequest.url || ""}
                       onChange={(e) =>
                         handleRequestFieldChange(
                           mapping.id,
                           "url",
+                          e.target.value
+                        )
+                      }
+                    />
+
+                    <label>Method</label>
+                    <input
+                      type="text"
+                      value={editedRequest.method || ""}
+                      onChange={(e) =>
+                        handleRequestFieldChange(
+                          mapping.id,
+                          "method",
                           e.target.value
                         )
                       }

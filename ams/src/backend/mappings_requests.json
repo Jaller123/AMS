@@ -1,15 +1,15 @@
 [
   {
-    "id": "2",
+    "id": "1",
     "resJson": {
-      "title": "Hämta user",
-      "url": "/user",
+      "title": "test",
+      "url": "/test",
       "method": "POST",
       "headers": {
         "Content-Type": "text/plain"
       },
       "body": {
-        "body": "req1"
+        "body": "test1"
       }
     }
   }
