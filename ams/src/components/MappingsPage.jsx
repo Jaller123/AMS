@@ -27,12 +27,14 @@ const MappingsPage = ({
     const initialSelections = {};
 
     mappings.forEach((mapping) => {
-      const relevantResponses = responses.filter((res) => res.reqId === mapping.id);
+      const relevantResponses = responses.filter(
+        (res) => res.reqId === mapping.id
+      );
       initialEditedRequests[mapping.id] = {
         url: mapping.request.url || "",
         headers: JSON.stringify(mapping.request.headers || {}, null, 2),
         body: JSON.stringify(mapping.request.body || {}, null, 2),
-        title: mapping.request.title || "", 
+        title: mapping.request.title || "",
       };
 
       if (relevantResponses.length > 0) {
@@ -40,7 +42,11 @@ const MappingsPage = ({
         initialSelections[mapping.id] = defaultResponse.id;
         initialEditedResponses[mapping.id] = {
           status: defaultResponse.resJson.status || "",
-          headers: JSON.stringify(defaultResponse.resJson.headers || {}, null, 2),
+          headers: JSON.stringify(
+            defaultResponse.resJson.headers || {},
+            null,
+            2
+          ),
           body: JSON.stringify(defaultResponse.resJson.body || {}, null, 2),
         };
       }
@@ -61,8 +67,6 @@ const MappingsPage = ({
     }));
   };
 
-  const goToDetails = (mappingId, selectedResponseId) => {
-    navigate(`/mapping/${mappingId}`, { state: { selectedResponseId } });
   const handleResponseFieldChange = (reqId, field, value) => {
     setEditedResponses((prev) => ({
       ...prev,
@@ -90,7 +94,9 @@ const MappingsPage = ({
       alert("Request updated successfully!");
     } catch (error) {
       console.error("Error parsing request JSON:", error);
-      alert("Invalid JSON format in the request. Please check headers or body.");
+      alert(
+        "Invalid JSON format in the request. Please check headers or body."
+      );
     }
   };
 
@@ -110,7 +116,9 @@ const MappingsPage = ({
       alert("Response updated successfully!");
     } catch (error) {
       console.error("Error parsing response JSON:", error);
-      alert("Invalid JSON format in the response. Please check headers or body.");
+      alert(
+        "Invalid JSON format in the response. Please check headers or body."
+      );
     }
   };
 
@@ -121,7 +129,11 @@ const MappingsPage = ({
         ...prev,
         [mappingId]: {
           status: selectedResponse.resJson.status || "",
-          headers: JSON.stringify(selectedResponse.resJson.headers || {}, null, 2),
+          headers: JSON.stringify(
+            selectedResponse.resJson.headers || {},
+            null,
+            2
+          ),
           body: JSON.stringify(selectedResponse.resJson.body || {}, null, 2),
         },
       }));
@@ -150,17 +162,16 @@ const MappingsPage = ({
             return (
               <li key={index} className={styles.mappingItem}>
                 <h3>Request</h3>
-                <pre>{JSON.stringify(mapping.request, null, 2)}</pre>
-               <h3>Request</h3>
-              <div>
-                 <strong>Titel:</strong> {editedRequest.title}
-                  <pre>{JSON.stringify(
-                 (({ title, ...rest }) => rest)(mapping.request), 
-                   null, 
-                  2
-                 )}</pre>
+                <div>
+                  <strong>Titel:</strong> {editedRequest.title}
+                  <pre>
+                    {JSON.stringify(
+                      (({ title, ...rest }) => rest)(mapping.request),
+                      null,
+                      2
+                    )}
+                  </pre>
                 </div>
-
 
                 {isEditingRequest[mapping.id] ? (
                   <div>
@@ -169,21 +180,34 @@ const MappingsPage = ({
                       type="text"
                       value={editedRequest.url}
                       onChange={(e) =>
-                        handleRequestFieldChange(mapping.id, "url", e.target.value)
+                        handleRequestFieldChange(
+                          mapping.id,
+                          "url",
+                          e.target.value
+                        )
                       }
                     />
+
                     <label>Headers (JSON)</label>
                     <textarea
                       value={editedRequest.headers}
                       onChange={(e) =>
-                        handleRequestFieldChange(mapping.id, "headers", e.target.value)
+                        handleRequestFieldChange(
+                          mapping.id,
+                          "headers",
+                          e.target.value
+                        )
                       }
                     />
                     <label>Body (JSON)</label>
                     <textarea
                       value={editedRequest.body}
                       onChange={(e) =>
-                        handleRequestFieldChange(mapping.id, "body", e.target.value)
+                        handleRequestFieldChange(
+                          mapping.id,
+                          "body",
+                          e.target.value
+                        )
                       }
                     />
                     <button
@@ -197,7 +221,10 @@ const MappingsPage = ({
                   <div>
                     <button
                       onClick={() =>
-                        setIsEditingRequest((prev) => ({ ...prev, [mapping.id]: true }))
+                        setIsEditingRequest((prev) => ({
+                          ...prev,
+                          [mapping.id]: true,
+                        }))
                       }
                       className={styles.editButton}
                     >
@@ -211,19 +238,22 @@ const MappingsPage = ({
                   <div>
                     <select
                       onChange={(e) =>
-                        handleResponseSelectionChange(mapping.id, e.target.value)
+                        handleResponseSelectionChange(
+                          mapping.id,
+                          e.target.value
+                        )
                       }
                       value={selectedResponseId}
-                      disabled={isEditingRequest[mapping.id] || isEditingResponse[mapping.id]}
+                      disabled={
+                        isEditingRequest[mapping.id] ||
+                        isEditingResponse[mapping.id]
+                      }
                     >
                       {relevantResponses.map((response) => (
                         <option key={response.id} value={response.id}>
                           {response.id} - {response.timestamp}
                         </option>
                       ))}
-                    </select>{" "}
-                    <button
-                      onClick={() => navigate(`/request/${mapping.id}`)}
                     </select>
                     <button
                       onClick={() => goToDetails(mapping.id)}
@@ -231,7 +261,6 @@ const MappingsPage = ({
                     >
                       Add New Response
                     </button>
-                    {selectedResponses[mapping.id] && (
                     {isEditingResponse[mapping.id] ? (
                       <div>
                         <label>Status</label>
@@ -239,21 +268,33 @@ const MappingsPage = ({
                           type="text"
                           value={editedResponse.status}
                           onChange={(e) =>
-                            handleResponseFieldChange(mapping.id, "status", e.target.value)
+                            handleResponseFieldChange(
+                              mapping.id,
+                              "status",
+                              e.target.value
+                            )
                           }
                         />
                         <label>Headers (JSON)</label>
                         <textarea
                           value={editedResponse.headers}
                           onChange={(e) =>
-                            handleResponseFieldChange(mapping.id, "headers", e.target.value)
+                            handleResponseFieldChange(
+                              mapping.id,
+                              "headers",
+                              e.target.value
+                            )
                           }
                         />
                         <label>Body (JSON)</label>
                         <textarea
                           value={editedResponse.body}
                           onChange={(e) =>
-                            handleResponseFieldChange(mapping.id, "body", e.target.value)
+                            handleResponseFieldChange(
+                              mapping.id,
+                              "body",
+                              e.target.value
+                            )
                           }
                         />
                         <button
@@ -301,14 +342,6 @@ const MappingsPage = ({
                     </button>
                   </div>
                 )}
-                <button
-                  onClick={() =>
-                    goToDetails(mapping.id, selectedResponses[mapping.id])
-                  }
-                  className={styles.detailsButton}
-                >
-                  View Details
-                </button>
                 <button
                   onClick={() => handleDelete(mapping.id)}
                   className={styles.deleteButton}

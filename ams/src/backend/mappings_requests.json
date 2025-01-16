@@ -1,9 +1,10 @@
 [
   {
-    "id": "1",
+    "id": "2",
     "resJson": {
+      "title": "Hämta user",
       "url": "/user",
-      "method": "GET",
+      "method": "POST",
       "headers": {
         "Content-Type": "text/plain"
       },
