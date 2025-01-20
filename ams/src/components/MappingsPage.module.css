@@ -160,3 +160,29 @@ textarea:focus {
   outline: none;
   border-color: #4caf50;
 }
+
+.titleRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.titleRow h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.toggleButton {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.toggleButton:hover {
+  background-color: #0056b3;
+}
