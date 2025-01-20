@@ -75,6 +75,7 @@ const App = () => {
 
         setRequestData(null);
         setResponseData(null);
+
         alert("Mapping saved successfully");
       } catch (error) {
         console.error("Error saving mapping:", error);
@@ -116,18 +117,22 @@ const App = () => {
 
   const handleUpdateRequest = async (requestId, updatedRequest) => {
     try {
-      const response = await fetch(`http://localhost:8080/requests/${requestId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ resJson: updatedRequest }),
-      });
-  
+      const response = await fetch(
+        `http://localhost:8080/requests/${requestId}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ resJson: updatedRequest }),
+        }
+      );
+
       if (!response.ok) {
         throw new Error("Failed to update request.");
       }
-  
-      const { updatedRequest: updatedRequestFromServer } = await response.json();
-  
+
+      const { updatedRequest: updatedRequestFromServer } =
+        await response.json();
+
       setMappings((prevMappings) =>
         prevMappings.map((mapping) =>
           mapping.id === requestId
@@ -140,7 +145,6 @@ const App = () => {
       alert("Failed to update request. Please try again.");
     }
   };
-  
 
   const handleUpdateResponse = async (responseId, updatedResponse) => {
     try {
@@ -165,7 +169,6 @@ const App = () => {
       console.error("Error updating response:", error);
       alert("Failed to update response. Please try again.");
     }
-    
   };
 
   return (

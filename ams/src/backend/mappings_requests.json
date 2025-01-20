@@ -1,16 +1,1 @@
-[
-  {
-    "id": "1",
-    "resJson": {
-      "title": "test",
-      "url": "/test",
-      "method": "POST",
-      "headers": {
-        "Content-Type": "text/plain"
-      },
-      "body": {
-        "body": "test1"
-      }
-    }
-  }
-]
+[]
