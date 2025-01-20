@@ -19,6 +19,7 @@ const App = () => {
   const [responses, setResponses] = useState([]);
   const [requestData, setRequestData] = useState(null);
   const [responseData, setResponseData] = useState(null);
+  const [resetForm, setResetForm] = useState(false);
 
   useEffect(() => {
     const loadMappingsAndResponses = async () => {
@@ -72,10 +73,16 @@ const App = () => {
             resJson: response,
           },
         ]);
-
+        
+        // Reset the form
+        setResetForm(true);
+        setTimeout(() => setResetForm(false), 0);
+        
+        // Clear request and response data
         setRequestData(null);
         setResponseData(null);
-        alert("Mapping saved successfully");
+        
+        alert("Mapping saved successfully!");
       } catch (error) {
         console.error("Error saving mapping:", error);
         alert("Failed to save mapping. Please try again.");
@@ -188,8 +195,8 @@ const App = () => {
           path="/mappings"
           element={
             <div>
-              <ReqForm setRequestData={setRequestData} />
-              <ResForm setResponseData={setResponseData} />
+              <ReqForm setRequestData={setRequestData} resetForm={resetForm} />
+              <ResForm setResponseData={setResponseData} resetForm={resetForm} />
               <Button onClick={handleSaveMapping}>Save Mapping</Button>
             </div>
           }
