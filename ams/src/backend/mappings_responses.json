@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "id": "1.1",
+    "reqId": "1",
+    "resJson": {
+      "status": "200",
+      "headers": {
+        "Content-Type": "text/plain"
+      },
+      "body": {
+        "body": "res1"
+      }
+    },
+    "timestamp": "2025-01-22 10:16:18"
+  }
+]

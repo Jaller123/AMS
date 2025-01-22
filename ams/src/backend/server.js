@@ -170,10 +170,8 @@ app.delete("/mappings/:id", (req, res) => {
   const requests = JSON.parse(fs.readFileSync(requestsFile, "utf-8"));
   const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"));
 
+  const updatedRequests = requests.filter((req) => req.id !== id);
   const updatedResponses = responses.filter((res) => res.reqId !== id);
-  const updatedRequests = requests.filter(
-    (req) => !updatedResponses.find((res) => res.reqId === req.id)
-  );
 
   fs.writeFileSync(requestsFile, JSON.stringify(updatedRequests, null, 2));
   fs.writeFileSync(responseFile, JSON.stringify(updatedResponses, null, 2));

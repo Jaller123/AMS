@@ -7,7 +7,7 @@ describe("Mappings Page", () => {
         requests: [
           {
             id: "1",
-            resJson: { name: "Sample Request 1", endpoint: "/api/sample1" },
+            resJson: { title: "Sample Request 1", endpoint: "/api/sample1" },
           },
         ],
         responses: [

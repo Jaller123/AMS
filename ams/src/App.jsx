@@ -5,6 +5,7 @@ import ReqForm from "./components/ReqForm";
 import ResForm from "./components/ResForm";
 import MappingsPage from "./components/MappingsPage";
 import MappingDetailPage from "./components/MappingDetailPage";
+
 import ReqDetailPage from "./components/ReqDetailPage";
 import Button from "./components/Button";
 import {
@@ -73,17 +74,16 @@ const App = () => {
             resJson: response,
           },
         ]);
-        
+
         // Reset the form
         setResetForm(true);
         setTimeout(() => setResetForm(false), 0);
-        
+
         // Clear request and response data
         setRequestData(null);
         setResponseData(null);
 
         alert("Mapping saved successfully");
-        
       } catch (error) {
         console.error("Error saving mapping:", error);
         alert("Failed to save mapping. Please try again.");
@@ -199,7 +199,10 @@ const App = () => {
           element={
             <div>
               <ReqForm setRequestData={setRequestData} resetForm={resetForm} />
-              <ResForm setResponseData={setResponseData} resetForm={resetForm} />
+              <ResForm
+                setResponseData={setResponseData}
+                resetForm={resetForm}
+              />
               <Button onClick={handleSaveMapping}>Save Mapping</Button>
             </div>
           }
