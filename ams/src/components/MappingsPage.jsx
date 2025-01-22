@@ -40,6 +40,7 @@ const MappingsPage = ({
       );
       initialEditedRequests[mapping.id] = {
         url: mapping.request.url || "",
+        method: mapping.request.method || "",
         headers: JSON.stringify(mapping.request.headers || {}, null, 2),
         body: JSON.stringify(mapping.request.body || {}, null, 2),
         title: mapping.request.title || "",
@@ -176,7 +177,10 @@ const MappingsPage = ({
               <li key={index} className={styles.mappingItem}>
                 <div className={styles.titleRow}
                 onClick={() => toggleMappingsDetails(mapping.id)}>
-                <h3>{editedRequest.title || "Untitled Mapping"}</h3>
+                {console.log(editedRequest)}
+                <h3>{editedRequest.method || "Unidentified Method"}</h3>
+                <h3>{editedRequest.url || "Unidentified URL"}</h3>
+                <h3>{editedRequest.title || "Untitled Mapping"}</h3> 
                 <button className={styles.toggleButton}>
                 {isExpanded ? "Hide Details" : "Show Details"}
                 </button>
