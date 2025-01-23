@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import ReqForm from "./components/ReqForm";
 import ResForm from "./components/ResForm";
-import MappingsPage from "./components/MappingsPage";
+import MappingsPage from "./components/MappingPage/MappingPage.jsx";
 import MappingDetailPage from "./components/MappingDetailPage";
 
 import ReqDetailPage from "./components/ReqDetailPage";
