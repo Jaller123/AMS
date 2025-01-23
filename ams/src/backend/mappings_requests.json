@@ -2,8 +2,9 @@
   {
     "id": "1",
     "resJson": {
-      "title": "",
-      "url": "/user",
+      "title": "Fetching user",
+      "url": "/User",
+      "method": "GET",
       "headers": {
         "Content-Type": "text/plain"
       },

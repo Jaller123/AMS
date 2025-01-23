@@ -162,6 +162,7 @@ const MappingsPage = ({
   return (
     <section className={styles.section}>
       <h2>Saved Mappings</h2>
+
       {mappings.length === 0 ? (
         <p>No mappings saved yet.</p>
       ) : (
@@ -179,19 +180,13 @@ const MappingsPage = ({
                   className={styles.titleRow}
                   onClick={() => toggleMappingsDetails(mapping.id)}
                 >
+                  {console.log(editedRequest)}
+                  <h3>{editedRequest.method || "Unidentified Method"}</h3>
+                  <h3>{editedRequest.url || "Unidentified URL"}</h3>
                   <h3>{editedRequest.title || "Untitled Mapping"}</h3>
                   <button className={styles.toggleButton}>
                     {isExpanded ? "Hide Details" : "Show Details"}
                   </button>
-                <div className={styles.titleRow}
-                onClick={() => toggleMappingsDetails(mapping.id)}>
-                {console.log(editedRequest)}
-                <h3>{editedRequest.method || "Unidentified Method"}</h3>
-                <h3>{editedRequest.url || "Unidentified URL"}</h3>
-                <h3>{editedRequest.title || "Untitled Mapping"}</h3> 
-                <button className={styles.toggleButton}>
-                {isExpanded ? "Hide Details" : "Show Details"}
-                </button>
                 </div>
 
                 {isExpanded && (
