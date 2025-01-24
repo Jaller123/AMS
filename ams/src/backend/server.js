@@ -167,19 +167,21 @@ app.delete("/mappings/:id", (req, res) => {
     return res.status(400).json({ success: false, message: "Invalid ID" });
   }
 
+  // Read the data from files
   const requests = JSON.parse(fs.readFileSync(requestsFile, "utf-8"));
   const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"));
 
-  const updatedResponses = responses.filter((res) => res.reqId !== id);
-  const updatedRequests = requests.filter(
-    (req) => !updatedResponses.find((res) => res.reqId === req.id)
-  );
+  // Filter out the specific request and associated responses
+  const updatedRequests = requests.filter((req) => String(req.id) !== String(id));
+  const updatedResponses = responses.filter((res) => String(res.reqId) !== String(id));
 
+  // Write the updated data back to files
   fs.writeFileSync(requestsFile, JSON.stringify(updatedRequests, null, 2));
   fs.writeFileSync(responseFile, JSON.stringify(updatedResponses, null, 2));
 
   res.json({ success: true });
 });
+
 
 app.listen(8080, () => {
   console.log("Server running on http://localhost:8080");

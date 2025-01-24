@@ -1,14 +1,38 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import styles from "./MappingsPage.module.css";
 
 const RequestEditor = ({ mappingId, editedRequest, setEditedRequest, handleUpdateRequest }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [localRequest, setLocalRequest] = useState({
+    title: "",
+    url: "",
+    method: "",
+    headers: "{}",
+    body: "{}",
+  });
+
+  // Initialize localRequest with values from editedRequest
+  useEffect(() => {
+    if (editedRequest) {
+      setLocalRequest({
+        title: editedRequest.title || "",
+        url: editedRequest.url || "",
+        method: editedRequest.method || "",
+        headers: JSON.stringify(editedRequest.headers || {}, null, 2),
+        body: JSON.stringify(editedRequest.body || {}, null, 2),
+      });
+    }
+  }, [editedRequest]);
+
   const saveRequest = () => {
     try {
       const updatedRequest = {
-        ...editedRequest,
-        headers: JSON.parse(editedRequest.headers || "{}"),
-        body: JSON.parse(editedRequest.body || "{}"),
+        ...localRequest,
+        headers: JSON.parse(localRequest.headers || "{}"),
+        body: JSON.parse(localRequest.body || "{}"),
       };
       handleUpdateRequest(mappingId, updatedRequest);
+      setIsEditing(false);
     } catch (error) {
       alert("Invalid JSON in headers or body.");
     }
@@ -16,30 +40,45 @@ const RequestEditor = ({ mappingId, editedRequest, setEditedRequest, handleUpdat
 
   return (
     <div>
-      <h4>Request Editor</h4>
-      <label>URL</label>
-      <input
-        type="text"
-        value={editedRequest?.url || ""}
-        onChange={(e) => setEditedRequest({ ...editedRequest, url: e.target.value })}
-      />
-      <label>Method</label>
-      <input
-        type="text"
-        value={editedRequest?.method || ""}
-        onChange={(e) => setEditedRequest({ ...editedRequest, method: e.target.value })}
-      />
-      <label>Headers (JSON)</label>
-      <textarea
-        value={editedRequest?.headers || "{}"}
-        onChange={(e) => setEditedRequest({ ...editedRequest, headers: e.target.value })}
-      />
-      <label>Body (JSON)</label>
-      <textarea
-        value={editedRequest?.body || "{}"}
-        onChange={(e) => setEditedRequest({ ...editedRequest, body: e.target.value })}
-      />
-      <button onClick={saveRequest}>Save Request</button>
+      <h4>Request</h4>
+      {isEditing ? (
+        <div>
+          <label>Title</label>
+          <input
+            type="text"
+            value={localRequest.title}
+            onChange={(e) => setLocalRequest({ ...localRequest, title: e.target.value })}
+          />
+          <label>URL</label>
+          <input
+            type="text"
+            value={localRequest.url}
+            onChange={(e) => setLocalRequest({ ...localRequest, url: e.target.value })}
+          />
+          <label>Method</label>
+          <input
+            type="text"
+            value={localRequest.method}
+            onChange={(e) => setLocalRequest({ ...localRequest, method: e.target.value })}
+          />
+          <label>Headers (JSON)</label>
+          <textarea
+            value={localRequest.headers}
+            onChange={(e) => setLocalRequest({ ...localRequest, headers: e.target.value })}
+          />
+          <label>Body (JSON)</label>
+          <textarea
+            value={localRequest.body}
+            onChange={(e) => setLocalRequest({ ...localRequest, body: e.target.value })}
+          />
+          <button onClick={saveRequest}>Save Request</button>
+        </div>
+      ) : (
+        <div>
+          <pre>{JSON.stringify(editedRequest, null, 2)}</pre>
+          <button onClick={() => setIsEditing(true)}>Edit Request</button>
+        </div>
+      )}
     </div>
   );
 };

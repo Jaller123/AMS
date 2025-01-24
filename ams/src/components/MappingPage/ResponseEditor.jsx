@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import styles from "./MappingsPage.module.css";
 
 const ResponseEditor = ({
   mappingId,
@@ -9,14 +11,35 @@ const ResponseEditor = ({
   setSelectedResponse,
   handleUpdateResponse,
 }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [localResponse, setLocalResponse] = useState({});
+
+  const navigate = useNavigate();
+
+  const goToDetails = (mappingId) => {
+    navigate(`/request/${mappingId}`);
+  };
+
+  // Initialize `localResponse` when `editedResponse` or `selectedResponse` changes
+  useEffect(() => {
+    const selectedRes =
+      relevantResponses.find((res) => res.id === selectedResponse) || {};
+    setLocalResponse({
+      ...selectedRes.resJson,
+      headers: selectedRes.resJson?.headers || {}, // Keep as an object
+      body: selectedRes.resJson?.body || {}, // Keep as an object
+    });
+  }, [editedResponse, selectedResponse, relevantResponses]);
+
   const saveResponse = () => {
     try {
       const updatedResponse = {
-        ...editedResponse,
-        headers: JSON.parse(editedResponse.headers || "{}"),
-        body: JSON.parse(editedResponse.body || "{}"),
+        ...localResponse,
+        headers: typeof localResponse.headers === "string" ? JSON.parse(localResponse.headers) : localResponse.headers,
+        body: typeof localResponse.body === "string" ? JSON.parse(localResponse.body) : localResponse.body,
       };
       handleUpdateResponse(selectedResponse, updatedResponse);
+      setIsEditing(false);
     } catch (error) {
       alert("Invalid JSON in headers or body.");
     }
@@ -24,42 +47,69 @@ const ResponseEditor = ({
 
   return (
     <div>
-      <h4>Response Editor</h4>
-      <select
-        value={selectedResponse || ""}
-        onChange={(e) => {
-          const response = relevantResponses.find((res) => res.id === e.target.value);
-          setSelectedResponse(response?.id || "");
-          setEditedResponse({
-            status: response?.resJson?.status || "",
-            headers: JSON.stringify(response?.resJson?.headers || {}, null, 2),
-            body: JSON.stringify(response?.resJson?.body || {}, null, 2),
-          });
-        }}
-      >
-        {relevantResponses.map((response) => (
-          <option key={response.id} value={response.id}>
-            {response.id} - {response.resJson?.status || "No Status"}
-          </option>
-        ))}
-      </select>
-      <label>Status</label>
-      <input
-        type="text"
-        value={editedResponse?.status || ""}
-        onChange={(e) => setEditedResponse({ ...editedResponse, status: e.target.value })}
-      />
-      <label>Headers (JSON)</label>
-      <textarea
-        value={editedResponse?.headers || "{}"}
-        onChange={(e) => setEditedResponse({ ...editedResponse, headers: e.target.value })}
-      />
-      <label>Body (JSON)</label>
-      <textarea
-        value={editedResponse?.body || "{}"}
-        onChange={(e) => setEditedResponse({ ...editedResponse, body: e.target.value })}
-      />
-      <button onClick={saveResponse}>Save Response</button>
+      <h4>Response</h4>
+      {isEditing ? (
+        <div>
+          <label>Status</label>
+          <input
+            type="text"
+            value={localResponse.status || ""}
+            onChange={(e) =>
+              setLocalResponse({ ...localResponse, status: e.target.value })
+            }
+          />
+          <label>Headers (JSON)</label>
+          <textarea
+            value={
+              typeof localResponse.headers === "string"
+                ? localResponse.headers
+                : JSON.stringify(localResponse.headers, null, 2)
+            }
+            onChange={(e) =>
+              setLocalResponse({ ...localResponse, headers: e.target.value })
+            }
+          />
+          <label>Body (JSON)</label>
+          <textarea
+            value={
+              typeof localResponse.body === "string"
+                ? localResponse.body
+                : JSON.stringify(localResponse.body, null, 2)
+            }
+            onChange={(e) =>
+              setLocalResponse({ ...localResponse, body: e.target.value })
+            }
+          />
+          <button onClick={saveResponse}>Save Response</button>
+        </div>
+      ) : (
+        <div>
+          <select
+            value={selectedResponse || ""}
+            onChange={(e) => {
+              const response = relevantResponses.find(
+                (res) => res.id === e.target.value
+              );
+              setSelectedResponse(response?.id || "");
+              setEditedResponse(response?.resJson || {});
+            }}
+          >
+            {relevantResponses.map((response) => (
+              <option key={response.id} value={response.id}>
+                {response.id} - {response.resJson?.status || "No Status"}
+              </option>
+            ))}
+          </select>
+          <pre>{JSON.stringify(localResponse, null, 2)}</pre>
+          <button onClick={() => setIsEditing(true)}>Edit Response</button>
+          <button
+            onClick={() => navigate(`/request/${mappingId}`)}
+            className={styles.detailsButton}
+          >
+            Add New Response
+          </button>
+        </div>
+      )}
     </div>
   );
 };
