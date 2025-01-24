@@ -131,6 +131,7 @@ const MappingsPage = ({
                 <h4>Request</h4>
                 <pre>{JSON.stringify(
                   {
+                    url: mapping.request.url,
                     method: mapping.request.method,
                     headers: mapping.request.headers,
                     body: mapping.request.body
