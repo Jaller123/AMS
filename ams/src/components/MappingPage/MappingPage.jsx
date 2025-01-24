@@ -22,6 +22,7 @@ const MappingsPage = ({
   const [editedResponseData, setEditedResponseData] = useState({});
   const [expandedMappings, setExpandedMappings] = useState({});
   const [selectedResponses, setSelectedResponses] = useState({});
+  const [search,setSearch]=useState("")
 
 
   useEffect(() => {
@@ -45,7 +46,10 @@ const MappingsPage = ({
       setEditedRequestData(request);
     }
   };
-
+  
+  const handelsearch=(e)=>{
+    setSearch(e.target.value)
+  }
   const toggleEditResponse = (responseId, response) => {
     if (editingResponse === responseId) {
       setEditingResponse(null);
@@ -82,7 +86,24 @@ const MappingsPage = ({
   return (
     <section className={styles.section}>
       <h2>Saved Mappings</h2>
-      {mappings.map((mapping) => {
+
+      <form onSubmit={(e)=> e.preventDefault()}className={styles["search-form"]} >
+        <input type="text" 
+        placeholder="sök"
+        value={search}
+        onChange={handelsearch}
+         data-testid="search-input"
+        
+        />
+
+      </form>
+      {mappings
+      .filter((mapping) =>
+        (mapping.request.title?.toLowerCase().includes(search.toLowerCase()) || 
+         mapping.request.url?.toLowerCase().includes(search.toLowerCase())
+        )
+      )
+      .map((mapping) => {
         const relevantResponses = responses.filter(
           (res) => res.reqId === mapping.id
         );
@@ -108,7 +129,16 @@ const MappingsPage = ({
             {expandedMappings[mapping.id] && (
               <div className={styles.details}>
                 <h4>Request</h4>
-                <pre>{JSON.stringify(mapping.request, null, 2)}</pre>
+                <pre>{JSON.stringify(
+                  {
+                    method: mapping.request.method,
+                    headers: mapping.request.headers,
+                    body: mapping.request.body
+
+                  },
+                  null,
+                  2
+                )}</pre>
 
                 {editingRequest === mapping.id ? (
                   <div>

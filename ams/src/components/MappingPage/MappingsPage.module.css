@@ -186,3 +186,23 @@ textarea:focus {
 .toggleButton:hover {
   background-color: #0056b3;
 }
+
+.search-form {
+  margin-bottom: 20px;
+  background-color: #ffffffa3;
+  border-radius: 25px;
+  padding: 5px 15px;
+  border: 2px solid black;
+  width: 50%; 
+}
+
+
+
+.search-form input {
+  outline: none;
+  border: none;
+  background-color: transparent;
+  color: #333;
+}
+
+
