@@ -35,8 +35,14 @@ const ResponseEditor = ({
     try {
       const updatedResponse = {
         ...localResponse,
-        headers: typeof localResponse.headers === "string" ? JSON.parse(localResponse.headers) : localResponse.headers,
-        body: typeof localResponse.body === "string" ? JSON.parse(localResponse.body) : localResponse.body,
+        headers:
+          typeof localResponse.headers === "string"
+            ? JSON.parse(localResponse.headers)
+            : localResponse.headers,
+        body:
+          typeof localResponse.body === "string"
+            ? JSON.parse(localResponse.body)
+            : localResponse.body,
       };
       handleUpdateResponse(selectedResponse, updatedResponse);
       setIsEditing(false);
@@ -52,6 +58,7 @@ const ResponseEditor = ({
         <div>
           <label>Status</label>
           <input
+            placeholder="Status"
             type="text"
             value={localResponse.status || ""}
             onChange={(e) =>

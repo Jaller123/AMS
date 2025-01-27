@@ -18,8 +18,9 @@ const SortControls = ({
   return (
     <div className={styles.sortControls}>
       <div className={styles.sortSection}></div>
+
       <div className={styles.searchSection}>
-        <label htmlFor="titleSearch">Search Title:</label>
+        <label htmlFor="titleSearch">Title:</label>
         <input
           type="text"
           id="titleSearch"
@@ -29,7 +30,7 @@ const SortControls = ({
           onChange={handleSearchChange}
         />
 
-        <label htmlFor="urlSearch">Search URL:</label>
+        <label htmlFor="urlSearch">URL:</label>
         <input
           type="text"
           id="urlSearch"
@@ -38,7 +39,8 @@ const SortControls = ({
           value={searchFilters.url || ""}
           onChange={handleSearchChange}
         />
-        <label htmlFor="methodSearch">Search Method:</label>
+
+        <label htmlFor="methodSearch">Method:</label>
         <input
           type="text"
           id="methodSearch"

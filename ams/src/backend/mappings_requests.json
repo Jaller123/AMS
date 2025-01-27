@@ -26,5 +26,33 @@
         "body": "reg"
       }
     }
+  },
+  {
+    "id": "4",
+    "resJson": {
+      "title": "fetching user",
+      "url": "/user",
+      "method": "GET",
+      "headers": {
+        "Content-Type": "text/plain"
+      },
+      "body": {
+        "body": "req2"
+      }
+    }
+  },
+  {
+    "id": "5",
+    "resJson": {
+      "title": "user",
+      "url": "/login",
+      "method": "GET",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "body": "req2"
+      }
+    }
   }
 ]

@@ -165,13 +165,18 @@ textarea:focus {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 20px; /* Mellanrum mellan kolumner */
   cursor: pointer;
 }
 
 .titleRow h3 {
   margin: 0;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: bold;
+  white-space: nowrap; /* Förhindra radbrytning */
+  overflow: hidden; /* Klipp text som inte får plats */
+  text-overflow: ellipsis; /* Lägg till "..." om texten klipps */
+  flex: 1; /* Se till att varje h3 delar samma utrymme */
 }
 
 .toggleButton {
@@ -193,10 +198,8 @@ textarea:focus {
   border-radius: 25px;
   padding: 5px 15px;
   border: 2px solid black;
-  width: 50%; 
+  width: 50%;
 }
-
-
 
 .search-form input {
   outline: none;
@@ -204,5 +207,3 @@ textarea:focus {
   background-color: transparent;
   color: #333;
 }
-
-
