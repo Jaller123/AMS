@@ -32,7 +32,11 @@ describe("Mappings Page Functionalities", () => {
     cy.visit("http://localhost:5173");
     cy.wait("@getMappings");
   });
-
+  
+  it("the title", () => {
+   cy.get('[data-testid="search-input"]').type("title");
+  });
+  
   it("should display method, URL, and title in collapsed mapping", () => {
     cy.contains("POST").should("exist");
     cy.contains("/test").should("exist");
@@ -169,7 +173,7 @@ describe("Mappings Page Functionalities", () => {
           {
             id: "1",
             resJson: {
-              title: "Updated Test Title",
+             
               url: "/test",
               method: "POST",
               headers: { "Content-Type": "text/plain" },

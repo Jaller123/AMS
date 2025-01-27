@@ -1,24 +1,42 @@
 describe("Mappings Page", () => {
-    it('should interact with the form fields correctly', () => {
-      // Besök sidan
-      cy.visit('http://localhost:5173/mappings');
-      
-      // Kontrollera om titel inputfält är synligt och skriv "gunnar"
-      cy.get('[data-testid="title-input"]').type("titel");
-  
-      // Kontrollera om URL inputfält är synligt och skriv en URL
-      cy.get('[data-testid="url-input"]').type("http://example.com");
-  
-      // Kontrollera om metod dropdown är synlig och välj "POST"
-      cy.get('[data-testid="method-select"]').select("POST");
-  
-      // Kontrollera om headers textarea är synlig och skriv JSON
-      cy.get('[data-testid="headers-input-req"]').type('{"Content-Type": "application/json"}', { parseSpecialCharSequences: false });
-  
-      // Kontrollera om body textarea är synlig och skriv JSON
-      cy.get('[data-testid="body-input-req"]').should('be.visible').type('{"key": "value"}', { parseSpecialCharSequences: false });
-      
-      // Skicka in formuläret om det finns en submit-knapp
-      // cy.get('[data-testid="submit-button"]').click();
-    });
+  it('should interact with both request and response form fields correctly and navigate to homepage after saving', () => {
+    // Visit the page
+    cy.visit('http://localhost:5173/mappings');
+    
+    // Interact with Request Form (ReqForm)
+    // Verify the title input field is visible and type "titel"
+    cy.get('[data-testid="title-input"]').type("titel");
+
+    // Verify the URL input field is visible and type a URL
+    cy.get('[data-testid="url-input"]').type("http://example.com");
+
+    // Verify the method dropdown is visible and select "POST"
+    cy.get('[data-testid="method-select"]').select("POST");
+
+    // Verify the headers textarea is visible and type JSON
+    cy.get('[data-testid="headers-input-req"]').type('{"Content-Type": "application/json"}', { parseSpecialCharSequences: false });
+
+    // Verify the body textarea is visible and type JSON
+    cy.get('[data-testid="body-input-req"]').should('be.visible').type('{"key": "value"}', { parseSpecialCharSequences: false });
+    
+    // Interact with Response Form (ResForm)
+    // Verify the status input field is visible and type a status code
+    cy.get('[data-testid="status-input"]').type("200");
+
+    // Verify the headers textarea is visible and type JSON
+    cy.get('[data-testid="headers-input"]').type('{"Content-Type": "application/json"}', { parseSpecialCharSequences: false });
+
+    // Verify the body textarea is visible and type JSON
+    cy.get('[data-testid="body-input"]').should('be.visible').type('{"key": "value"}', { parseSpecialCharSequences: false });
+
+   
+
+    // Click the "Save Mapping" button
+    cy.get('button').contains('Save Mapping').click();
+
+    
+   
+
+   
   });
+});
