@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import SortControls from "./SortControls";
 import styles from "./MappingsPage.module.css";
 
 const MappingsPage = ({
@@ -8,7 +9,6 @@ const MappingsPage = ({
   handleUpdateRequest,
   handleUpdateResponse,
   handleDelete,
-
 }) => {
   const navigate = useNavigate();
 
@@ -22,7 +22,13 @@ const MappingsPage = ({
   const [editedResponseData, setEditedResponseData] = useState({});
   const [expandedMappings, setExpandedMappings] = useState({});
   const [selectedResponses, setSelectedResponses] = useState({});
-
+  const [sortCriterion, setSortCriterion] = useState("title");
+  const [searchFilters, setSearchFilters] = useState({
+    title: "",
+    url: "",
+    method: "",
+  });
+  const [sortedFilteredMappings, setSortedFilteredMappings] = useState([]);
 
   useEffect(() => {
     const initialSelections = {};
@@ -46,14 +52,28 @@ const MappingsPage = ({
     }
   };
 
-  const toggleEditResponse = (responseId, response) => {
-    if (editingResponse === responseId) {
-      setEditingResponse(null);
-    } else {
-      setEditingResponse(responseId);
-      setEditedResponseData(response);
-    }
-  };
+  useEffect(() => {
+    const filteredMappings = mappings.filter((mapping) => {
+      const { title, url, method } = searchFilters;
+
+      const matchTitle =
+        title === "" || mapping.request.title?.toLowerCase().includes(title);
+      const matchURL =
+        url === "" || mapping.request.url?.toLowerCase().includes(url);
+      const matchMethod =
+        method === "" || mapping.request.method?.toLowerCase().includes(method);
+
+      return matchTitle && matchURL && matchMethod;
+    });
+
+    const sortedMappings = filteredMappings.sort((a, b) => {
+      const fieldA = a.request[sortCriterion]?.toLowerCase() || "";
+      const fieldB = b.request[sortCriterion]?.toLowerCase() || "";
+      return fieldA.localeCompare(fieldB);
+    });
+
+    setSortedFilteredMappings(sortedMappings);
+  }, [sortCriterion, searchFilters, mappings]);
 
   const toggleMappingDetails = (mappingId) => {
     setExpandedMappings((prev) => ({
@@ -82,7 +102,14 @@ const MappingsPage = ({
   return (
     <section className={styles.section}>
       <h2>Saved Mappings</h2>
-      {mappings.map((mapping) => {
+      <SortControls
+        sortCriterion={sortCriterion}
+        setSortCriterion={setSortCriterion}
+        searchFilters={searchFilters}
+        setSearchFilters={setSearchFilters}
+      />
+
+      {sortedFilteredMappings.map((mapping) => {
         const relevantResponses = responses.filter(
           (res) => res.reqId === mapping.id
         );
@@ -162,15 +189,20 @@ const MappingsPage = ({
                         })
                       }
                     />
-                    <button onClick={() => handleSaveRequest(mapping.id)}
-                    className={styles.saveButton}>
+                    <button
+                      onClick={() => handleSaveRequest(mapping.id)}
+                      className={styles.saveButton}
+                    >
                       Save Request
                     </button>
                   </div>
                 ) : (
                   <button
-                    onClick={() => toggleEditRequest(mapping.id, mapping.request)}
-                  className={styles.editButton}>
+                    onClick={() =>
+                      toggleEditRequest(mapping.id, mapping.request)
+                    }
+                    className={styles.editButton}
+                  >
                     Edit Request
                   </button>
                 )}
@@ -186,11 +218,15 @@ const MappingsPage = ({
                           e.target.value
                         )
                       }
-                      disabled={editingRequest === mapping.id || editingResponse === selectedResponses[mapping.id]}
+                      disabled={
+                        editingRequest === mapping.id ||
+                        editingResponse === selectedResponses[mapping.id]
+                      }
                     >
                       {relevantResponses.map((response) => (
                         <option key={response.id} value={response.id}>
-                          {response.id} - {response.resJson.status || "No Status"}
+                          {response.id} -{" "}
+                          {response.resJson.status || "No Status"}
                         </option>
                       ))}
                     </select>
@@ -242,8 +278,10 @@ const MappingsPage = ({
                         />
                         <button
                           onClick={() =>
-                            handleSaveResponse(selectedResponses[mapping.id])}
-                            className={styles.saveButton}>
+                            handleSaveResponse(selectedResponses[mapping.id])
+                          }
+                          className={styles.saveButton}
+                        >
                           Save Response
                         </button>
                       </div>
@@ -253,7 +291,10 @@ const MappingsPage = ({
                           toggleEditResponse(
                             selectedResponses[mapping.id],
                             selectedResponse.resJson
-                          )} className={styles.editButton}>
+                          )
+                        }
+                        className={styles.editButton}
+                      >
                         Edit Response
                       </button>
                     )}

@@ -1,15 +1,29 @@
 [
   {
-    "id": "1",
+    "id": "2",
+    "resJson": {
+      "title": "Hello",
+      "url": "/reg",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "text": "hello world"
+      }
+    }
+  },
+  {
+    "id": "3",
     "resJson": {
       "title": "Fetching user",
-      "url": "/User",
-      "method": "GET",
+      "url": "/user",
+      "method": "POST",
       "headers": {
         "Content-Type": "text/plain"
       },
       "body": {
-        "body": "req1"
+        "body": "reg"
       }
     }
   }

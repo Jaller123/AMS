@@ -1,0 +1,29 @@
+.sortControls {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.sortSection {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.searchSection {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.searchSection label {
+  margin-right: 0.5rem;
+  font-weight: bold;
+}
+
+.searchSection input {
+  padding: 0.25rem;
+  font-size: 1rem;
+  flex-grow: 1;
+}
