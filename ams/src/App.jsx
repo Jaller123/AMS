@@ -5,6 +5,7 @@ import ReqForm from "./components/ReqForm";
 import ResForm from "./components/ResForm";
 import MappingsPage from "./components/MappingPage/MappingPage.jsx";
 import MappingDetailPage from "./components/MappingDetailPage";
+
 import ReqDetailPage from "./components/ReqDetailPage";
 import Button from "./components/Button";
 import {
@@ -73,16 +74,16 @@ const App = () => {
             resJson: response,
           },
         ]);
-        
+
         // Reset the form
         setResetForm(true);
         setTimeout(() => setResetForm(false), 0);
-        
+
         // Clear request and response data
         setRequestData(null);
         setResponseData(null);
-        
-        alert("Mapping saved successfully!");
+
+        alert("Mapping saved successfully");
       } catch (error) {
         console.error("Error saving mapping:", error);
         alert("Failed to save mapping. Please try again.");
@@ -123,18 +124,22 @@ const App = () => {
 
   const handleUpdateRequest = async (requestId, updatedRequest) => {
     try {
-      const response = await fetch(`http://localhost:8080/requests/${requestId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ resJson: updatedRequest }),
-      });
-  
+      const response = await fetch(
+        `http://localhost:8080/requests/${requestId}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ resJson: updatedRequest }),
+        }
+      );
+
       if (!response.ok) {
         throw new Error("Failed to update request.");
       }
-  
-      const { updatedRequest: updatedRequestFromServer } = await response.json();
-  
+
+      const { updatedRequest: updatedRequestFromServer } =
+        await response.json();
+
       setMappings((prevMappings) =>
         prevMappings.map((mapping) =>
           mapping.id === requestId
@@ -147,7 +152,6 @@ const App = () => {
       alert("Failed to update request. Please try again.");
     }
   };
-  
 
   const handleUpdateResponse = async (responseId, updatedResponse) => {
     try {
@@ -172,7 +176,6 @@ const App = () => {
       console.error("Error updating response:", error);
       alert("Failed to update response. Please try again.");
     }
-    
   };
 
   return (
@@ -196,7 +199,10 @@ const App = () => {
           element={
             <div>
               <ReqForm setRequestData={setRequestData} resetForm={resetForm} />
-              <ResForm setResponseData={setResponseData} resetForm={resetForm} />
+              <ResForm
+                setResponseData={setResponseData}
+                resetForm={resetForm}
+              />
               <Button onClick={handleSaveMapping}>Save Mapping</Button>
             </div>
           }

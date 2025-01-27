@@ -23,7 +23,6 @@ export const fetchMappings = async () => {
   }
 };
 
-
 export const saveMapping = async (mapping) => {
   try {
     const response = await fetch(`${API_BASE_URL}/mappings`, {

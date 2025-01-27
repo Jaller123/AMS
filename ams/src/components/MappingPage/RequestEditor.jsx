@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from "react";
 import styles from "./MappingsPage.module.css";
 
-const RequestEditor = ({ mappingId, editedRequest, setEditedRequest, handleUpdateRequest }) => {
+const RequestEditor = ({
+  mappingId,
+  editedRequest,
+  setEditedRequest,
+  handleUpdateRequest,
+}) => {
   const [isEditing, setIsEditing] = useState(false);
   const [localRequest, setLocalRequest] = useState({
     title: "",
@@ -45,34 +50,47 @@ const RequestEditor = ({ mappingId, editedRequest, setEditedRequest, handleUpdat
         <div>
           <label>Title</label>
           <input
+            placeholder="Title"
             type="text"
             placeholder="Title"
             value={localRequest.title}
-            onChange={(e) => setLocalRequest({ ...localRequest, title: e.target.value })}
+            onChange={(e) =>
+              setLocalRequest({ ...localRequest, title: e.target.value })
+            }
           />
           <label>URL</label>
           <input
+            placeholder="Url"
             type="text"
           placeholder="URL"
             value={localRequest.url}
-            onChange={(e) => setLocalRequest({ ...localRequest, url: e.target.value })}
+            onChange={(e) =>
+              setLocalRequest({ ...localRequest, url: e.target.value })
+            }
           />
           <label>Method</label>
           <input
+            placeholder="Method"
             type="text"
             placeholder="Method"
             value={localRequest.method}
-            onChange={(e) => setLocalRequest({ ...localRequest, method: e.target.value })}
+            onChange={(e) =>
+              setLocalRequest({ ...localRequest, method: e.target.value })
+            }
           />
           <label>Headers (JSON)</label>
           <textarea
             value={localRequest.headers}
-            onChange={(e) => setLocalRequest({ ...localRequest, headers: e.target.value })}
+            onChange={(e) =>
+              setLocalRequest({ ...localRequest, headers: e.target.value })
+            }
           />
           <label>Body (JSON)</label>
           <textarea
             value={localRequest.body}
-            onChange={(e) => setLocalRequest({ ...localRequest, body: e.target.value })}
+            onChange={(e) =>
+              setLocalRequest({ ...localRequest, body: e.target.value })
+            }
           />
           <button onClick={saveRequest}>Save Request</button>
         </div>
