@@ -1,58 +1,16 @@
 [
   {
-    "id": "2.1",
-    "reqId": "2",
-    "resJson": {
-      "status": "201",
-      "headers": {
-        "Content-Type": "application/json"
-      },
-      "body": {
-        "message": "OK"
-      }
-    },
-    "timestamp": "2025-01-23 11:44:25"
-  },
-  {
-    "id": "3.1",
-    "reqId": "3",
-    "resJson": {
-      "status": "205",
-      "headers": {
-        "Content-Type": "text/plain"
-      },
-      "body": {
-        "message": "Working"
-      }
-    },
-    "timestamp": "2025-01-23 12:51:06"
-  },
-  {
-    "id": "4.1",
-    "reqId": "4",
-    "resJson": {
-      "status": "204",
-      "headers": {
-        "Content-Type": "text/plain"
-      },
-      "body": {
-        "message": "OK"
-      }
-    },
-    "timestamp": "2025-01-27 11:21:09"
-  },
-  {
-    "id": "5.1",
-    "reqId": "5",
+    "id": "1.1",
+    "reqId": "1",
     "resJson": {
       "status": "200",
       "headers": {
-        "Content-Type": "application/json"
+        "Content-Type": "text/plain"
       },
       "body": {
-        "text": "working fine"
+        "body": "updated response body"
       }
     },
-    "timestamp": "2025-01-27 11:23:13"
+    "timestamp": "2025-01-23 11:44:25"
   }
 ]

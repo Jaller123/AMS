@@ -1,57 +1,15 @@
 [
   {
-    "id": "2",
+    "id": "1",
     "resJson": {
-      "title": "Hello",
-      "url": "/reg",
-      "method": "POST",
-      "headers": {
-        "Content-Type": "application/json"
-      },
-      "body": {
-        "text": "hello world"
-      }
-    }
-  },
-  {
-    "id": "3",
-    "resJson": {
-      "title": "Fetching user",
-      "url": "/user",
+      "title": "Updated Test Title",
+      "url": "/test",
       "method": "POST",
       "headers": {
         "Content-Type": "text/plain"
       },
       "body": {
-        "body": "reg"
-      }
-    }
-  },
-  {
-    "id": "4",
-    "resJson": {
-      "title": "fetching user",
-      "url": "/user",
-      "method": "GET",
-      "headers": {
-        "Content-Type": "text/plain"
-      },
-      "body": {
-        "body": "req2"
-      }
-    }
-  },
-  {
-    "id": "5",
-    "resJson": {
-      "title": "user",
-      "url": "/login",
-      "method": "GET",
-      "headers": {
-        "Content-Type": "application/json"
-      },
-      "body": {
-        "body": "req2"
+        "body": "test1"
       }
     }
   }
