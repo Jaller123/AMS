@@ -61,7 +61,6 @@ const ResponseEditor = ({
           <input
             placeholder="Status"
             type="text"
-            placeholder="Status"
             value={localResponse.status || ""}
             onChange={(e) =>
               setLocalResponse({ ...localResponse, status: e.target.value })

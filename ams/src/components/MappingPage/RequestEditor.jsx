@@ -52,7 +52,6 @@ const RequestEditor = ({
           <input
             placeholder="Title"
             type="text"
-            placeholder="Title"
             value={localRequest.title}
             onChange={(e) =>
               setLocalRequest({ ...localRequest, title: e.target.value })
@@ -61,8 +60,7 @@ const RequestEditor = ({
           <label>URL</label>
           <input
             placeholder="Url"
-            type="text"
-          placeholder="URL"
+            type="text"         
             value={localRequest.url}
             onChange={(e) =>
               setLocalRequest({ ...localRequest, url: e.target.value })
@@ -72,7 +70,6 @@ const RequestEditor = ({
           <input
             placeholder="Method"
             type="text"
-            placeholder="Method"
             value={localRequest.method}
             onChange={(e) =>
               setLocalRequest({ ...localRequest, method: e.target.value })
