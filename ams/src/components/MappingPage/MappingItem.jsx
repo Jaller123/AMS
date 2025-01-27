@@ -63,7 +63,7 @@ const MappingItem = ({
         </button>
       </div>
       {expandedMappings[mapping.id] && (
-        <div>
+        <>
           <RequestEditor
             mappingId={mapping.id}
             editedRequest={editedRequests[mapping.id]}
@@ -93,12 +93,13 @@ const MappingItem = ({
             handleUpdateResponse={handleUpdateResponse}
           />
           <button
+            placeholder="Delete Button"
             onClick={() => handleDelete(mapping.id)}
             className={styles.deleteButton}
           >
             Delete Mapping
           </button>
-        </div>
+        </>
       )}
     </li>
   );

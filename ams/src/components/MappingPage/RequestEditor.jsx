@@ -46,18 +46,21 @@ const RequestEditor = ({ mappingId, editedRequest, setEditedRequest, handleUpdat
           <label>Title</label>
           <input
             type="text"
+            placeholder="Title"
             value={localRequest.title}
             onChange={(e) => setLocalRequest({ ...localRequest, title: e.target.value })}
           />
           <label>URL</label>
           <input
             type="text"
+          placeholder="URL"
             value={localRequest.url}
             onChange={(e) => setLocalRequest({ ...localRequest, url: e.target.value })}
           />
           <label>Method</label>
           <input
             type="text"
+            placeholder="Method"
             value={localRequest.method}
             onChange={(e) => setLocalRequest({ ...localRequest, method: e.target.value })}
           />

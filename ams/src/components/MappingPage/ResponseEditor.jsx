@@ -29,6 +29,7 @@ const ResponseEditor = ({
       headers: selectedRes.resJson?.headers || {}, // Keep as an object
       body: selectedRes.resJson?.body || {}, // Keep as an object
     });
+    console.log("Updated Responses:", relevantResponses);
   }, [editedResponse, selectedResponse, relevantResponses]);
 
   const saveResponse = () => {
@@ -53,6 +54,7 @@ const ResponseEditor = ({
           <label>Status</label>
           <input
             type="text"
+            placeholder="Status"
             value={localResponse.status || ""}
             onChange={(e) =>
               setLocalResponse({ ...localResponse, status: e.target.value })
@@ -71,6 +73,7 @@ const ResponseEditor = ({
           />
           <label>Body (JSON)</label>
           <textarea
+            placeholder="Body"
             value={
               typeof localResponse.body === "string"
                 ? localResponse.body
@@ -84,12 +87,10 @@ const ResponseEditor = ({
         </div>
       ) : (
         <div>
-          <select
+          <select placeholder="Select Response"
             value={selectedResponse || ""}
             onChange={(e) => {
-              const response = relevantResponses.find(
-                (res) => res.id === e.target.value
-              );
+              const response = relevantResponses.find((res) => res.id === e.target.value);
               setSelectedResponse(response?.id || "");
               setEditedResponse(response?.resJson || {});
             }}
