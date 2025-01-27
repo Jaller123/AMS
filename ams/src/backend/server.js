@@ -26,6 +26,7 @@ const getNextId = (mappings) => {
 app.get("/mappings", (req, res) => {
   const requests = JSON.parse(fs.readFileSync(requestsFile, "utf-8"));
   const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"));
+  console.log("GET /mappings:", { requests, responses });
   res.json({ requests, responses });
 });
 
@@ -78,27 +79,23 @@ app.post("/mappings", (req, res) => {
 app.post("/responses", (req, res) => {
   const { reqId, resJson, timestamp } = req.body;
 
-  if (!reqId || !resJson) {
-    return res.status(400).json({ success: false, message: "Invalid data." });
+  if (!reqId || !resJson || !resJson.status || !resJson.headers || !resJson.body) {
+    return res.status(400).json({ success: false, message: "Invalid data. Ensure reqId and resJson fields are valid." });
   }
 
   const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"));
 
-  // Skapa ny Response ID
-  const matchingResponses = responses.filter(
-    (response) => response.reqId === reqId
-  );
+  const matchingResponses = responses.filter((response) => response.reqId === reqId);
   const responseId = `${reqId}.${matchingResponses.length + 1}`;
 
   const newResponse = {
     id: responseId,
     reqId,
     resJson,
-    timestamp,
+    timestamp: timestamp || new Date().toISOString(),
   };
 
   responses.push(newResponse);
-
   fs.writeFileSync(responseFile, JSON.stringify(responses, null, 2));
 
   res.json({ success: true, newResponse });

@@ -75,29 +75,113 @@ describe("Mappings Page Functionalities", () => {
 
   it("should edit and save a response", () => {
     cy.contains("Show Details").click();
+  
+    // Enter editing mode
     cy.contains("Edit Response").click();
-
-    // Update the response status and save
-    cy.get('input[placeholder="Status"]').clear().type("404");
+  
+    // Clear and update the body field
+    cy.get('textarea[placeholder="Body"]')
+      .clear()
+      .type('{"body":"updated response body"}', { parseSpecialCharSequences: false });
+  
+    // Save the updated response
     cy.contains("Save Response").click();
-
-    // Verify the update
-    cy.contains("404").should("exist");
+  
+    // Verify the updated response
+    cy.get("pre").should("contain.text", '"body": "updated response body"');
   });
 
-  it("should add a new response and navigate", () => {
+  it("should view response details", () => {
+    cy.contains("Show Details").click();
+
+    // Verify response details
+    cy.contains("Response").should("exist");
+    cy.contains("200").should("exist");
+    cy.contains('"Content-Type": "text/plain"').should("exist");
+    cy.contains('"body": "test1"').should("exist");
+  });
+
+  it("should add a new response, navigate and choose the new response", () => {
+    // Open the details view
     cy.contains("Show Details").click();
     cy.contains("Add New Response").click();
-
-    // Verify navigation to add response page
+  
+    // Verify navigation to the add response page
     cy.url().should("eq", "http://localhost:5173/request/1");
-  });
-
-  it("should delete a mapping", () => {
+  
+    // Fill in the new response details
+    cy.get('input[placeholder="e.g., 200"]').type("201");
+    cy.get('textarea[placeholder=\'{"Content-Type":"application/json"}\']')
+      .clear()
+      .type('{"Content-Type":"application/json"}', { parseSpecialCharSequences: false });
+    cy.get('textarea[placeholder=\'{"key": "value"}\']')
+      .clear()
+      .type('{"body":"new response body"}', { parseSpecialCharSequences: false });
+  
+    // Mock the POST response and ensure it completes
+    cy.intercept("POST", "http://localhost:8080/responses").as("saveResponse");
+    cy.contains("Save Response").click();
+    cy.wait("@saveResponse");
+  
+    // Register the intercept for updated mappings before navigating back
+    cy.intercept("GET", "http://localhost:8080/mappings", {
+      statusCode: 200,
+      body: {
+        requests: [
+          {
+            id: "1",
+            resJson: {
+              title: "Updated Test Title",
+              url: "/test",
+              method: "POST",
+              headers: { "Content-Type": "text/plain" },
+              body: { body: "test1" },
+            },
+          },
+        ],
+        responses: [
+          {
+            id: "1.1",
+            reqId: "1",
+            resJson: {
+              status: "200",
+              headers: { "Content-Type": "text/plain" },
+              body: { body: "test1" },
+            },
+          },
+          {
+            id: "1.2",
+            reqId: "1",
+            resJson: {
+              status: "201",
+              headers: { "Content-Type": "application/json" },
+              body: { body: "new response body" },
+            },
+          },
+        ],
+      },
+    }).as("updatedMappings");
+  
+    // Navigate back to mappings
+    cy.contains("Back to Mappings").click();
+  
+    // Verify the dropdown contains the new response
     cy.contains("Show Details").click();
-    cy.contains("Delete Mapping").click();
-
-    // Verify the mapping is removed
+    cy.get("select[placeholder='Select Response'] option")
+      .should("have.length", 2)
+      .and("contain", "201");
+  
+    // Select and verify the new response details
+    cy.get("select[placeholder='Select Response']").select("1.2").should("contain", "201");
+    cy.get("pre").should("contain.text", '"status": "201"');
+    cy.get("pre").should("contain.text", '"Content-Type": "application/json"');
+    cy.get("pre").should("contain.text", '"body": "new response body"');
+  });
+  
+  it("should delete a mapping", () => {
+    cy.wait(500);
+    cy.contains("Show Details").click();
+    cy.get('button[placeholder="Delete Button"]').click();
     cy.contains("POST").should("not.exist");
     cy.contains("/test").should("not.exist");
     cy.contains("test2").should("not.exist");

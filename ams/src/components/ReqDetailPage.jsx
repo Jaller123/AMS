@@ -70,7 +70,7 @@ const ReqDetailPage = ({ mappings, handleSaveResponse }) => {
                     headers: e.target.value,
                   }))
                 }
-                placeholder='{"Content-Type": "application/json"}'
+                placeholder='{"Content-Type":"application/json"}'
               />
             </div>
             <div className={styles.inputGroup}>

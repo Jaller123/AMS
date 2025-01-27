@@ -60,7 +60,7 @@ const RequestEditor = ({
           <label>URL</label>
           <input
             placeholder="Url"
-            type="text"
+            type="text"         
             value={localRequest.url}
             onChange={(e) =>
               setLocalRequest({ ...localRequest, url: e.target.value })
