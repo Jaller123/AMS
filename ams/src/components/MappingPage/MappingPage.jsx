@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import SortControls from "./SortControls";
 import styles from "./MappingsPage.module.css";
+import MappingList from "./MappingList"; 
 
 const MappingsPage = ({
   mappings,
@@ -10,25 +11,12 @@ const MappingsPage = ({
   handleUpdateResponse,
   handleDelete,
 }) => {
-  const navigate = useNavigate();
+  
 
-  const goToDetails = (mappingId) => {
-    navigate(`/request/${mappingId}`);
-  };
-
-  const [editingRequest, setEditingRequest] = useState(null);
-  const [editingResponse, setEditingResponse] = useState(null);
-  const [editedRequestData, setEditedRequestData] = useState({});
-  const [editedResponseData, setEditedResponseData] = useState({});
   const [expandedMappings, setExpandedMappings] = useState({});
   const [selectedResponses, setSelectedResponses] = useState({});
-  const [sortCriterion, setSortCriterion] = useState("title");
-  const [searchFilters, setSearchFilters] = useState({
-    title: "",
-    url: "",
-    method: "",
-  });
-  const [sortedFilteredMappings, setSortedFilteredMappings] = useState([]);
+  const [editedRequests, setEditedRequests] = useState({});
+  const [editedResponses, setEditedResponses] = useState({});
 
   useEffect(() => {
     const initialSelections = {};
@@ -37,67 +25,12 @@ const MappingsPage = ({
         (res) => res.reqId === mapping.id
       );
       if (relevantResponses.length > 0) {
-        initialSelections[mapping.id] = relevantResponses[0].id; // Default to the first response
+        initialSelections[mapping.id] = relevantResponses[0].id;
       }
     });
     setSelectedResponses(initialSelections);
   }, [mappings, responses]);
 
-  const toggleEditRequest = (mappingId, request) => {
-    if (editingRequest === mappingId) {
-      setEditingRequest(null);
-    } else {
-      setEditingRequest(mappingId);
-      setEditedRequestData(request);
-    }
-  };
-
-  useEffect(() => {
-    const filteredMappings = mappings.filter((mapping) => {
-      const { title, url, method } = searchFilters;
-
-      const matchTitle =
-        title === "" || mapping.request.title?.toLowerCase().includes(title);
-      const matchURL =
-        url === "" || mapping.request.url?.toLowerCase().includes(url);
-      const matchMethod =
-        method === "" || mapping.request.method?.toLowerCase().includes(method);
-
-      return matchTitle && matchURL && matchMethod;
-    });
-
-    const sortedMappings = filteredMappings.sort((a, b) => {
-      const fieldA = a.request[sortCriterion]?.toLowerCase() || "";
-      const fieldB = b.request[sortCriterion]?.toLowerCase() || "";
-      return fieldA.localeCompare(fieldB);
-    });
-
-    setSortedFilteredMappings(sortedMappings);
-  }, [sortCriterion, searchFilters, mappings]);
-
-  const toggleMappingDetails = (mappingId) => {
-    setExpandedMappings((prev) => ({
-      ...prev,
-      [mappingId]: !prev[mappingId],
-    }));
-  };
-
-  const handleSaveRequest = (mappingId) => {
-    handleUpdateRequest(mappingId, editedRequestData);
-    setEditingRequest(null);
-  };
-
-  const handleSaveResponse = (responseId) => {
-    handleUpdateResponse(responseId, editedResponseData);
-    setEditingResponse(null);
-  };
-
-  const handleResponseSelectionChange = (mappingId, responseId) => {
-    setSelectedResponses((prev) => ({
-      ...prev,
-      [mappingId]: responseId,
-    }));
-  };
 
   return (
     <section className={styles.section}>
@@ -244,82 +177,29 @@ const MappingsPage = ({
                           onChange={(e) =>
                             setEditedResponseData({
                               ...editedResponseData,
-                              status: e.target.value,
                             })
                           }
                         />
-                        <label>Headers (JSON):</label>
-                        <textarea
-                          value={JSON.stringify(
-                            editedResponseData.headers || {},
-                            null,
-                            2
-                          )}
-                          onChange={(e) =>
-                            setEditedResponseData({
-                              ...editedResponseData,
-                              headers: JSON.parse(e.target.value || "{}"),
-                            })
-                          }
-                        />
-                        <label>Body (JSON):</label>
-                        <textarea
-                          value={JSON.stringify(
-                            editedResponseData.body || {},
-                            null,
-                            2
-                          )}
-                          onChange={(e) =>
-                            setEditedResponseData({
-                              ...editedResponseData,
-                              body: JSON.parse(e.target.value || "{}"),
-                            })
-                          }
-                        />
-                        <button
-                          onClick={() =>
-                            handleSaveResponse(selectedResponses[mapping.id])
-                          }
-                          className={styles.saveButton}
-                        >
-                          Save Response
-                        </button>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() =>
-                          toggleEditResponse(
-                            selectedResponses[mapping.id],
-                            selectedResponse.resJson
-                          )
-                        }
-                        className={styles.editButton}
-                      >
-                        Edit Response
-                      </button>
-                    )}
-                  </div>
-                ) : (
-                  <p>No responses available.</p>
-                )}
-
-                <button
-                  onClick={() => navigate(`/request/${mapping.id}`)}
-                  className={styles.detailsButton}
-                >
-                  Add New Response
-                </button>
-                <button
-                  onClick={() => handleDelete(mapping.id)}
-                  className={styles.deleteButton}
-                >
-                  Delete Mapping
-                </button>
-              </div>
-            )}
-          </div>
-        );
-      })}
+=======
+  return (
+    <section className={styles.section}>
+      <h2>Saved Mappings</h2>
+      <MappingList
+        mappings={mappings}
+        responses={responses}
+        expandedMappings={expandedMappings}
+        setExpandedMappings={setExpandedMappings}
+        selectedResponses={selectedResponses}
+        setSelectedResponses={setSelectedResponses}
+        editedRequests={editedRequests}
+        setEditedRequests={setEditedRequests}
+        editedResponses={editedResponses}
+        setEditedResponses={setEditedResponses}
+        handleDelete={handleDelete}
+        handleUpdateRequest={handleUpdateRequest}
+        handleUpdateResponse={handleUpdateResponse}
+      />
+>>>>>>> ad48271b01ef6a0a3a4ac6980b8684d6b1e3fd3f
     </section>
   );
 };

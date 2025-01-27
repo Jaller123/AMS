@@ -6,6 +6,7 @@ describe("Mappings Page Functionalities", () => {
         requests: [
           {
             id: "1",
+<<<<<<< HEAD
             resJson: {
               title: "test2",
               url: "/test",
@@ -13,6 +14,9 @@ describe("Mappings Page Functionalities", () => {
               headers: { "Content-Type": "text/plain" },
               body: { body: "test1" },
             },
+=======
+            resJson: { title: "Sample Request 1", endpoint: "/api/sample1" },
+>>>>>>> ad48271b01ef6a0a3a4ac6980b8684d6b1e3fd3f
           },
         ],
         responses: [
@@ -31,6 +35,42 @@ describe("Mappings Page Functionalities", () => {
 
     cy.visit("http://localhost:5173");
     cy.wait("@getMappings");
+<<<<<<< HEAD
+=======
+
+    // Mock the API responses for editing, deleting, etc.
+    cy.intercept("PUT", "http://localhost:8080/requests/1", {
+      statusCode: 200,
+      body: {
+        success: true,
+        updatedRequest: {
+          id: "1",
+          resJson: { title: "Updated Request", endpoint: "/api/updated" },
+        },
+      },
+    }).as("editRequest");
+
+    cy.intercept("PUT", "http://localhost:8080/responses/1.1", {
+      statusCode: 200,
+      body: {
+        success: true,
+        updatedResponse: {
+          id: "1.1",
+          reqId: "1",
+          resJson: { status: "404" },
+          timestamp: "2025-01-01 10:05:00",
+        },
+      },
+    }).as("editResponse");
+
+    cy.intercept("DELETE", "http://localhost:8080/mappings/1", {
+      statusCode: 200,
+      body: { success: true },
+    }).as("deleteMapping");
+
+    cy.visit("http://localhost:5173");
+    cy.wait("@getMappings"); // Wait for the GET request to finish
+>>>>>>> ad48271b01ef6a0a3a4ac6980b8684d6b1e3fd3f
   });
 
   it("should display method, URL, and title in collapsed mapping", () => {
