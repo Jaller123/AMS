@@ -5,6 +5,7 @@ import ReqForm from "./components/ReqForm";
 import ResForm from "./components/ResForm";
 import MappingsPage from "./components/MappingPage/MappingPage.jsx";
 import MappingDetailPage from "./components/MappingDetailPage";
+import TrafficPage from "./components/TrafficPage";
 
 import ReqDetailPage from "./components/ReqDetailPage";
 import Button from "./components/Button";
@@ -227,6 +228,7 @@ const App = () => {
             />
           }
         />
+        <Route path="/traffic" element={<TrafficPage />} />
       </Routes>
     </Router>
   );
