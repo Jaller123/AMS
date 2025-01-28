@@ -1,5 +1,5 @@
-[
-  {
+[  
+{
     "id": "1",
     "resJson": {
       "title": "user",
@@ -32,6 +32,8 @@
     "resJson": {
       "title": "login",
       "url": "/login",
+      "title": "Updated Test Title",
+      "url": "/test",
       "method": "POST",
       "headers": {
         "Content-Type": "text/plain"
@@ -52,6 +54,11 @@
       },
       "body": {
         "body": "ok"
+      }
+    }
+  }
+]
+        "body": "test1"
       }
     }
   }

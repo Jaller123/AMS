@@ -3,18 +3,21 @@ import fs from "fs";
 import bodyParser from "body-parser";
 import cors from "cors";
 import path from "path";
+import fetch from "node-fetch"
 import { fileURLToPath } from "url";
 import fetch from "node-fetch";
 
+const WIREMOCK_BASE_URL = "http://localhost:8081/__admin/mappings";
 const app = express();
 app.use(bodyParser.json());
-app.use(cors());
+app.use(cors({ origin: "*" }));
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const requestsFile = path.join(__dirname, "./mappings_requests.json");
 const responseFile = path.join(__dirname, "./mappings_responses.json");
+
 
 // Helper för nästa ID
 const getNextId = (mappings) => {
@@ -31,14 +34,57 @@ app.get("/mappings", (req, res) => {
   res.json({ requests, responses });
 });
 
+const sendMappingToWireMock = async (request, response) => {
+  const mapping = {
+    request: {
+      method: request.method.toUpperCase(),
+      url: request.url,
+      headers: Object.fromEntries(
+        Object.entries(request.headers || {}).map(([key, value]) => [
+          key,
+          { equalTo: value }, // Transform headers to WireMock format
+        ])
+      ),
+      bodyPatterns: request.body
+        ? [{ equalToJson: request.body }] // Transform body for WireMock
+        : undefined,
+    },
+    response: {
+      status: response.status,
+      headers: response.headers,
+      body: JSON.stringify(response.body), // Ensure body is a string
+    },
+  };
+
+  console.log("Transformed mapping to WireMock format:", JSON.stringify(mapping, null, 2));
+
+  try {
+    const wireMockResponse = await fetch(WIREMOCK_BASE_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(mapping),
+    });
+
+    const responseText = await wireMockResponse.text();
+    if (!wireMockResponse.ok) {
+      console.error(`WireMock response error: ${wireMockResponse.status}`);
+      console.error("Response body:", responseText);
+    } else {
+      console.log("Mapping successfully sent to WireMock.");
+    }
+  } catch (error) {
+    console.error("Error sending mapping to WireMock:", error);
+  }
+};
+
+
 // Skapa ny mapping
-app.post("/mappings", (req, res) => {
+app.post("/mappings", async (req, res) => {
   const { request, response } = req.body;
 
   const requests = JSON.parse(fs.readFileSync(requestsFile, "utf-8"));
   const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"));
 
-  // Kontrollera om request redan finns
   const existingRequest = requests.find(
     (req) => JSON.stringify(req.resJson) === JSON.stringify(request)
   );
@@ -52,7 +98,6 @@ app.post("/mappings", (req, res) => {
     fs.writeFileSync(requestsFile, JSON.stringify(requests, null, 2));
   }
 
-  // Skapa nytt response-ID
   const matchingResponses = responses.filter((res) => res.reqId === requestId);
   const responseId = `${requestId}.${matchingResponses.length + 1}`;
 
@@ -70,12 +115,18 @@ app.post("/mappings", (req, res) => {
   responses.push(newResponse);
   fs.writeFileSync(responseFile, JSON.stringify(responses, null, 2));
 
+  console.log("Sending mapping to WireMock...");
+
+  await sendMappingToWireMock(request, response);
+
   res.json({
     success: true,
     newRequest: { id: requestId, resJson: request },
     newResponse,
   });
 });
+
+
 
 app.post("/responses", (req, res) => {
   const { reqId, resJson, timestamp } = req.body;

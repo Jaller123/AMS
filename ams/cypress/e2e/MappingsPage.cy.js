@@ -32,8 +32,50 @@ describe("Mappings Page Functionalities", () => {
     cy.visit("http://localhost:5173");
     cy.wait("@getMappings");
   });
-
+  
+  it("the title", () => {
+   cy.get('[data-testid="search-input"]').type("title");
+  });
+  
   it("should display method, URL, and title in collapsed mapping", () => {
+    cy.contains("POST").should("exist");
+    cy.contains("/test").should("exist");
+    cy.contains("test2").should("exist");
+  });
+
+  it("should filter mappings based on title, URL, and method", () => {
+    // Check filtering by title
+    cy.get('input[placeholder="Search by Title"]').type("test2");
+    cy.contains("POST").should("exist");
+    cy.contains("/test").should("exist");
+    cy.contains("test2").should("exist");
+  
+    // Clear title filter and verify mapping is still visible
+    cy.get('input[placeholder="Search by Title"]').clear();
+    cy.contains("POST").should("exist");
+    cy.contains("/test").should("exist");
+    cy.contains("test2").should("exist");
+  
+    // Check filtering by URL
+    cy.get('input[placeholder="Search by URL"]').type("/test");
+    cy.contains("POST").should("exist");
+    cy.contains("/test").should("exist");
+    cy.contains("test2").should("exist");
+  
+    // Clear URL filter and verify mapping is still visible
+    cy.get('input[placeholder="Search by URL"]').clear();
+    cy.contains("POST").should("exist");
+    cy.contains("/test").should("exist");
+    cy.contains("test2").should("exist");
+  
+    // Check filtering by method
+    cy.get('input[placeholder="Search by Method"]').type("POST");
+    cy.contains("POST").should("exist");
+    cy.contains("/test").should("exist");
+    cy.contains("test2").should("exist");
+  
+    // Clear method filter and verify mapping is still visible
+    cy.get('input[placeholder="Search by Method"]').clear();
     cy.contains("POST").should("exist");
     cy.contains("/test").should("exist");
     cy.contains("test2").should("exist");
@@ -131,7 +173,7 @@ describe("Mappings Page Functionalities", () => {
           {
             id: "1",
             resJson: {
-              title: "Updated Test Title",
+             
               url: "/test",
               method: "POST",
               headers: { "Content-Type": "text/plain" },

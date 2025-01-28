@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { ToastContainer, toast, Bounce } from 'react-toastify';
+
 import Navbar from "./components/Navbar";
 import ReqForm from "./components/ReqForm";
 import ResForm from "./components/ResForm";
@@ -89,14 +91,52 @@ const App = () => {
         // Clear request and response data
         setRequestData(null);
         setResponseData(null);
-
-        alert("Mapping saved successfully");
+  
+        // Show success toast
+        toast.success("Mapping saved successfully!", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
       } catch (error) {
         console.error("Error saving mapping:", error);
-        alert("Failed to save mapping. Please try again.");
+  
+        if (!toast.isActive("error-toast")) { 
+          toast.error("Failed to save mapping. Please try again.", {
+            toastId: "error-toast", 
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: false,
+            pauseOnHover: false,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            transition: Bounce,
+          });
+        }
       }
     } else {
-      alert("Both request and response data are required.");
+      if (!toast.isActive("missing-data-toast")) { 
+        toast.warn("Both request and response data are required.", {
+          toastId: "missing-data-toast", 
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+      }
     }
   };
 
@@ -211,6 +251,7 @@ const App = () => {
                 resetForm={resetForm}
               />
               <Button onClick={handleSaveMapping}>Save Mapping</Button>
+              <ToastContainer />
             </div>
           }
         />
