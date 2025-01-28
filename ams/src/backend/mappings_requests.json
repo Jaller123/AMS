@@ -1,1 +1,58 @@
-[]
+[
+  {
+    "id": "1",
+    "resJson": {
+      "title": "user",
+      "url": "/user",
+      "method": "GET",
+      "headers": {
+        "Content-Type": "text/plain"
+      },
+      "body": {
+        "body": "req1"
+      }
+    }
+  },
+  {
+    "id": "2",
+    "resJson": {
+      "title": "fetching user",
+      "url": "/reg",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "body": "req1"
+      }
+    }
+  },
+  {
+    "id": "3",
+    "resJson": {
+      "title": "login",
+      "url": "/login",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "text/plain"
+      },
+      "body": {
+        "body": "request1"
+      }
+    }
+  },
+  {
+    "id": "4",
+    "resJson": {
+      "title": "title2",
+      "url": "/user",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "body": "ok"
+      }
+    }
+  }
+]

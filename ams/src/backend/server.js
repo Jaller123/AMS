@@ -4,6 +4,7 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
+import fetch from "node-fetch";
 
 const app = express();
 app.use(bodyParser.json());
@@ -79,13 +80,24 @@ app.post("/mappings", (req, res) => {
 app.post("/responses", (req, res) => {
   const { reqId, resJson, timestamp } = req.body;
 
-  if (!reqId || !resJson || !resJson.status || !resJson.headers || !resJson.body) {
-    return res.status(400).json({ success: false, message: "Invalid data. Ensure reqId and resJson fields are valid." });
+  if (
+    !reqId ||
+    !resJson ||
+    !resJson.status ||
+    !resJson.headers ||
+    !resJson.body
+  ) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid data. Ensure reqId and resJson fields are valid.",
+    });
   }
 
   const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"));
 
-  const matchingResponses = responses.filter((response) => response.reqId === reqId);
+  const matchingResponses = responses.filter(
+    (response) => response.reqId === reqId
+  );
   const responseId = `${reqId}.${matchingResponses.length + 1}`;
 
   const newResponse = {
@@ -169,8 +181,12 @@ app.delete("/mappings/:id", (req, res) => {
   const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"));
 
   // Filter out the specific request and associated responses
-  const updatedRequests = requests.filter((req) => String(req.id) !== String(id));
-  const updatedResponses = responses.filter((res) => String(res.reqId) !== String(id));
+  const updatedRequests = requests.filter(
+    (req) => String(req.id) !== String(id)
+  );
+  const updatedResponses = responses.filter(
+    (res) => String(res.reqId) !== String(id)
+  );
 
   // Write the updated data back to files
   fs.writeFileSync(requestsFile, JSON.stringify(updatedRequests, null, 2));
@@ -178,7 +194,6 @@ app.delete("/mappings/:id", (req, res) => {
 
   res.json({ success: true });
 });
-
 
 app.listen(8080, () => {
   console.log("Server running on http://localhost:8080");
