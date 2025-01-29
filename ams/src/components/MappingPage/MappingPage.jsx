@@ -23,6 +23,7 @@ const MappingsPage = ({
   const [filteredMappings, setFilteredMappings] = useState(mappings);
   const [search, setSearch] = useState("");
 
+
   useEffect(() => {
     // Uppdatera val av responses när mappings ändras
     const initialSelections = {};
@@ -55,15 +56,15 @@ const MappingsPage = ({
     // Filter by search input
     filtered = filtered.filter((mapping) => {
       const searchLower = search.toLowerCase();
-      const requestBody = JSON.stringify(mapping.request.body || {}).toLowerCase();
-      const requestHeaders = JSON.stringify(mapping.request.headers || {}).toLowerCase();
+      const requestBody = JSON.stringify(mapping.request?.body || {}).toLowerCase();
+      const requestHeaders = JSON.stringify(mapping.request?.headers || {}).toLowerCase();
 
       return (
-        mapping.request.title?.toLowerCase().includes(searchLower) ||
-        mapping.request.url?.toLowerCase().includes(searchLower) ||
+        mapping.request?.title?.toLowerCase().includes(searchLower) ||
+        mapping.request?.url?.toLowerCase().includes(searchLower) ||
         requestBody.includes(searchLower) ||
         requestHeaders.includes(searchLower) ||
-        mapping.request.method?.toLowerCase().includes(searchLower)
+        mapping.request?.method?.toLowerCase().includes(searchLower)
       );
     });
 
