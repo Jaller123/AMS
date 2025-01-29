@@ -1,4 +1,5 @@
 const API_BASE_URL = "http://localhost:8080";
+const API_WIREMOCK_URL = "http://localhost:8081/__admin/mappings"; 
 
 export const fetchMappings = async () => {
   try {
@@ -22,6 +23,35 @@ export const fetchMappings = async () => {
     return { requests: [], responses: [] };
   }
 };
+// WireMock API
+
+export const fetchWireMockTraffic = async () => {
+  try {
+    const response = await fetch("http://localhost:8081/__admin/mappings");
+    if (!response.ok) throw new Error("Failed to fetch WireMock mappings");
+
+    const data = await response.json();
+
+    return {
+      requests: data.mappings.map((mapping) => ({
+        id: mapping.id,
+        request: mapping.request || {}, // Ensure request object exists
+      })),
+      responses: data.mappings.map((mapping) => ({
+        id: mapping.id,
+        reqId: mapping.id, // WireMock uses `id` instead of `reqId`
+        resJson: mapping.response || {}, // Ensure response object exists
+        status: mapping.response?.status || "N/A", // Fix: Ensure status is always included
+        timestamp: new Date().toISOString(), // WireMock doesn't provide timestamps
+      })),
+    };
+  } catch (error) {
+    console.error("Error fetching WireMock mappings:", error);
+    return { requests: [], responses: [] };
+  }
+};
+
+
 
 export const saveMapping = async (mapping) => {
   try {

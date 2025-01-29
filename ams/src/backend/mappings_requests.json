@@ -1,4 +1,3 @@
-
 [
   {
     "id": "1",
@@ -6,6 +5,47 @@
       "title": "Updated Test Title",
       "url": "/test",
       "method": "POST",
+      "headers": {
+        "Content-Type": "text/plain"
+      },
+      "body": {
+        "body": "test1"
+      }
+    }
+  },
+  {
+    "id": "2",
+    "resJson": {
+      "title": "titel",
+      "url": "/test1",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "text/plain"
+      },
+      "body": {
+        "body": "test1"
+      }
+    }
+  },
+  {
+    "id": "3",
+    "resJson": {
+      "title": "Hejsan",
+      "url": "/hello",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "text/plain"
+      },
+      "body": {
+        "body": "test16"
+      }
+    }
+  },
+  {
+    "id": "4",
+    "resJson": {
+      "method": "POST",
+      "url": "/test",
       "headers": {
         "Content-Type": "text/plain"
       },

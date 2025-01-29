@@ -230,6 +230,47 @@ app.delete("/mappings/:id", (req, res) => {
   res.json({ success: true });
 });
 
+app.get("/traffic", async (req, res) => {
+  try {
+    
+    // Read AMS mappings
+    const requests = JSON.parse(fs.readFileSync(requestsFile, "utf-8"));
+    const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"));
+
+    // Fetch logged requests from WireMock
+    const wireMockResponse = await fetch("http://localhost:8081/__admin/requests");
+    if (!wireMockResponse.ok) {
+      throw new Error(`Failed to fetch WireMock logs: ${wireMockResponse.status}`);
+    }
+
+    const wireMockData = await wireMockResponse.json();
+    const wireMockLogs = wireMockData.requests || [];
+
+    // Combine AMS mappings and WireMock logs
+    const trafficData = wireMockLogs.map((log) => ({
+      id: log.id,
+      request: {
+        method: log.request.method,
+        url: log.request.url,
+        headers: log.request.headers,
+        body: log.request.body,
+      },
+      response: {
+        status: log.response.status,
+        headers: log.response.headers,
+        body: log.response.body,
+      },
+      timestamp: log.loggedDate,
+    }));
+
+    res.json({ success: true, trafficData });
+  } catch (error) {
+    console.error("Error fetching traffic data:", error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+
 
 app.listen(8080, () => {
   console.log("Server running on http://localhost:8080");
