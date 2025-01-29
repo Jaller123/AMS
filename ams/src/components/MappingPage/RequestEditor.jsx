@@ -9,18 +9,16 @@ const RequestEditor = ({
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [localRequest, setLocalRequest] = useState({
-    title: "",
     url: "",
     method: "",
     headers: "{}",
     body: "{}",
   });
 
-  // Initialize localRequest with values from editedRequest
+  // Initialize localRequest with values from editedRequest, excluding title
   useEffect(() => {
     if (editedRequest) {
       setLocalRequest({
-        title: editedRequest.title || "",
         url: editedRequest.url || "",
         method: editedRequest.method || "",
         headers: JSON.stringify(editedRequest.headers || {}, null, 2),
@@ -31,11 +29,14 @@ const RequestEditor = ({
 
   const saveRequest = () => {
     try {
+      // Remove 'title' from the request JSON
       const updatedRequest = {
         ...localRequest,
         headers: JSON.parse(localRequest.headers || "{}"),
         body: JSON.parse(localRequest.body || "{}"),
       };
+
+      // Call the handler to update the request (without the title field)
       handleUpdateRequest(mappingId, updatedRequest);
       setIsEditing(false);
     } catch (error) {
@@ -48,19 +49,10 @@ const RequestEditor = ({
       <h4>Request</h4>
       {isEditing ? (
         <div>
-          <label>Title</label>
-          <input
-            placeholder="Title"
-            type="text"
-            value={localRequest.title}
-            onChange={(e) =>
-              setLocalRequest({ ...localRequest, title: e.target.value })
-            }
-          />
           <label>URL</label>
           <input
             placeholder="Url"
-            type="text"         
+            type="text"
             value={localRequest.url}
             onChange={(e) =>
               setLocalRequest({ ...localRequest, url: e.target.value })
@@ -93,12 +85,25 @@ const RequestEditor = ({
         </div>
       ) : (
         <div>
-          <pre>{JSON.stringify(editedRequest, null, 2)}</pre>
+          {/* Display the request without title */}
+          <pre>{JSON.stringify(
+            {
+              url: editedRequest.url,
+              method: editedRequest.method,
+              headers: editedRequest.headers,
+              body: editedRequest.body,
+            },
+            null,
+            2
+          )}</pre>
           <button onClick={() => setIsEditing(true)}>Edit Request</button>
         </div>
       )}
     </div>
   );
 };
+
+
+
 
 export default RequestEditor;
