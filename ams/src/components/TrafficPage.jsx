@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styles from "./TrafficPage.module.css";
+import { fetchWireMockTraffic } from "../backend/api"; // Import API function
 
 const TrafficPage = () => {
   const [trafficData, setTrafficData] = useState([]);
@@ -10,22 +11,24 @@ const TrafficPage = () => {
   const fetchTrafficData = async () => {
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:8080/mappings"); // Your API endpoint
-      if (!response.ok) throw new Error("Failed to fetch traffic data");
 
-      const data = await response.json();
+      // Fetch WireMock traffic data
+      const wireMockData = await fetchWireMockTraffic();
 
-      const combinedData = data.responses.map((res) => {
-        const request = data.requests.find((req) => req.id === res.reqId);
+      // Combine requests & responses into one array for display
+      const formattedData = wireMockData.requests.map((req) => {
+        const matchingResponse = wireMockData.responses.find((res) => res.reqId === req.id) || {};
+        
         return {
-          id: res.id,
-          request: request?.resJson || {},
-          response: res.resJson || {},
-          timestamp: res.timestamp,
+          id: req.id, 
+          request: req.request || {},
+          response: matchingResponse.resJson || {}, 
+          status: matchingResponse.status || "N/A", // Fix: Ensure status is displayed
+          timestamp: matchingResponse.timestamp || new Date().toISOString(), 
         };
       });
 
-      setTrafficData(combinedData);
+      setTrafficData(formattedData);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -52,7 +55,7 @@ const TrafficPage = () => {
 
   return (
     <div className={styles.trafficContainer}>
-      <h2>Traffic Overview</h2>
+      <h2>WireMock Traffic Overview</h2>
       <input
         type="text"
         placeholder="Filter by URL or Method"
@@ -64,15 +67,15 @@ const TrafficPage = () => {
         <div className={styles.tableHeader}>
           <span>Method</span>
           <span>URL</span>
-          <span>Status</span>
+          <span>Status</span> {/* Fix: Display Status Column */}
           <span>Timestamp</span>
         </div>
         {filteredData.map((item) => (
           <div key={item.id} className={styles.tableRow}>
             <span>{item.request.method || "N/A"}</span>
             <span>{item.request.url || "N/A"}</span>
-            <span>{item.response.status || "N/A"}</span>
-            <span>{item.timestamp || "N/A"}</span>
+            <span>{item.status || "N/A"}</span> {/* Fix: Show Correct Status */}
+            <span>{new Date(item.timestamp).toLocaleString() || "N/A"}</span>
           </div>
         ))}
       </div>

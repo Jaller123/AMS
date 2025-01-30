@@ -1,16 +1,2 @@
 [
-  {
-    "id": "1.1",
-    "reqId": "1",
-    "resJson": {
-      "status": "200",
-      "headers": {
-        "Content-Type": "text/plain"
-      },
-      "body": {
-        "body": "hello"
-      }
-    },
-    "timestamp": "2025-01-30 12:05:50"
-  }
 ]

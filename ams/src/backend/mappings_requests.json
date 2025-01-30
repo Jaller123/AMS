@@ -1,16 +1,2 @@
 [
-  {
-    "id": "1",
-    "resJson": {
-      "title": "user",
-      "url": "/user",
-      "method": "GET",
-      "headers": {
-        "Content-Type": "text/plain"
-      },
-      "body": {
-        "body": "hello"
-      }
-    }
-  }
 ]

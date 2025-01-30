@@ -15,6 +15,7 @@ const MappingList = ({
   handleDelete,
   handleUpdateRequest,
   handleUpdateResponse,
+  isActive,
 }) => {
   return (
     <ul>
@@ -34,6 +35,7 @@ const MappingList = ({
           handleDelete={handleDelete}
           handleUpdateRequest={handleUpdateRequest}
           handleUpdateResponse={handleUpdateResponse}
+          isActive={isActive}
         />
       ))}
     </ul>

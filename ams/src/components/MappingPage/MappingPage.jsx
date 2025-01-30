@@ -114,13 +114,15 @@ const MappingsPage = ({
       const requestHeaders = JSON.stringify(
         mapping.request.headers || {}
       ).toLowerCase();
+      const requestBody = JSON.stringify(mapping.request?.body || {}).toLowerCase();
+      const requestHeaders = JSON.stringify(mapping.request?.headers || {}).toLowerCase();
 
       return (
-        mapping.request.title?.toLowerCase().includes(searchLower) ||
-        mapping.request.url?.toLowerCase().includes(searchLower) ||
+        mapping.request?.title?.toLowerCase().includes(searchLower) ||
+        mapping.request?.url?.toLowerCase().includes(searchLower) ||
         requestBody.includes(searchLower) ||
         requestHeaders.includes(searchLower) ||
-        mapping.request.method?.toLowerCase().includes(searchLower)
+        mapping.request?.method?.toLowerCase().includes(searchLower)
       );
     });
 
