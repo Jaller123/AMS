@@ -54,85 +54,57 @@ const App = () => {
   const handleSaveMapping = async () => {
     if (requestData && responseData) {
       try {
+        // ✅ Call `saveMapping`
         const newMapping = await saveMapping({
           request: requestData,
           response: responseData,
         });
-
-        const { id, request, response } = newMapping;
-
-        setMappings((prevMappings) => {
-          const exists = prevMappings.some((mapping) => mapping.id === id);
-          if (exists) return prevMappings;
-          return [...prevMappings, { id, request }];
-        });
-
+  
+        const { id, request, response, wireMockUuid } = newMapping;
+  
+        // ✅ Update UI instantly
+        setMappings((prevMappings) => [
+          ...prevMappings,
+          {
+            id,
+            request,
+            wireMockUuid,
+            isActive: true, // ✅ Show as active immediately
+          },
+        ]);
+  
         setResponses((prevResponses) => [
           ...prevResponses,
           {
-            id: `${id}.${
-              prevResponses.filter((r) => r.reqId === id).length + 1
-            }`,
+            id: `${id}.${prevResponses.filter((r) => r.reqId === id).length + 1}`,
             reqId: id,
             resJson: response,
           },
         ]);
-
-        // Reset the form
-        setResetForm(true);
-        setTimeout(() => setResetForm(false), 0);
-
-        // Clear request and response data
+  
+        // ✅ **Clear input fields**
         setRequestData(null);
         setResponseData(null);
+        setResetForm(true); // ✅ Reset form state
+        setTimeout(() => setResetForm(false), 0); // ✅ Ensure UI updates
   
-        // Show success toast
-        toast.success("Mapping saved successfully!", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: false,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-          transition: Bounce,
-        });
+        // ✅ Fetch mappings after a short delay
+        setTimeout(async () => {
+          const updatedData = await fetchMappings();
+          setMappings(updatedData.requests);
+        }, 500);
+  
+        toast.success("Mapping saved successfully!");
       } catch (error) {
         console.error("Error saving mapping:", error);
-  
-        if (!toast.isActive("error-toast")) { 
-          toast.error("Failed to save mapping. Please try again.", {
-            toastId: "error-toast", 
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: false,
-            pauseOnHover: false,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-            transition: Bounce,
-          });
-        }
+        toast.error("Failed to save mapping. Please try again.");
       }
     } else {
-      if (!toast.isActive("missing-data-toast")) { 
-        toast.warn("Both request and response data are required.", {
-          toastId: "missing-data-toast", 
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: false,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-          transition: Bounce,
-        });
-      }
+      toast.warn("Both request and response data are required.");
     }
   };
+  
+  
 
   const handleDeleteMapping = async (id) => {
     try {

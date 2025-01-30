@@ -2,56 +2,16 @@
   {
     "id": "1",
     "resJson": {
-      "title": "Updated Test Title",
-      "url": "/test",
+      "title": "WireMock Test",
+      "url": "/wiremock",
       "method": "POST",
       "headers": {
         "Content-Type": "text/plain"
       },
       "body": {
-        "body": "test1"
+        "Body": "text"
       }
-    }
-  },
-  {
-    "id": "2",
-    "resJson": {
-      "title": "titel",
-      "url": "/test1",
-      "method": "POST",
-      "headers": {
-        "Content-Type": "text/plain"
-      },
-      "body": {
-        "body": "test1"
-      }
-    }
-  },
-  {
-    "id": "3",
-    "resJson": {
-      "title": "Hejsan",
-      "url": "/hello",
-      "method": "POST",
-      "headers": {
-        "Content-Type": "text/plain"
-      },
-      "body": {
-        "body": "test16"
-      }
-    }
-  },
-  {
-    "id": "4",
-    "resJson": {
-      "method": "POST",
-      "url": "/test",
-      "headers": {
-        "Content-Type": "text/plain"
-      },
-      "body": {
-        "body": "test1"
-      }
-    }
+    },
+    "wireMockUuid": "a43ce857-cdde-4b03-8250-8df291779a05"
   }
 ]

@@ -26,8 +26,10 @@ const MappingItem = ({
   };
 
   const relevantResponses = responses.filter((res) => res.reqId === mapping.id);
+  
+  // ✅ Ensure isActive is properly checked
+  const isActive = mapping.isActive ? "✅ Active" : "❌ Inactive";
 
-  // Initialize editedRequests and editedResponses
   useEffect(() => {
     if (!editedRequests[mapping.id]) {
       setEditedRequests((prev) => ({
@@ -58,6 +60,10 @@ const MappingItem = ({
         <h3>{editedRequests[mapping.id]?.method || "Unidentified Method"}</h3>
         <h3>{editedRequests[mapping.id]?.url || "Unidentified URL"}</h3>
         <h3>{editedRequests[mapping.id]?.title || "Untitled Mapping"}</h3>
+        {/* ✅ Ensure Active/Inactive is displayed correctly */}
+        <h3 className={mapping.isActive ? styles.active : styles.inactive}>
+          {isActive}
+        </h3>
         <button className={styles.toggleButton}>
           {expandedMappings[mapping.id] ? "Hide Details" : "Show Details"}
         </button>
@@ -71,12 +77,11 @@ const MappingItem = ({
               setEditedRequests((prev) => ({ ...prev, [mapping.id]: data }))
             }
             handleUpdateRequest={(id, updatedRequest) => {
-              // Update title and other fields in editedRequests
               setEditedRequests((prev) => ({
                 ...prev,
                 [id]: updatedRequest,
               }));
-              handleUpdateRequest(id, updatedRequest); // Call the original handler
+              handleUpdateRequest(id, updatedRequest);
             }}
           />
           <ResponseEditor

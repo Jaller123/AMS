@@ -25,6 +25,19 @@ const getNextId = (mappings) => {
   return String(maxId + 1); // Increment and return as string
 };
 
+// ✅ Add WireMock Health Check Route
+app.get("/health", async (req, res) => {
+  try {
+    const response = await fetch("http://localhost:8081/__admin/mappings");
+    if (!response.ok) throw new Error("WireMock is unavailable");
+
+    res.json({ wiremockRunning: true });
+  } catch (error) {
+    console.error("❌ WireMock is DOWN:", error.message);
+    res.json({ wiremockRunning: false }); // ✅ Send false if WireMock is down
+  }
+});
+
 // Hämta alla mappings
 app.get("/mappings", (req, res) => {
   const requests = JSON.parse(fs.readFileSync(requestsFile, "utf-8"));
@@ -44,9 +57,7 @@ const sendMappingToWireMock = async (request, response) => {
           { equalTo: value }, // Transform headers to WireMock format
         ])
       ),
-      bodyPatterns: request.body
-        ? [{ equalToJson: request.body }] // Transform body for WireMock
-        : undefined,
+      bodyPatterns: request.body ? [{ equalToJson: request.body }] : undefined,
     },
     response: {
       status: response.status,
@@ -55,7 +66,7 @@ const sendMappingToWireMock = async (request, response) => {
     },
   };
 
-  console.log("Transformed mapping to WireMock format:", JSON.stringify(mapping, null, 2));
+  console.log("🔄 Sending mapping to WireMock...", JSON.stringify(mapping, null, 2));
 
   try {
     const wireMockResponse = await fetch(WIREMOCK_BASE_URL, {
@@ -64,17 +75,22 @@ const sendMappingToWireMock = async (request, response) => {
       body: JSON.stringify(mapping),
     });
 
-    const responseText = await wireMockResponse.text();
+    const data = await wireMockResponse.json();
+    console.log("✅ WireMock Response:", data);
+
     if (!wireMockResponse.ok) {
-      console.error(`WireMock response error: ${wireMockResponse.status}`);
-      console.error("Response body:", responseText);
-    } else {
-      console.log("Mapping successfully sent to WireMock.");
+      console.error(`❌ WireMock Error: ${wireMockResponse.status}`, data);
+      return null;
     }
+
+    return data.id ?? data.uuid; // ✅ Ensure UUID is returned correctly
   } catch (error) {
-    console.error("Error sending mapping to WireMock:", error);
+    console.error("❌ Error sending mapping to WireMock:", error);
+    return null;
   }
 };
+
+
 
 
 // Skapa ny mapping
@@ -115,8 +131,23 @@ app.post("/mappings", async (req, res) => {
   fs.writeFileSync(responseFile, JSON.stringify(responses, null, 2));
 
   console.log("Sending mapping to WireMock...");
-
-  await sendMappingToWireMock(request, response);
+  const wireMockId = await sendMappingToWireMock(request, response);
+  
+  const newRequest = {
+    id: requestId,
+    resJson: request,
+    wireMockUuid: wireMockId, // ✅ Store the WireMock UUID
+  };
+  
+  // Find if request already exists
+  const existingIndex = requests.findIndex((req) => req.id === requestId);
+  if (existingIndex !== -1) {
+    requests[existingIndex] = newRequest; // ✅ Update existing request with UUID
+  } else {
+    requests.push(newRequest);
+  }
+  fs.writeFileSync(requestsFile, JSON.stringify(requests, null, 2));
+  console.log("✅ New Mapping Saved:", newRequest);
 
   res.json({
     success: true,
