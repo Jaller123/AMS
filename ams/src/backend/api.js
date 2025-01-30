@@ -1,14 +1,43 @@
 const API_BASE_URL = "http://localhost:8080";
+const API_WIREMOCK_URL = "http://localhost:8081/__admin/mappings";
 
 export const fetchMappings = async () => {
   try {
+    // Fetch mappings from backend
     const response = await fetch(`${API_BASE_URL}/mappings`);
+    if (!response.ok) throw new Error("Failed to fetch mappings");
     const { requests, responses } = await response.json();
+
+    // Fetch mappings from WireMock
+    const wireMockResponse = await fetch(API_WIREMOCK_URL);
+    if (!wireMockResponse.ok)
+      throw new Error("Failed to fetch WireMock mappings");
+
+    const wireMockData = await wireMockResponse.json();
+
+    // ✅ Create a Set of WireMock UUIDs
+    const wireMockMappings = new Set(
+      wireMockData.mappings.map((mapping) => mapping.id)
+    );
+
+    console.log(
+      "🔄 Backend Mappings:",
+      requests.map((req) => ({
+        id: req.id,
+        request: req.resJson,
+        uuid: req.wireMockUuid, // ✅ Changed from wireMockUuid → uuid
+        isActive: wireMockMappings.has(req.wireMockUuid), // ✅ Match using stored UUID
+      }))
+    );
+
+    console.log("✅ WireMock Mappings:", wireMockMappings);
 
     return {
       requests: requests.map((req) => ({
         id: req.id,
-        request: req.resJson, // Ensure `request` matches what the frontend expects
+        request: req.resJson,
+        uuid: req.wireMockUuid, // ✅ Changed from wireMockUuid → uuid
+        isActive: wireMockMappings.has(req.wireMockUuid), // ✅ Correctly check Active status
       })),
       responses: responses.map((res) => ({
         id: res.id,
@@ -18,7 +47,36 @@ export const fetchMappings = async () => {
       })),
     };
   } catch (error) {
-    console.error("Error fetching mappings:", error);
+    console.error("❌ Error fetching mappings:", error);
+    return { requests: [], responses: [] };
+  }
+};
+
+// WireMock API
+
+export const fetchWireMockTraffic = async () => {
+  try {
+    const response = await fetch(API_WIREMOCK_URL);
+    if (!response.ok) throw new Error("Failed to fetch WireMock mappings");
+
+    const data = await response.json();
+
+    return {
+      requests: data.mappings.map((mapping) => ({
+        id: mapping.id,
+        request: mapping.request || {}, // Ensure request object exists
+        isActive: true,
+      })),
+      responses: data.mappings.map((mapping) => ({
+        id: mapping.id,
+        reqId: mapping.id, // WireMock uses `id` instead of `reqId`
+        resJson: mapping.response || {}, // Ensure response object exists
+        status: mapping.response?.status || "N/A", // Fix: Ensure status is always included
+        timestamp: new Date().toISOString(), // WireMock doesn't provide timestamps
+      })),
+    };
+  } catch (error) {
+    console.error("Error fetching WireMock mappings:", error);
     return { requests: [], responses: [] };
   }
 };

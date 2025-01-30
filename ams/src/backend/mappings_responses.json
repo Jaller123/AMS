@@ -8,55 +8,9 @@
         "Content-Type": "text/plain"
       },
       "body": {
-        "body": "res1.1"
-      }
-    },
-    "timestamp": "2025-01-28 09:06:17"
-  },
-  {
-    "id": "2.1",
-    "reqId": "2",
-    "resJson": {
-      "status": "201",
-      "headers": {
-        "Content-Type": "application/json"
-      },
-      "body": {
-        "message": "OK"
-      }
-    },
-    "timestamp": "2025-01-28 10:50:14"
-  },
-  {
-    "id": "3.1",
-    "reqId": "3",
-    "resJson": {
-      "status": "201",
-      "headers": {
-        "Content-Type": "text/plain"
-      },
-      "body": {
-        "body": "response1"
-      }
-    },
-    "timestamp": "2025-01-28 12:04:11"
-  },
-  {
-    "id": "4.1",
-    "reqId": "4",
-    "resJson": {
-      "status": "200",
-      "headers": {
-        "Content-Type": "application/json"
-      },
-      "body": {
         "body": "hello"
       }
     },
-    "timestamp": "2025-01-28 12:32:09"
-        "body": "updated response body"
-      }
-    },
-    "timestamp": "2025-01-23 11:44:25"
+    "timestamp": "2025-01-30 12:05:50"
   }
 ]

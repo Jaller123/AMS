@@ -50,7 +50,14 @@ const MappingItem = ({
         [mapping.id]: relevantResponses[0].id,
       }));
     }
-  }, [mapping, relevantResponses, selectedResponses, setEditedRequests, setEditedResponses, setSelectedResponses]);
+  }, [
+    mapping,
+    relevantResponses,
+    selectedResponses,
+    setEditedRequests,
+    setEditedResponses,
+    setSelectedResponses,
+  ]);
 
   return (
     <li className={styles.mappingItem}>
@@ -58,6 +65,14 @@ const MappingItem = ({
         <h3>{editedRequests[mapping.id]?.method || "Unidentified Method"}</h3>
         <h3>{editedRequests[mapping.id]?.url || "Unidentified URL"}</h3>
         <h3>{editedRequests[mapping.id]?.title || "Untitled Mapping"}</h3>
+
+        <span
+          className={
+            mapping.status === "Active" ? styles.active : styles.unmapped
+          }
+        >
+          {mapping.status}
+        </span>
         <button className={styles.toggleButton}>
           {expandedMappings[mapping.id] ? "Hide Details" : "Show Details"}
         </button>
@@ -88,7 +103,10 @@ const MappingItem = ({
             }
             selectedResponse={selectedResponses[mapping.id]}
             setSelectedResponse={(responseId) =>
-              setSelectedResponses((prev) => ({ ...prev, [mapping.id]: responseId }))
+              setSelectedResponses((prev) => ({
+                ...prev,
+                [mapping.id]: responseId,
+              }))
             }
             handleUpdateResponse={handleUpdateResponse}
           />
