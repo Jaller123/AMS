@@ -3,7 +3,7 @@ import fs from "fs";
 import bodyParser from "body-parser";
 import cors from "cors";
 import path from "path";
-import fetch from "node-fetch"
+import fetch from "node-fetch";
 import { fileURLToPath } from "url";
 
 const WIREMOCK_BASE_URL = "http://localhost:8081/__admin/mappings";
@@ -16,7 +16,6 @@ const __dirname = path.dirname(__filename);
 
 const requestsFile = path.join(__dirname, "./mappings_requests.json");
 const responseFile = path.join(__dirname, "./mappings_responses.json");
-
 
 // Helper för nästa ID
 const getNextId = (mappings) => {
@@ -66,7 +65,10 @@ const sendMappingToWireMock = async (request, response) => {
     },
   };
 
-  console.log("🔄 Sending mapping to WireMock...", JSON.stringify(mapping, null, 2));
+  console.log(
+    "🔄 Sending mapping to WireMock...",
+    JSON.stringify(mapping, null, 2)
+  );
 
   try {
     const wireMockResponse = await fetch(WIREMOCK_BASE_URL, {
@@ -89,9 +91,6 @@ const sendMappingToWireMock = async (request, response) => {
     return null;
   }
 };
-
-
-
 
 // Skapa ny mapping
 app.post("/mappings", async (req, res) => {
@@ -132,13 +131,13 @@ app.post("/mappings", async (req, res) => {
 
   console.log("Sending mapping to WireMock...");
   const wireMockId = await sendMappingToWireMock(request, response);
-  
+
   const newRequest = {
     id: requestId,
     resJson: request,
     wireMockUuid: wireMockId,   // ✅ Store the WireMock UUID
   };
-  
+
   // Find if request already exists
   const existingIndex = requests.findIndex((req) => req.id === requestId);
   if (existingIndex !== -1) {
@@ -156,18 +155,29 @@ app.post("/mappings", async (req, res) => {
   });
 });
 
-
-
 app.post("/responses", (req, res) => {
   const { reqId, resJson, timestamp } = req.body;
 
-  if (!reqId || !resJson || !resJson.status || !resJson.headers || !resJson.body) {
-    return res.status(400).json({ success: false, message: "Invalid data. Ensure reqId and resJson fields are valid." });
+  if (
+    !reqId ||
+    !resJson ||
+    !resJson.status ||
+    !resJson.headers ||
+    !resJson.body
+  ) {
+    return res
+      .status(400)
+      .json({
+        success: false,
+        message: "Invalid data. Ensure reqId and resJson fields are valid.",
+      });
   }
 
   const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"));
 
-  const matchingResponses = responses.filter((response) => response.reqId === reqId);
+  const matchingResponses = responses.filter(
+    (response) => response.reqId === reqId
+  );
   const responseId = `${reqId}.${matchingResponses.length + 1}`;
 
   const newResponse = {
@@ -251,8 +261,12 @@ app.delete("/mappings/:id", (req, res) => {
   const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"));
 
   // Filter out the specific request and associated responses
-  const updatedRequests = requests.filter((req) => String(req.id) !== String(id));
-  const updatedResponses = responses.filter((res) => String(res.reqId) !== String(id));
+  const updatedRequests = requests.filter(
+    (req) => String(req.id) !== String(id)
+  );
+  const updatedResponses = responses.filter(
+    (res) => String(res.reqId) !== String(id)
+  );
 
   // Write the updated data back to files
   fs.writeFileSync(requestsFile, JSON.stringify(updatedRequests, null, 2));
@@ -263,7 +277,6 @@ app.delete("/mappings/:id", (req, res) => {
 
 app.get("/traffic", async (req, res) => {
   try {
-    
     // Read AMS mappings
     const storeRequests = JSON.parse(fs.readFileSync(requestsFile, "utf-8"));
     const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"));
@@ -274,9 +287,13 @@ app.get("/traffic", async (req, res) => {
     }, {})
 
     // Fetch logged requests from WireMock
-    const wireMockResponse = await fetch("http://localhost:8081/__admin/requests");
+    const wireMockResponse = await fetch(
+      "http://localhost:8081/__admin/requests"
+    );
     if (!wireMockResponse.ok) {
-      throw new Error(`Failed to fetch WireMock logs: ${wireMockResponse.status}`);
+      throw new Error(
+        `Failed to fetch WireMock logs: ${wireMockResponse.status}`
+      );
     }
 
     const wireMockData = await wireMockResponse.json();

@@ -53,12 +53,15 @@ export const fetchMappings = async () => {
       }
     }
 
-    console.log("🔄 Backend Mappings:", requests.map(req => ({
-      id: req.id,
-      request: req.resJson,
-      uuid: req.wireMockUuid,
-      isActive: wiremockRunning && wireMockMappings.has(req.wireMockUuid), // ✅ Inactive if WireMock is Down
-    })));
+    console.log(
+      "🔄 Backend Mappings:",
+      requests.map((req) => ({
+        id: req.id,
+        request: req.resJson,
+        uuid: req.wireMockUuid,
+        isActive: wiremockRunning && wireMockMappings.has(req.wireMockUuid), // ✅ Inactive if WireMock is Down
+      }))
+    );
 
     return {
       requests: requests.map((req) => ({
@@ -73,7 +76,7 @@ export const fetchMappings = async () => {
         resJson: res.resJson,
         timestamp: res.timestamp,
       })),
-    };    
+    };
   } catch (error) {
     console.error("❌ Error fetching mappings:", error);
     return { requests: [], responses: [] };
@@ -128,14 +131,14 @@ export const fetchWireMockTraffic = async () => {
 
 
 
-export const saveMapping = async (mapping,) => {
+export const saveMapping = async (mapping) => {
   try {
     const response = await fetch(`${API_BASE_URL}/mappings`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(mapping),
     });
-    const { newRequest, newResponse } = await response.json()
+    const { newRequest, newResponse } = await response.json();
 
     return {
       id: newRequest.id,

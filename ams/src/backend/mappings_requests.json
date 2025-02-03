@@ -6,71 +6,12 @@
       "url": "/wiremock",
       "method": "POST",
       "headers": {
-        "Content-Type": "text/plain"
+        "Content-Type": "application/json"
       },
       "body": {
         "Body": "text"
       }
     },
     "wireMockUuid": "a43ce857-cdde-4b03-8250-8df291779a05"
-  },
-  {
-    "id": "2",
-    "resJson": {
-      "title": "Test",
-      "url": "/test",
-      "method": "POST",
-      "headers": {
-        "Content-Type": "application/json"
-      },
-      "body": {
-        "body": "text"
-      }
-    },
-    "wireMockUuid": "28e74aba-abf8-4ab7-b366-86aad5332910"
-  },
-  {
-    "id": "3",
-    "resJson": {
-      "title": "Hello",
-      "url": "/testarigen",
-      "method": "POST",
-      "headers": {
-        "Content-Type": "application/json"
-      },
-      "body": {
-        "body": "text"
-      }
-    },
-    "wireMockUuid": "89ec6e78-6a22-4408-af9f-b2f1babebe23"
-  },
-  {
-    "id": "4",
-    "resJson": {
-      "title": "t1",
-      "url": "/tst",
-      "method": "POST",
-      "headers": {
-        "Content-Type": "application/json"
-      },
-      "body": {
-        "body": "text"
-      }
-    },
-    "wireMockUuid": "ab6cbec0-e3fb-44f4-b460-32ea335d8d9c"
-  },
-  {
-    "id": "5",
-    "resJson": {
-      "method": "POST",
-      "url": "/test",
-      "headers": {
-        "Content-Type": "text/plain"
-      },
-      "body": {
-        "body": "test1"
-      }
-    },
-    "wireMockUuid": "ae80b689-a419-4f67-9bd2-21c98217bf31"
   }
 ]

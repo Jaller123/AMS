@@ -207,3 +207,19 @@ textarea:focus {
   background-color: transparent;
   color: #333;
 }
+/* Stilar för statusindikator */
+.active {
+  background-color: green;
+  color: white;
+  padding: 5px;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.unmapped {
+  background-color: red;
+  color: white;
+  padding: 5px;
+  border-radius: 5px;
+  font-weight: bold;
+}

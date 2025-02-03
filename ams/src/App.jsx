@@ -27,10 +27,16 @@ const App = () => {
 
   useEffect(() => {
     const loadMappingsAndResponses = async () => {
-      const data = await fetchMappings();
-      setMappings(data.requests || []);
-      setResponses(data.responses || []);
+      try {
+        const data = await fetchMappings();
+        setMappings(data.requests || []); // Make sure 'requests' exists in your data
+        setResponses(data.responses || []); // Ensure 'responses' exists
+      } catch (error) {
+        console.error("Failed to load mappings and responses:", error);
+        alert("Failed to load data from the server. Please check the console.");
+      }
     };
+
     loadMappingsAndResponses();
   }, []);
 
