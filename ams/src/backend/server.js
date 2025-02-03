@@ -69,7 +69,6 @@ const sendMappingToWireMock = async (request, response) => {
     "🔄 Sending mapping to WireMock...",
     JSON.stringify(mapping, null, 2)
   );
-  console.log("🔄 Sending mapping to WireMock...", JSON.stringify(mapping, null, 2));
 
   try {
     const wireMockResponse = await fetch(WIREMOCK_BASE_URL, {
@@ -92,9 +91,6 @@ const sendMappingToWireMock = async (request, response) => {
     return null;
   }
 };
-
-
-
 
 // Skapa ny mapping
 app.post("/mappings", async (req, res) => {
@@ -135,16 +131,13 @@ app.post("/mappings", async (req, res) => {
 
   console.log("Sending mapping to WireMock...");
   const wireMockId = await sendMappingToWireMock(request, response);
-<<<<<<< HEAD
 
-  
   const newRequest = {
     id: requestId,
     resJson: request,
     wireMockUuid: wireMockId, // ✅ Store the WireMock UUID
   };
 
-  
   // Find if request already exists
   const existingIndex = requests.findIndex((req) => req.id === requestId);
   if (existingIndex !== -1) {
@@ -284,7 +277,6 @@ app.delete("/mappings/:id", (req, res) => {
 
 app.get("/traffic", async (req, res) => {
   try {
-    
     // Read AMS mappings
     const requests = JSON.parse(fs.readFileSync(requestsFile, "utf-8"));
     const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"));
@@ -297,9 +289,6 @@ app.get("/traffic", async (req, res) => {
       throw new Error(
         `Failed to fetch WireMock logs: ${wireMockResponse.status}`
       );
-    const wireMockResponse = await fetch("http://localhost:8081/__admin/requests");
-    if (!wireMockResponse.ok) {
-      throw new Error(`Failed to fetch WireMock logs: ${wireMockResponse.status}`);
     }
 
     const wireMockData = await wireMockResponse.json();
@@ -328,8 +317,6 @@ app.get("/traffic", async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 });
-
-
 
 app.listen(8080, () => {
   console.log("Server running on http://localhost:8080");

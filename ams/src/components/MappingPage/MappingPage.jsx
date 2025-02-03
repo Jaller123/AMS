@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import styles from "./MappingsPage.module.css";
 import SortControls from "./SortControls";
 import MappingList from "./MappingList";
-import { fetchMappings } from "../../backend/api";
 
 const MappingsPage = ({
   mappings,
@@ -24,71 +23,19 @@ const MappingsPage = ({
   const [filteredMappings, setFilteredMappings] = useState(mappings);
   const [search, setSearch] = useState("");
 
-  const [updatedMappings, setUpdatedMappings] = useState([]);
-
-  const [localMappings, setLocalMappings] = useState([]);
-
-  useEffect(() => {
-    const loadMappings = async () => {
-      const data = await fetchMappings();
-      console.log("Fetched data:", data);
-      setLocalMappings(Array.isArray(data) ? data : []);
-    };
-    loadMappings();
-  }, []);
-
-  useEffect(() => {
-    // Hämta aktiva mappningar från WireMock och uppdatera status
-    const fetchActiveMappings = async () => {
-      try {
-        const response = await fetch("http://localhost:8081/__admin/mappings");
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        // Kolla om responsen är JSON
-        const contentType = response.headers.get("content-type");
-        if (!contentType || !contentType.includes("application/json")) {
-          const text = await response.text(); // Läs text istället för JSON
-          throw new Error(`Expected JSON, but got: ${text}`);
-        }
-
-        const data = await response.json();
-        console.log("Fetched mappings:", data);
-
-        // Resten av din logik...
-      } catch (error) {
-        console.error("Error fetching active mappings:", error);
-      }
-    };
-
-    fetchActiveMappings();
-  }, [mappings]);
-
   useEffect(() => {
     // Uppdatera val av responses när mappings ändras
     const initialSelections = {};
     mappings.forEach((mapping) => {
-      // Hitta relevanta responses för den aktuella mappingen
       const relevantResponses = responses.filter(
         (res) => res.reqId === mapping.id
       );
-
-      // Kontrollera om relevanta responses hittades
       if (relevantResponses.length > 0) {
-        // Välj den första relevanta responsen (kan anpassas om du har fler kriterier)
         initialSelections[mapping.id] = relevantResponses[0].id;
-      } else {
-        console.log(
-          `No relevant responses found for mapping with id: ${mapping.id}`
-        );
       }
     });
-
-    // Uppdatera selectedResponses med initialSelections
     setSelectedResponses(initialSelections);
-  }, []);
+  }, [mappings, responses]);
 
   useEffect(() => {
     // Filter och sortera mappings
@@ -109,13 +56,11 @@ const MappingsPage = ({
     filtered = filtered.filter((mapping) => {
       const searchLower = search.toLowerCase();
       const requestBody = JSON.stringify(
-        mapping.request.body || {}
+        mapping.request?.body || {}
       ).toLowerCase();
       const requestHeaders = JSON.stringify(
-        mapping.request.headers || {}
+        mapping.request?.headers || {}
       ).toLowerCase();
-      const requestBody = JSON.stringify(mapping.request?.body || {}).toLowerCase();
-      const requestHeaders = JSON.stringify(mapping.request?.headers || {}).toLowerCase();
 
       return (
         mapping.request?.title?.toLowerCase().includes(searchLower) ||
@@ -141,31 +86,6 @@ const MappingsPage = ({
   return (
     <section className={styles.section}>
       <h2>Saved Mappings</h2>
-      <ul>
-        {localMappings.map((mapping) => (
-          <li
-            key={mapping.id}
-            style={{ display: "flex", alignItems: "center" }}
-          >
-            {activeMappings.some(
-              (activeMapping) => activeMapping.uuid === mapping.wireMockId
-            ) && (
-              <span
-                style={{
-                  width: 10,
-                  height: 10,
-                  backgroundColor: "green",
-                  borderRadius: "50%",
-                  display: "inline-block",
-                  marginRight: 10,
-                }}
-              ></span>
-            )}
-            {mappings.request.url} - {mapping.response.status} -
-            {mapping.wireMockId}
-          </li>
-        ))}
-      </ul>
 
       <div className={styles["searchable-mappings"]}>
         <form
@@ -192,9 +112,7 @@ const MappingsPage = ({
 
       {/* Lista med filtrerade och sorterade mappningar */}
       <MappingList
-        mappings={
-          updatedMappings.length > 0 ? updatedMappings : filteredMappings
-        } // Använd de filtrerade mappningarna här
+        mappings={filteredMappings} // Använd de filtrerade mappningarna här
         responses={responses}
         expandedMappings={expandedMappings}
         setExpandedMappings={setExpandedMappings}
