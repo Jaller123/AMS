@@ -26,7 +26,7 @@ const MappingItem = ({
   };
 
   const relevantResponses = responses.filter((res) => res.reqId === mapping.id);
-  
+
   // ✅ Ensure isActive is properly checked
   const isActive = mapping.isActive ? "✅ Active" : "❌ Inactive";
 

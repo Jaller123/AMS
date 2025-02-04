@@ -215,11 +215,3 @@ textarea:focus {
   border-radius: 5px;
   font-weight: bold;
 }
-
-.unmapped {
-  background-color: red;
-  color: white;
-  padding: 5px;
-  border-radius: 5px;
-  font-weight: bold;
-}

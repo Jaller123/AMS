@@ -2,14 +2,13 @@
   {
     "id": "1",
     "resJson": {
-      "title": "fetching user",
-      "url": "/user",
-      "method": "GET",
+      "url": "/test-url",
+      "method": "POST",
       "headers": {
         "Content-Type": "application/json"
       },
       "body": {
-        "body": "request1"
+        "body": "Test Body"
       }
     },
     "wireMockUuid": "7aca84b1-955b-460d-bfe5-a2427c0ffaa7"
