@@ -57,7 +57,7 @@ const ReqDetailPage = ({ mappings, handleSaveResponse }) => {
                 onChange={(e) =>
                   setNewResponse((prev) => ({ ...prev, status: e.target.value }))
                 }
-                placeholder="e.g., 200"
+                placeholder="Status"
               />
             </div>
             <div className={styles.inputGroup}>

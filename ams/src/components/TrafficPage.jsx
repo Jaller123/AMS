@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom"; // Import Link from react-router-dom
 import styles from "./TrafficPage.module.css";
 import { fetchWireMockTraffic } from "../backend/api";
 
@@ -11,11 +12,11 @@ const TrafficPage = () => {
   useEffect(() => {
     const loadTraffic = async () => {
       setLoading(true);
-      setError(null); // ✅ Reset error before fetching
+      setError(null);
 
       try {
         const data = await fetchWireMockTraffic();
-        setTrafficData(data.trafficData || []); // ✅ Correct response key
+        setTrafficData(data.trafficData || []);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -24,7 +25,7 @@ const TrafficPage = () => {
     };
 
     loadTraffic();
-  }, []); // ✅ Fetch data only once
+  }, []);
 
   const filteredData = trafficData.filter((item) => {
     const method = item?.request?.method || "";
@@ -62,8 +63,17 @@ const TrafficPage = () => {
               <span>{item?.request?.method || "N/A"}</span>
               <span>{item?.request?.url || "N/A"}</span>
               <span>{item?.response?.status || "N/A"}</span>
-              <span>{item?.matchedStubId ? "✅ Matched" : "❌ Unmatched"}</span>
-              <span>{item.timestamp ? new Date(item.timestamp).toLocaleString() : "N/A"}</span>
+              <span>
+                {item?.matchedStubId ? (
+                  "✅ Matched"
+                ) : (
+                  // Render a link for unmatched traffic that navigates back to the mappings page
+                  <Link to="/mappings">❌ Unmatched</Link>
+                )}
+              </span>
+              <span>
+                {item.timestamp ? new Date(item.timestamp).toLocaleString() : "N/A"}
+              </span>
             </div>
           ))
         ) : (
