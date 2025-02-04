@@ -1,56 +1,42 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom"; // Import Link from react-router-dom
 import styles from "./TrafficPage.module.css";
-import { fetchWireMockTraffic } from "../backend/api"; // Import API function
+import { fetchWireMockTraffic } from "../backend/api";
 
 const TrafficPage = () => {
   const [trafficData, setTrafficData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState(""); // Filter for search
+  const [filter, setFilter] = useState("");
   const [error, setError] = useState(null);
 
-  const fetchTrafficData = async () => {
-    try {
-      setLoading(true);
-
-      // Fetch WireMock traffic data
-      const wireMockData = await fetchWireMockTraffic();
-
-      // Combine requests & responses into one array for display
-      const formattedData = wireMockData.requests.map((req) => {
-        const matchingResponse = wireMockData.responses.find((res) => res.reqId === req.id) || {};
-        
-        return {
-          id: req.id, 
-          request: req.request || {},
-          response: matchingResponse.resJson || {}, 
-          status: matchingResponse.status || "N/A", // Fix: Ensure status is displayed
-          timestamp: matchingResponse.timestamp || new Date().toISOString(), 
-        };
-      });
-
-      setTrafficData(formattedData);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchTrafficData();
+    const loadTraffic = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const data = await fetchWireMockTraffic();
+        setTrafficData(data.trafficData || []);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadTraffic();
   }, []);
 
   const filteredData = trafficData.filter((item) => {
-    const method = item.request.method || "";
-    const url = item.request.url || "";
+    const method = item?.request?.method || "";
+    const url = item?.request?.url || "";
     return (
       method.toLowerCase().includes(filter.toLowerCase()) ||
       url.toLowerCase().includes(filter.toLowerCase())
     );
   });
 
-  if (loading)
-    return <div className={styles.loading}>Loading traffic data...</div>;
+  if (loading) return <div className={styles.loading}>Loading traffic data...</div>;
   if (error) return <div className={styles.error}>Error: {error}</div>;
 
   return (
@@ -67,17 +53,32 @@ const TrafficPage = () => {
         <div className={styles.tableHeader}>
           <span>Method</span>
           <span>URL</span>
-          <span>Status</span> {/* Fix: Display Status Column */}
+          <span>Status</span>
+          <span>Matched</span>
           <span>Timestamp</span>
         </div>
-        {filteredData.map((item) => (
-          <div key={item.id} className={styles.tableRow}>
-            <span>{item.request.method || "N/A"}</span>
-            <span>{item.request.url || "N/A"}</span>
-            <span>{item.status || "N/A"}</span> {/* Fix: Show Correct Status */}
-            <span>{new Date(item.timestamp).toLocaleString() || "N/A"}</span>
-          </div>
-        ))}
+        {filteredData.length > 0 ? (
+          filteredData.map((item) => (
+            <div key={item.id} className={styles.tableRow}>
+              <span>{item?.request?.method || "N/A"}</span>
+              <span>{item?.request?.url || "N/A"}</span>
+              <span>{item?.response?.status || "N/A"}</span>
+              <span>
+                {item?.matchedStubId ? (
+                  "✅ Matched"
+                ) : (
+                  // Render a link for unmatched traffic that navigates back to the mappings page
+                  <Link to="/mappings">❌ Unmatched</Link>
+                )}
+              </span>
+              <span>
+                {item.timestamp ? new Date(item.timestamp).toLocaleString() : "N/A"}
+              </span>
+            </div>
+          ))
+        ) : (
+          <div className={styles.noData}>No traffic data available.</div>
+        )}
       </div>
     </div>
   );

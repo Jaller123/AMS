@@ -12,41 +12,5 @@
       }
     },
     "timestamp": "2025-01-31 14:19:21"
-  },
-  {
-    "id": "2.1",
-    "reqId": "2",
-    "resJson": {
-      "status": "200",
-      "headers": {
-        "Content-Type": "application/json"
-      },
-      "body": {}
-    },
-    "timestamp": "2025-02-03 10:29:06"
-  },
-  {
-    "id": "3.1",
-    "reqId": "3",
-    "resJson": {
-      "status": "200",
-      "headers": {},
-      "body": {}
-    },
-    "timestamp": "2025-02-03 10:37:03"
-  },
-  {
-    "id": "4.1",
-    "reqId": "4",
-    "resJson": {
-      "status": "203",
-      "headers": {
-        "Content-Type": "text/plain"
-      },
-      "body": {
-        "body": "hello"
-      }
-    },
-    "timestamp": "2025-02-03 10:39:08"
   }
 ]

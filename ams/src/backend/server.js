@@ -135,7 +135,7 @@ app.post("/mappings", async (req, res) => {
   const newRequest = {
     id: requestId,
     resJson: request,
-    wireMockUuid: wireMockId, // ✅ Store the WireMock UUID
+    wireMockUuid: wireMockId,   // ✅ Store the WireMock UUID
   };
 
   // Find if request already exists
@@ -278,8 +278,13 @@ app.delete("/mappings/:id", (req, res) => {
 app.get("/traffic", async (req, res) => {
   try {
     // Read AMS mappings
-    const requests = JSON.parse(fs.readFileSync(requestsFile, "utf-8"));
+    const storeRequests = JSON.parse(fs.readFileSync(requestsFile, "utf-8"));
     const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"));
+
+    const mappingLookup = storeRequests.reduce((lookup, mapping) => {
+      lookup[mapping.wireMockUuid] = mapping
+      return lookup;
+    }, {})
 
     // Fetch logged requests from WireMock
     const wireMockResponse = await fetch(
@@ -295,28 +300,40 @@ app.get("/traffic", async (req, res) => {
     const wireMockLogs = wireMockData.requests || [];
 
     // Combine AMS mappings and WireMock logs
-    const trafficData = wireMockLogs.map((log) => ({
-      id: log.id,
-      request: {
-        method: log.request.method,
-        url: log.request.url,
-        headers: log.request.headers,
-        body: log.request.body,
-      },
-      response: {
-        status: log.response.status,
-        headers: log.response.headers,
-        body: log.response.body,
-      },
-      timestamp: log.loggedDate,
-    }));
+       const trafficData = wireMockLogs.map((log) => {
+      // Extract the Matched-Stub-Id from response headers
+      const stubId = log.response?.headers && log.response.headers["Matched-Stub-Id"];
+      const matchingMapping = stubId && mappingLookup[stubId];
+      const matchedMappingId = matchingMapping ? matchingMapping.id : "Not Matched";
+
+      console.log(`Traffic log ${log.id} matchedMappingId: ${matchedMappingId}`);
+
+      return {
+        id: log.id,
+        request: {
+          method: log.request.method,
+          url: log.request.url,
+          headers: log.request.headers,
+          body: log.request.body,
+        },
+        response: {
+          status: log.response.status,
+          headers: log.response.headers, matchedMappingId,
+          body: log.response.body,
+        },
+        timestamp: log.request.loggedDate,
+        // Enrich log with matched mapping id if available
+        
+      };
+    });
 
     res.json({ success: true, trafficData });
   } catch (error) {
     console.error("Error fetching traffic data:", error);
     res.status(500).json({ success: false, error: error.message });
   }
-});
+})
+
 
 app.listen(8080, () => {
   console.log("Server running on http://localhost:8080");
