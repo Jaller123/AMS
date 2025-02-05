@@ -77,8 +77,9 @@ const MappingItem = ({
         </span>
         {/* ✅ Ensure Active/Inactive is displayed correctly */}
         <h3 className={mapping.isActive ? styles.active : styles.inactive}>
-          {isActive}
-        </h3>
+  {mapping.isActive ? <i className="fas fa-check"></i> : "❌"} 
+</h3>
+
         <button className={styles.toggleButton}>
           {expandedMappings[mapping.id] ? "Hide Details" : "Show Details"}
         </button>

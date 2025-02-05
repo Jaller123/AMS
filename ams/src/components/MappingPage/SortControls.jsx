@@ -17,7 +17,7 @@ const SortControls = ({
 
   return (
     <div className={styles.sortControls}>
-      <div className={styles.sortSection}></div>
+    
 
       <div className={styles.searchSection}>
         <label htmlFor="titleSearch">Title:</label>
@@ -54,4 +54,4 @@ const SortControls = ({
   );
 };
 
-export default SortControls;
+export default SortControls;  

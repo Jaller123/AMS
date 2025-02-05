@@ -22,6 +22,7 @@ const MappingsPage = ({
   }); // För sökning
   const [filteredMappings, setFilteredMappings] = useState(mappings);
   const [search, setSearch] = useState("");
+  const [isSectionOpen, setIsSectionOpen] = useState(); 
 
   useEffect(() => {
     // Uppdatera val av responses när mappings ändras
@@ -83,49 +84,57 @@ const MappingsPage = ({
     setFilteredMappings(filtered);
   }, [mappings, search, searchFilters, sortCriterion]);
 
+  const toggleSection = () => {
+    setIsSectionOpen((prev) => !prev); // Toggle the visibility of the section
+  };
+
   return (
-    <section className={styles.section}>
-      <h2>Saved Mappings</h2>
+    <section className={styles.sectionn}>
+      <h2 onClick={toggleSection} style={{ cursor: "pointer" }}>
+        Saved Mappings
+      </h2>
 
-      <div className={styles["searchable-mappings"]}>
-        <form
-          onSubmit={(e) => e.preventDefault()}
-          className={styles["search-form"]}
-        >
-          <input
-            type="text"
-            placeholder="Search "
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            data-testid="search-input"
-            className={styles.searchInput}
+      {isSectionOpen && ( // Only render the content if section is open
+        <>
+          <div className={styles["searchable-mappings"]}>
+            <form onSubmit={(e) => e.preventDefault()} className={styles["search-form"]}>
+              <input
+                type="text"
+                placeholder="Search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                data-testid="search-input"
+                className={styles.searchInput}
+              />
+            </form>
+          </div>
+
+          {/* Sorterings- och sökkomponent */}
+          <SortControls
+            setSortCriterion={setSortCriterion}
+            searchFilters={searchFilters}
+            setSearchFilters={setSearchFilters}
+            onClick={(e) => e.stopPropagation()} // Stoppa eventet från att bubbla upp
           />
-        </form>
-      </div>
 
-      {/* Sorterings- och sökkomponent */}
-      <SortControls
-        setSortCriterion={setSortCriterion}
-        searchFilters={searchFilters}
-        setSearchFilters={setSearchFilters}
-      />
-
-      {/* Lista med filtrerade och sorterade mappningar */}
-      <MappingList
-        mappings={filteredMappings} // Använd de filtrerade mappningarna här
-        responses={responses}
-        expandedMappings={expandedMappings}
-        setExpandedMappings={setExpandedMappings}
-        selectedResponses={selectedResponses}
-        setSelectedResponses={setSelectedResponses}
-        editedRequests={editedRequests}
-        setEditedRequests={setEditedRequests}
-        editedResponses={editedResponses}
-        setEditedResponses={setEditedResponses}
-        handleDelete={handleDelete}
-        handleUpdateRequest={handleUpdateRequest}
-        handleUpdateResponse={handleUpdateResponse}
-      />
+          {/* Lista med filtrerade och sorterade mappningar */}
+          <MappingList
+            mappings={filteredMappings} // Använd de filtrerade mappningarna här
+            responses={responses}
+            expandedMappings={expandedMappings}
+            setExpandedMappings={setExpandedMappings}
+            selectedResponses={selectedResponses}
+            setSelectedResponses={setSelectedResponses}
+            editedRequests={editedRequests}
+            setEditedRequests={setEditedRequests}
+            editedResponses={editedResponses}
+            setEditedResponses={setEditedResponses}
+            handleDelete={handleDelete}
+            handleUpdateRequest={handleUpdateRequest}
+            handleUpdateResponse={handleUpdateResponse}
+          />
+        </>
+      )}
     </section>
   );
 };

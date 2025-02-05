@@ -53,7 +53,7 @@ const ResponseEditor = ({
   };
 
   return (
-    <div>
+    <div className={styles.Response}>
       <h4>Response</h4>
       {isEditing ? (
         <div>
@@ -107,14 +107,16 @@ const ResponseEditor = ({
               </option>
             ))}
           </select>
-          <pre>{JSON.stringify(localResponse, null, 2)}</pre>
-          <button onClick={() => setIsEditing(true)}>Edit Response</button>
+          <pre className={styles.preresponse}>{JSON.stringify(localResponse, null, 2)}</pre>
+          <div className={styles.buttonContainer}>
+           <button onClick={() => setIsEditing(true)} className={styles.ButtonEdit}>Edit Response</button>
           <button
             onClick={() => navigate(`/request/${mappingId}`)}
             className={styles.detailsButton}
           >
             Add New Response
           </button>
+          </div>
         </div>
       )}
     </div>

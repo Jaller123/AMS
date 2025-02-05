@@ -1,6 +1,24 @@
-body {
-    font-family: "Century Gothic", sans-serif;
-    margin: 0;
-    padding: 0;
-    color: #333; /* Default text color */
-  }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+:root {
+  --main-bg-color: rgb(255, 255, 255); /* Den färg du vill använda för både navbar och home */
+}
+
+
+
+
+html, body {
+  width: 100%;
+ 
+  background-color: var(--main-bg-color);
+  height: 100%;
+}
+.pageContainer {
+  width: 100%;
+ padding: 20px;
+ background-color: var(--main-bg-color);
+  min-height: 100vh; 
+}

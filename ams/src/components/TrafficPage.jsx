@@ -40,45 +40,46 @@ const TrafficPage = () => {
   if (error) return <div className={styles.error}>Error: {error}</div>;
 
   return (
-    <div className={styles.trafficContainer}>
-      <h2>WireMock Traffic Overview</h2>
-      <input
-        type="text"
-        placeholder="Filter by URL or Method"
-        value={filter}
-        onChange={(e) => setFilter(e.target.value)}
-        className={styles.filterInput}
-      />
-      <div className={styles.trafficTable}>
-        <div className={styles.tableHeader}>
-          <span>Method</span>
-          <span>URL</span>
-          <span>Status</span>
-          <span>Matched</span>
-          <span>Timestamp</span>
+    <div className={styles.trafficc}>  {/* Add this wrapper div */}
+      <div className={styles.trafficContainer}>
+        <h2>WireMock Traffic Overview</h2>
+        <input
+          type="text"
+          placeholder="Filter by URL or Method"
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          className={styles.filterInput}
+        />
+        <div className={styles.trafficTable}>
+          <div className={styles.tableHeader}>
+            <span>Method</span>
+            <span>URL</span>
+            <span>Status</span>
+            <span>Matched</span>
+            <span>Timestamp</span>
+          </div>
+          {filteredData.length > 0 ? (
+            filteredData.map((item) => (
+              <div key={item.id} className={styles.tableRow}>
+                <span>{item?.request?.method || "N/A"}</span>
+                <span>{item?.request?.url || "N/A"}</span>
+                <span>{item?.response?.status || "N/A"}</span>
+                <span>
+                  {item?.matchedStubId ? (
+                    "✅ Matched"
+                  ) : (
+                    <Link to="/mappings">❌ Unmatched</Link>
+                  )}
+                </span>
+                <span>
+                  {item.timestamp ? new Date(item.timestamp).toLocaleString() : "N/A"}
+                </span>
+              </div>
+            ))
+          ) : (
+            <div className={styles.noData}>No traffic data available.</div>
+          )}
         </div>
-        {filteredData.length > 0 ? (
-          filteredData.map((item) => (
-            <div key={item.id} className={styles.tableRow}>
-              <span>{item?.request?.method || "N/A"}</span>
-              <span>{item?.request?.url || "N/A"}</span>
-              <span>{item?.response?.status || "N/A"}</span>
-              <span>
-                {item?.matchedStubId ? (
-                  "✅ Matched"
-                ) : (
-                  // Render a link for unmatched traffic that navigates back to the mappings page
-                  <Link to="/mappings">❌ Unmatched</Link>
-                )}
-              </span>
-              <span>
-                {item.timestamp ? new Date(item.timestamp).toLocaleString() : "N/A"}
-              </span>
-            </div>
-          ))
-        ) : (
-          <div className={styles.noData}>No traffic data available.</div>
-        )}
       </div>
     </div>
   );

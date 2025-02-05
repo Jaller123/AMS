@@ -43,13 +43,12 @@ const RequestEditor = ({
       alert("Invalid JSON in headers or body.");
     }
   };
-
   return (
-    <div>
+    <div className={styles.RequestEditor}>
       <h4>Request</h4>
       {isEditing ? (
         <div>
-          <label>URL</label>
+          <label htmlFor="url">URL</label>
           <input
             placeholder="Url"
             type="text"
@@ -58,7 +57,7 @@ const RequestEditor = ({
               setLocalRequest({ ...localRequest, url: e.target.value })
             }
           />
-          <label>Method</label>
+          <label htmlFor="method">Method</label>
           <input
             placeholder="Method"
             type="text"
@@ -67,7 +66,7 @@ const RequestEditor = ({
               setLocalRequest({ ...localRequest, method: e.target.value })
             }
           />
-          <label>Headers (JSON)</label>
+          <label htmlFor="method">Headers (JSON)</label>
           <textarea
             value={localRequest.headers}
             onChange={(e) =>
@@ -102,8 +101,5 @@ const RequestEditor = ({
     </div>
   );
 };
-
-
-
 
 export default RequestEditor;

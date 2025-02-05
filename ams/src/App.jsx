@@ -17,6 +17,7 @@ import {
   deleteMapping,
   saveResponse,
 } from "./backend/api.js";
+import Home from "../src/components/Home.jsx"; // Import den nya komponenten
 
 const App = () => {
   const [mappings, setMappings] = useState([]);
@@ -60,14 +61,14 @@ const App = () => {
   const handleSaveMapping = async () => {
     if (requestData && responseData) {
       try {
-        // ✅ Call `saveMapping`
+        // ✅ Call saveMapping
         const newMapping = await saveMapping({
           request: requestData,
           response: responseData,
         });
-  
+
         const { id, request, response, wireMockUuid } = newMapping;
-  
+
         // ✅ Update UI instantly
         setMappings((prevMappings) => [
           ...prevMappings,
@@ -78,7 +79,7 @@ const App = () => {
             isActive: true, // ✅ Show as active immediately
           },
         ]);
-  
+
         setResponses((prevResponses) => [
           ...prevResponses,
           {
@@ -87,19 +88,19 @@ const App = () => {
             resJson: response,
           },
         ]);
-  
+
         // ✅ **Clear input fields**
         setRequestData(null);
         setResponseData(null);
         setResetForm(true); // ✅ Reset form state
         setTimeout(() => setResetForm(false), 0); // ✅ Ensure UI updates
-  
+
         // ✅ Fetch mappings after a short delay
         setTimeout(async () => {
           const updatedData = await fetchMappings();
           setMappings(updatedData.requests);
         }, 500);
-  
+
         toast.success("Mapping saved successfully!");
       } catch (error) {
         console.error("Error saving mapping:", error);
@@ -109,8 +110,6 @@ const App = () => {
       toast.warn("Both request and response data are required.");
     }
   };
-  
-  
 
   const handleDeleteMapping = async (id) => {
     try {
@@ -204,7 +203,7 @@ const App = () => {
         <Route
           path="/"
           element={
-            <MappingsPage
+            <Home
               mappings={mappings}
               responses={responses}
               handleDelete={handleDeleteMapping}
