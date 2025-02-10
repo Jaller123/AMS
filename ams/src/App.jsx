@@ -247,7 +247,7 @@ const App = () => {
             />
           }
         />
-        <Route path="/traffic" element={<TrafficPage />} />
+        <Route path="/traffic" element={<TrafficPage savedMappings={mappings} />} />
       </Routes>
     </Router>
   );

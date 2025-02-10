@@ -1,2 +1,17 @@
 [
+  {
+    "id": "1",
+    "resJson": {
+      "title": "Wiremock Testning",
+      "url": "/wiremocktestning",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "test": "hejsan"
+      }
+    },
+    "wireMockUuid": "19d816dc-81ce-42c1-83b2-dbcd5c78b31a"
+  }
 ]

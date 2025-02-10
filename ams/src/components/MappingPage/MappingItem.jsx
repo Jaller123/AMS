@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import styles from "./MappingsPage.module.css";
 import RequestEditor from "./RequestEditor";
 import ResponseEditor from "./ResponseEditor";
@@ -17,7 +17,12 @@ const MappingItem = ({
   handleDelete,
   handleUpdateRequest,
   handleUpdateResponse,
+  autoExpandMappingId, // received from MappingList (or MappingsPage)
 }) => {
+  // Create a ref for the container element
+  const mappingItemRef = useRef(null);
+  const toggleButtonRef = useRef(null);
+
   const toggleExpanded = () => {
     setExpandedMappings((prev) => ({
       ...prev,
@@ -26,8 +31,6 @@ const MappingItem = ({
   };
 
   const relevantResponses = responses.filter((res) => res.reqId === mapping.id);
-
-  // ✅ Ensure isActive is properly checked
   const isActive = mapping.isActive ? "Active" : "Inactive";
 
   useEffect(() => {
@@ -37,7 +40,6 @@ const MappingItem = ({
         [mapping.id]: mapping.request || {},
       }));
     }
-
     if (!editedResponses[mapping.id]) {
       const firstResponse = relevantResponses[0] || {};
       setEditedResponses((prev) => ({
@@ -45,7 +47,6 @@ const MappingItem = ({
         [mapping.id]: firstResponse.resJson || {},
       }));
     }
-
     if (!selectedResponses[mapping.id] && relevantResponses.length > 0) {
       setSelectedResponses((prev) => ({
         ...prev,
@@ -61,70 +62,90 @@ const MappingItem = ({
     setSelectedResponses,
   ]);
 
-  return (
-    <li className={styles.mappingItem}>
-      <div className={styles.titleRow} onClick={toggleExpanded}>
-        <h3>{editedRequests[mapping.id]?.method || "Unidentified Method"}</h3>
-        <h3>{editedRequests[mapping.id]?.url || "Unidentified URL"}</h3>
-        <h3>{editedRequests[mapping.id]?.title || "Untitled Mapping"}</h3>
+  // Auto-trigger the toggle if this mapping should be auto-expanded
+  useEffect(() => {
+    if (
+      autoExpandMappingId &&
+      mapping.id === autoExpandMappingId &&
+      !expandedMappings[mapping.id]
+    ) {
+      if (toggleButtonRef.current) {
+        toggleButtonRef.current.click();
+      }
+    }
+  }, [autoExpandMappingId, mapping.id, expandedMappings]);
 
-        <span
-          className={
-            mapping.status === "Active" ? styles.active : styles.unmapped
-          }
-        >
-          {mapping.status}
-        </span>
-        {/* ✅ Ensure Active/Inactive is displayed correctly */}
-        <h3 className={mapping.isActive ? styles.active : styles.inactive}>
-          {isActive}
-        </h3>
-        <button className={styles.toggleButton}>
-          {expandedMappings[mapping.id] ? "Hide Details" : "Show Details"}
-        </button>
-      </div>
-      {expandedMappings[mapping.id] && (
-        <>
-          <RequestEditor
-            mappingId={mapping.id}
-            editedRequest={editedRequests[mapping.id]}
-            setEditedRequest={(data) =>
-              setEditedRequests((prev) => ({ ...prev, [mapping.id]: data }))
+  // After the mapping item is expanded, scroll it into view
+  useEffect(() => {
+    if (expandedMappings[mapping.id] && mapping.id === autoExpandMappingId && mappingItemRef.current) {
+      mappingItemRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [expandedMappings, autoExpandMappingId, mapping.id]);
+
+  return (
+    <div id={`mapping-${mapping.id}`}ref={mappingItemRef}>
+      <li className={styles.mappingItem}>
+        <div className={styles.titleRow} onClick={toggleExpanded}>
+          <h3>{editedRequests[mapping.id]?.method || "Unidentified Method"}</h3>
+          <h3>{editedRequests[mapping.id]?.url || "Unidentified URL"}</h3>
+          <h3>{editedRequests[mapping.id]?.title || "Untitled Mapping"}</h3>
+          <span
+            className={
+              mapping.status === "Active" ? styles.active : styles.unmapped
             }
-            handleUpdateRequest={(id, updatedRequest) => {
-              setEditedRequests((prev) => ({
-                ...prev,
-                [id]: updatedRequest,
-              }));
-              handleUpdateRequest(id, updatedRequest);
-            }}
-          />
-          <ResponseEditor
-            mappingId={mapping.id}
-            relevantResponses={relevantResponses}
-            editedResponse={editedResponses[mapping.id]}
-            setEditedResponse={(data) =>
-              setEditedResponses((prev) => ({ ...prev, [mapping.id]: data }))
-            }
-            selectedResponse={selectedResponses[mapping.id]}
-            setSelectedResponse={(responseId) =>
-              setSelectedResponses((prev) => ({
-                ...prev,
-                [mapping.id]: responseId,
-              }))
-            }
-            handleUpdateResponse={handleUpdateResponse}
-          />
-          <button
-            placeholder="Delete Button"
-            onClick={() => handleDelete(mapping.id)}
-            className={styles.deleteButton}
           >
-            Delete Mapping
+            {mapping.status}
+          </span>
+          <h3 className={mapping.isActive ? styles.active : styles.inactive}>
+            {isActive}
+          </h3>
+          <button ref={toggleButtonRef} className={styles.toggleButton}>
+            {expandedMappings[mapping.id] ? "Hide Details" : "Show Details"}
           </button>
-        </>
-      )}
-    </li>
+        </div>
+        {expandedMappings[mapping.id] && (
+          <>
+            <RequestEditor
+              mappingId={mapping.id}
+              editedRequest={editedRequests[mapping.id]}
+              setEditedRequest={(data) =>
+                setEditedRequests((prev) => ({ ...prev, [mapping.id]: data }))
+              }
+              handleUpdateRequest={(id, updatedRequest) => {
+                setEditedRequests((prev) => ({
+                  ...prev,
+                  [id]: updatedRequest,
+                }));
+                handleUpdateRequest(id, updatedRequest);
+              }}
+            />
+            <ResponseEditor
+              mappingId={mapping.id}
+              relevantResponses={relevantResponses}
+              editedResponse={editedResponses[mapping.id]}
+              setEditedResponse={(data) =>
+                setEditedResponses((prev) => ({ ...prev, [mapping.id]: data }))
+              }
+              selectedResponse={selectedResponses[mapping.id]}
+              setSelectedResponse={(responseId) =>
+                setSelectedResponses((prev) => ({
+                  ...prev,
+                  [mapping.id]: responseId,
+                }))
+              }
+              handleUpdateResponse={handleUpdateResponse}
+            />
+            <button
+              placeholder="Delete Button"
+              onClick={() => handleDelete(mapping.id)}
+              className={styles.deleteButton}
+            >
+              Delete Mapping
+            </button>
+          </>
+        )}
+      </li>
+    </div>
   );
 };
 
