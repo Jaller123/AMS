@@ -57,7 +57,7 @@ const MappingsPage = ({
       );
     });
 
-    // Filter by search input
+    
     filtered = filtered.filter((mapping) => {
       const searchLower = search.toLowerCase();
       const requestBody = JSON.stringify(
@@ -65,7 +65,7 @@ const MappingsPage = ({
       ).toLowerCase();
       const requestHeaders = JSON.stringify(
         mapping.request?.headers || {}
-      ).toLowerCase();
+      ).toLowerCase(); 
 
       return (
         mapping.request?.title?.toLowerCase().includes(searchLower) ||
