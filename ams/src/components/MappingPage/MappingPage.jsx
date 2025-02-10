@@ -26,6 +26,70 @@ const MappingsPage = ({
   const [search, setSearch] = useState("");
 
   const location = useLocation();
+ 
+
+  useEffect(() => {
+    // Uppdatera val av responses när mappings ändras
+    const initialSelections = {};
+    mappings.forEach((mapping) => {
+      const relevantResponses = responses.filter(
+        (res) => res.reqId === mapping.id
+      );
+      if (relevantResponses.length > 0) {
+        initialSelections[mapping.id] = relevantResponses[0].id;
+      }
+    });
+    setSelectedResponses(initialSelections);
+  }, [mappings, responses]);
+
+  useEffect(() => {
+    // Filter och sortera mappings
+    let filtered = mappings.filter((mapping) => {
+      const request = mapping.request || {};
+      const title = (request.title || "").toLowerCase();
+      const url = (request.url || "").toLowerCase();
+      const method = (request.method || "").toLowerCase();
+
+      return (
+        title.includes(searchFilters.title) &&
+        url.includes(searchFilters.url) &&
+        method.includes(searchFilters.method)
+      );
+    });
+
+    // Filter by search input
+    filtered = filtered.filter((mapping) => {
+      const searchLower = search.toLowerCase();
+      const requestBody = JSON.stringify(
+        mapping.request?.body || {}
+      ).toLowerCase();
+      const requestHeaders = JSON.stringify(
+        mapping.request?.headers || {}
+      ).toLowerCase();
+
+      return (
+        mapping.request?.title?.toLowerCase().includes(searchLower) ||
+        mapping.request?.url?.toLowerCase().includes(searchLower) ||
+        requestBody.includes(searchLower) ||
+        requestHeaders.includes(searchLower) ||
+        mapping.request?.method?.toLowerCase().includes(searchLower)
+      );
+    });
+
+    // Apply sorting
+    if (sortCriterion) {
+      filtered = filtered.sort((a, b) => {
+        const fieldA = (a.request?.[sortCriterion] || "").toLowerCase();
+        const fieldB = (b.request?.[sortCriterion] || "").toLowerCase();
+        return fieldA.localeCompare(fieldB);
+      });
+    }
+
+    setFilteredMappings(filtered);
+  }, [mappings, search, searchFilters, sortCriterion]);
+
+ 
+
   // Read the mapping id to auto-expand from location.state (if provided)
   const autoExpandMappingId = location.state?.expandMappingId;
   console.log("Auto-expand mapping id from location:", autoExpandMappingId);
