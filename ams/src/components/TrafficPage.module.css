@@ -1,12 +1,13 @@
 /* Container wrapper for centering */
 .trafficc {
   display: flex;
-  justify-content: center; /* Horizontally center */
-  align-items: center;     /* Vertically center */
-  min-height: 100vh;       /* Full height of the viewport */
-  padding: 1rem;           /* Optional: Add some padding */
-  background-color: #ffffff; /* Optional: Background color for the page */
+  justify-content: center; /* Centrerar horisontellt */
+  align-items: center;     /* Centrerar vertikalt */
+  min-height: calc(100vh - 80px); /* Justera 80px beroende på navbarens höjd */
+  width: 100%;
+  background-color: #ffffff;
 }
+
 
 /* Main container for the content (Form-like container) */
 .trafficContainer {
@@ -35,7 +36,7 @@
 
 /* Filter input styling */
 .filterInput {
-  width: 100%; /* Make filter input take up full width */
+  width: 50%; /* Make filter input take up full width */
   padding: 1rem;
   margin-bottom: 1rem;
   border-radius: 30px;
@@ -74,7 +75,7 @@
 .tableRow {
   display: grid;
   grid-template-columns: 1fr 2fr 1fr 2fr 1fr;
-  padding: 1rem;
+  padding: 7px;
   background-color: #fff;
   border-radius: 10px;
   border: 1px solid #ddd;

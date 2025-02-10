@@ -1,29 +1,65 @@
-.section {
-  margin-bottom: 20px;
+.ResForm {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* Centrerar sektionen på hela sidan */
   padding: 20px;
+  margin-bottom: 90px;
+}
+
+.section {
+  width: 500px;
+  background: linear-gradient(to bottom right, #000000, #c1c1c1); /* Vit bakgrund för kort */
+  padding: 30px;
+  border-radius: 12px; /* Rundade hörn */
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+h2 {
+  text-align: center;
+  color: #ffffff;
+  font-size: 24px;
+  margin-bottom: 20px;
 }
 
 .formGroup {
-  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
 }
 
-.input {
+label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #ffffff;
+}
+
+input,
+textarea {
   width: 100%;
   padding: 10px;
-  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
   box-sizing: border-box;
+  transition: border-color 0.3s ease-in-out;
+  font-size: 16px;
+}
+
+input:focus,
+textarea:focus {
+  border-color: #007bff; /* Blå markering vid fokus */
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 100px;
 }
 
 .errorText {
   color: red;
   font-size: 14px;
   margin-top: 5px;
-}
-
-.textarea {
-  width: 100%;
-  padding: 10px;
-  margin-top: 5px;
-  box-sizing: border-box;
-  resize: none;
 }

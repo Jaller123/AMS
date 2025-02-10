@@ -9,7 +9,7 @@ const RequestEditor = ({
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [localRequest, setLocalRequest] = useState({
-    url: "",
+    title:"",
     method: "",
     headers: "{}",
     body: "{}",
@@ -19,6 +19,7 @@ const RequestEditor = ({
   useEffect(() => {
     if (editedRequest) {
       setLocalRequest({
+        title: editedRequest.title || "",
         url: editedRequest.url || "",
         method: editedRequest.method || "",
         headers: JSON.stringify(editedRequest.headers || {}, null, 2),
@@ -48,10 +49,20 @@ const RequestEditor = ({
       <h4>Request</h4>
       {isEditing ? (
         <div>
+          <label htmlFor="url">Titel</label>
+          <input
+            placeholder="Titel"
+            type="text"
+            value={localRequest.title}
+            onChange={(e) =>
+              setLocalRequest({ ...localRequest, title: e.target.value })
+            }
+          />
           <label htmlFor="url">URL</label>
           <input
             placeholder="Url"
             type="text"
+            data-testid="search-url"
             value={localRequest.url}
             onChange={(e) =>
               setLocalRequest({ ...localRequest, url: e.target.value })

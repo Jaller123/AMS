@@ -51,63 +51,73 @@ const ReqForm = ({ setRequestData, resetForm }) => {
   }, [resetForm]);
 
   return (
-    <section className={styles.section}>
-      <h2>Request</h2>
-      <div className={styles.formGroup}>
-        <label htmlFor="title">Title</label>
-        <input
-          id="title"
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Enter request title"
-        />
+    
+      <div className={styles.ReqForm}>
+        <section className={styles.section}>
+          <h2>Request</h2>
+          <div className={styles.formGroup}>
+            <label htmlFor="title">Title</label>
+            <input
+              id="title"
+              type="text"
+              data-testid="title-input"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Enter request title"
+            />
+          </div>
+          <div className={styles.formGroup}>
+            <label htmlFor="url">URL</label>
+            <input
+              id="url"
+              type="text"
+              value={url}
+               data-testid="url-input"
+              onChange={(e) => setUrl(e.target.value)}
+              placeholder="Enter the request URL"
+            />
+          </div>
+          <div className={styles.formGroup}>
+            <label htmlFor="method">Method</label>
+            <select
+              id="method"
+               data-testid="method-select"
+              value={method}
+              onChange={(e) => setMethod(e.target.value)}
+            >
+              <option value="GET">GET</option>
+              <option value="POST">POST</option>
+              <option value="PUT">PUT</option>
+              <option value="DELETE">DELETE</option>
+            </select>
+          </div>
+          <div className={styles.formGroup}>
+            <label htmlFor="headers">Headers (JSON format)</label>
+            <textarea
+              id="headers"
+              value={headers}
+              data-testid="headers-input-req"
+              onChange={(e) => setHeaders(e.target.value)}
+              rows={4}
+              placeholder='{"Content-Type": "application/json"}'
+            />
+          </div>
+          <div className={styles.formGroup}>
+            <label htmlFor="body">Body (JSON format)</label>
+            <textarea
+              id="body"
+              value={body}
+              data-testid="body-input-req"
+              onChange={(e) => setBody(e.target.value)}
+              rows={4}
+              placeholder='{"key": "value"}'
+            />
+          </div>
+        </section>
       </div>
-      <div className={styles.formGroup}>
-        <label htmlFor="url">URL</label>
-        <input
-          id="url"
-          type="text"
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-          placeholder="Enter the request URL"
-        />
-      </div>
-      <div className={styles.formGroup}>
-        <label htmlFor="method">Method</label>
-        <select
-          id="method"
-          value={method}
-          onChange={(e) => setMethod(e.target.value)}
-        >
-          <option value="GET">GET</option>
-          <option value="POST">POST</option>
-          <option value="PUT">PUT</option>
-          <option value="DELETE">DELETE</option>
-        </select>
-      </div>
-      <div className={styles.formGroup}>
-        <label htmlFor="headers">Headers (JSON format)</label>
-        <textarea
-          id="headers"
-          value={headers}
-          onChange={(e) => setHeaders(e.target.value)}
-          rows={4}
-          placeholder='{"Content-Type": "application/json"}'
-        />
-      </div>
-      <div className={styles.formGroup}>
-        <label htmlFor="body">Body (JSON format)</label>
-        <textarea
-          id="body"
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-          rows={4}
-          placeholder='{"key": "value"}'
-        />
-      </div>
-    </section>
-  );
+    );
+    
+  
 };
 
 export default ReqForm;

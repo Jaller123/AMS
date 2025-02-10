@@ -9,9 +9,7 @@ const Home = ({ mappings, responses, handleDelete, handleUpdateRequest, handleUp
   return (
     <motion.div
       className={style.container}
-      initial={{ x: "-100vw" }}
-      animate={{ x: 0 }}
-      transition={{ duration: 2, ease: "easeOut" }}
+    
     >
       {/* Welcome section with text and logo */}
       <motion.div className={style.welcomeContainer}>
@@ -38,7 +36,7 @@ const Home = ({ mappings, responses, handleDelete, handleUpdateRequest, handleUp
         </motion.div>
       </motion.div>
 
-      {/* "Saved Mappings" Section below the welcome text and logo */}
+      {/* "Saved Mappings" Section without animation */}
       <div className={style.mappingPageContainer}>
         <MappingsPage
           mappings={mappings}
@@ -52,4 +50,4 @@ const Home = ({ mappings, responses, handleDelete, handleUpdateRequest, handleUp
   );
 };
 
-export default Home;   
+export default Home;

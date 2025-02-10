@@ -1,5 +1,4 @@
 .container {
-   
     display: flex;
     flex-direction: column; /* Ensure that the whole content stack vertically */
     align-items: center; /* Center everything horizontally */
@@ -7,6 +6,7 @@
     padding: 20px;
     background-color: var(--main-bg-color);
     overflow: hidden; 
+    min-height: 100vh;
   }
   
   /* Welcome section with logo and text */
@@ -15,8 +15,9 @@
     flex-direction: row; /* Keep the items side by side */
     align-items: center;
     justify-content: center;
-    color: rgb(30, 27, 27);
-    /* Remove the margin-bottom to eliminate the space */
+    color: rgb(255, 255, 255);
+    position: relative; /* Ensures that z-index on the text works */
+    z-index: 2;
   }
   .laptopContainer{
     position: relative;

@@ -45,6 +45,7 @@ const ResForm = ({ setResponseData, resetForm }) => {
   }, [resetForm]);
 
   return (
+    <div className={styles.ResForm}>
     <section className={styles.section}>
       <h2>Response</h2>
       <div className={styles.formGroup}>
@@ -52,6 +53,7 @@ const ResForm = ({ setResponseData, resetForm }) => {
         <input
           id="status"
           type="text"
+            data-testid="status-input"
           value={status}
           onChange={(e) => setStatus(e.target.value)}
           placeholder="Enter response status"
@@ -62,6 +64,7 @@ const ResForm = ({ setResponseData, resetForm }) => {
         <textarea
           id="headers"
           value={headers}
+           data-testid="headers-input"
           onChange={(e) => setHeaders(e.target.value)}
           rows={4}
           placeholder='{"Content-Type": "application/json"}'
@@ -75,6 +78,7 @@ const ResForm = ({ setResponseData, resetForm }) => {
         <textarea
           id="body"
           value={body}
+           data-testid="body-input"
           onChange={(e) => setBody(e.target.value)}
           rows={4}
           placeholder='{"key": "value"}'
@@ -84,6 +88,7 @@ const ResForm = ({ setResponseData, resetForm }) => {
         )}
       </div>
     </section>
+    </div>
   );
 };
 

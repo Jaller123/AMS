@@ -12,7 +12,6 @@
 
 html, body {
   width: 100%;
- 
   background-color: var(--main-bg-color);
   height: 100%;
 }
@@ -21,4 +20,40 @@ html, body {
  padding: 20px;
  background-color: var(--main-bg-color);
   min-height: 100vh; 
+}
+.custom-shape-divider-top-1738768978 {
+  position: absolute;
+  top: 90px;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+  transform: rotate(180deg);
+}
+
+.custom-shape-divider-top-1738768978 svg {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 254px;
+}
+
+.custom-shape-divider-top-1738768978 .shape-fill {
+  fill: #000000;  /* Justera färgen om det behövs */
+}
+.mappingsContainer {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.formWrapper {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 1200px;
+  gap: 20px;
+  margin-bottom: 20px;
 }
