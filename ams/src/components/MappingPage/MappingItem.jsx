@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import styles from "./MappingsPage.module.css";
 import RequestEditor from "./RequestEditor";
 import ResponseEditor from "./ResponseEditor";
@@ -17,7 +17,12 @@ const MappingItem = ({
   handleDelete,
   handleUpdateRequest,
   handleUpdateResponse,
+  autoExpandMappingId, // received from MappingList (or MappingsPage)
 }) => {
+  // Create a ref for the container element
+  const mappingItemRef = useRef(null);
+  const toggleButtonRef = useRef(null);
+
   const toggleExpanded = () => {
     setExpandedMappings((prev) => ({
       ...prev,
@@ -26,8 +31,6 @@ const MappingItem = ({
   };
 
   const relevantResponses = responses.filter((res) => res.reqId === mapping.id);
-
-  // ✅ Ensure isActive is properly checked
   const isActive = mapping.isActive ? "Active" : "Inactive";
 
   useEffect(() => {
@@ -37,7 +40,6 @@ const MappingItem = ({
         [mapping.id]: mapping.request || {},
       }));
     }
-
     if (!editedResponses[mapping.id]) {
       const firstResponse = relevantResponses[0] || {};
       setEditedResponses((prev) => ({
@@ -45,7 +47,6 @@ const MappingItem = ({
         [mapping.id]: firstResponse.resJson || {},
       }));
     }
-
     if (!selectedResponses[mapping.id] && relevantResponses.length > 0) {
       setSelectedResponses((prev) => ({
         ...prev,
@@ -60,6 +61,26 @@ const MappingItem = ({
     setEditedResponses,
     setSelectedResponses,
   ]);
+
+  // Auto-trigger the toggle if this mapping should be auto-expanded
+  useEffect(() => {
+    if (
+      autoExpandMappingId &&
+      mapping.id === autoExpandMappingId &&
+      !expandedMappings[mapping.id]
+    ) {
+      if (toggleButtonRef.current) {
+        toggleButtonRef.current.click();
+      }
+    }
+  }, [autoExpandMappingId, mapping.id, expandedMappings]);
+
+  // After the mapping item is expanded, scroll it into view
+  useEffect(() => {
+    if (expandedMappings[mapping.id] && mapping.id === autoExpandMappingId && mappingItemRef.current) {
+      mappingItemRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [expandedMappings, autoExpandMappingId, mapping.id]);
 
   return (
     <li className={styles.mappingItem}>
@@ -77,8 +98,9 @@ const MappingItem = ({
         </span>
         {/* ✅ Ensure Active/Inactive is displayed correctly */}
         <h3 className={mapping.isActive ? styles.active : styles.inactive}>
-          {isActive}
-        </h3>
+  {mapping.isActive ? "✅ " : "❌ "}
+</h3>
+
         <button className={styles.toggleButton}>
           {expandedMappings[mapping.id] ? "Hide Details" : "Show Details"}
         </button>

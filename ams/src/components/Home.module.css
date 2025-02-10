@@ -1,0 +1,74 @@
+.container {
+    display: flex;
+    flex-direction: column; /* Ensure that the whole content stack vertically */
+    align-items: center; /* Center everything horizontally */
+    margin-top: 90px;
+    padding: 20px;
+    background-color: var(--main-bg-color);
+    overflow: hidden; 
+    min-height: 100vh;
+  }
+  
+  /* Welcome section with logo and text */
+  .welcomeContainer {
+    display: flex;
+    flex-direction: row; /* Keep the items side by side */
+    align-items: center;
+    justify-content: center;
+    color: rgb(255, 255, 255);
+    position: relative; /* Ensures that z-index on the text works */
+    z-index: 2;
+  }
+  .laptopContainer{
+    position: relative;
+  width: 300px; /* Set appropriate size for the laptop */
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  }
+  .laptopImage {
+    width: 67%; /* Make sure laptop covers the whole container */
+    height: auto;
+  }
+  
+  .laptopScreen {
+    position: absolute;
+    top: 10%; /* Position the screen inside the laptop */
+    left: 6%;
+    width: 80%; /* Adjust screen size */
+    height: 70%; /* Adjust screen size */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+   
+  }
+  .header {
+    display: flex;
+    flex-direction: column; /* Stack vertically */
+    align-items: center; /* Center items horizontally */
+    justify-content: flex-start;
+    gap: 0; /* Remove the gap */
+  }
+  
+  .text {
+    font-size: 3rem;
+    text-align: center;
+    text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
+  }
+  
+  .logoo {
+    width: 150px; /* Adjust the logo size */
+    height: 95px;
+    margin-left: 20px; /* Space between text and logo */
+  }
+  
+  /* The container for the MappingsPage, ensuring it sits below the welcome section */
+  .mappingPageContainer {
+    width: 780px; /* Ensure it's full-width */
+    display: flex;
+    justify-content: center;
+    margin-top: 10px; /* Center the MappingsPage */
+    /* Remove the margin-top to eliminate the space */
+  }

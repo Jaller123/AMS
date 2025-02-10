@@ -9,7 +9,7 @@ const RequestEditor = ({
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [localRequest, setLocalRequest] = useState({
-    url: "",
+    title:"",
     method: "",
     headers: "{}",
     body: "{}",
@@ -19,6 +19,7 @@ const RequestEditor = ({
   useEffect(() => {
     if (editedRequest) {
       setLocalRequest({
+        title: editedRequest.title || "",
         url: editedRequest.url || "",
         method: editedRequest.method || "",
         headers: JSON.stringify(editedRequest.headers || {}, null, 2),
@@ -43,22 +44,31 @@ const RequestEditor = ({
       alert("Invalid JSON in headers or body.");
     }
   };
-
   return (
-    <div>
+    <div className={styles.RequestEditor}>
       <h4>Request</h4>
       {isEditing ? (
         <div>
-          <label>URL</label>
+          <label htmlFor="url">Titel</label>
+          <input
+            placeholder="Titel"
+            type="text"
+            value={localRequest.title}
+            onChange={(e) =>
+              setLocalRequest({ ...localRequest, title: e.target.value })
+            }
+          />
+          <label htmlFor="url">URL</label>
           <input
             placeholder="Url"
             type="text"
+            data-testid="search-url"
             value={localRequest.url}
             onChange={(e) =>
               setLocalRequest({ ...localRequest, url: e.target.value })
             }
           />
-          <label>Method</label>
+          <label htmlFor="method">Method</label>
           <input
             placeholder="Method"
             type="text"
@@ -67,7 +77,7 @@ const RequestEditor = ({
               setLocalRequest({ ...localRequest, method: e.target.value })
             }
           />
-          <label>Headers (JSON)</label>
+          <label htmlFor="method">Headers (JSON)</label>
           <textarea
             value={localRequest.headers}
             onChange={(e) =>
@@ -102,8 +112,5 @@ const RequestEditor = ({
     </div>
   );
 };
-
-
-
 
 export default RequestEditor;

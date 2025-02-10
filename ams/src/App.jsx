@@ -8,7 +8,6 @@ import ResForm from "./components/ResForm";
 import MappingsPage from "./components/MappingPage/MappingPage.jsx";
 import MappingDetailPage from "./components/MappingDetailPage";
 import TrafficPage from "./components/TrafficPage";
-
 import ReqDetailPage from "./components/ReqDetailPage";
 import Button from "./components/Button";
 import {
@@ -17,6 +16,7 @@ import {
   deleteMapping,
   saveResponse,
 } from "./backend/api.js";
+import Home from "../src/components/Home.jsx"; // Import den nya komponenten
 
 const App = () => {
   const [mappings, setMappings] = useState([]);
@@ -60,14 +60,14 @@ const App = () => {
   const handleSaveMapping = async () => {
     if (requestData && responseData) {
       try {
-        // ✅ Call `saveMapping`
+        // ✅ Call saveMapping
         const newMapping = await saveMapping({
           request: requestData,
           response: responseData,
         });
-  
+
         const { id, request, response, wireMockUuid } = newMapping;
-  
+
         // ✅ Update UI instantly
         setMappings((prevMappings) => [
           ...prevMappings,
@@ -78,7 +78,7 @@ const App = () => {
             isActive: true, // ✅ Show as active immediately
           },
         ]);
-  
+
         setResponses((prevResponses) => [
           ...prevResponses,
           {
@@ -87,19 +87,19 @@ const App = () => {
             resJson: response,
           },
         ]);
-  
+
         // ✅ **Clear input fields**
         setRequestData(null);
         setResponseData(null);
         setResetForm(true); // ✅ Reset form state
         setTimeout(() => setResetForm(false), 0); // ✅ Ensure UI updates
-  
+
         // ✅ Fetch mappings after a short delay
         setTimeout(async () => {
           const updatedData = await fetchMappings();
           setMappings(updatedData.requests);
         }, 500);
-  
+
         toast.success("Mapping saved successfully!");
       } catch (error) {
         console.error("Error saving mapping:", error);
@@ -109,8 +109,6 @@ const App = () => {
       toast.warn("Both request and response data are required.");
     }
   };
-  
-  
 
   const handleDeleteMapping = async (id) => {
     try {
@@ -201,32 +199,50 @@ const App = () => {
     <Router>
       <Navbar />
       <Routes>
-        <Route
+      <Route
           path="/"
           element={
-            <MappingsPage
-              mappings={mappings}
-              responses={responses}
-              handleDelete={handleDeleteMapping}
-              handleUpdateRequest={handleUpdateRequest}
-              handleUpdateResponse={handleUpdateResponse}
-            />
+            <div>
+            
+              <div className="custom-shape-divider-top-1738768978">
+                <svg
+                  data-name="Layer 1"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 1200 120"
+                  preserveAspectRatio="none"
+                >
+                  <path
+                    d="M985.66,92.83C906.67,72,823.78,15,793.84,14.19c-82.26-17.34-168.06-16.33-250.45.39-57.84,11.73-114,31.07-172,41.86A600.21,600.21,0,0,1,0,27.35V120H1200V95.8C1132.19,118.92,1055.71,111.31,985.66,92.83Z"
+                    className="shape-fill"
+                  ></path>
+                </svg>
+              </div>
+              <Home
+                mappings={mappings}
+                responses={responses}
+                handleDelete={handleDeleteMapping}
+                handleUpdateRequest={handleUpdateRequest}
+                handleUpdateResponse={handleUpdateResponse}
+                
+              />
+            </div>
+           
           }
         />
         <Route
-          path="/mappings"
-          element={
-            <div>
-              <ReqForm setRequestData={setRequestData} resetForm={resetForm} />
-              <ResForm
-                setResponseData={setResponseData}
-                resetForm={resetForm}
-              />
-              <Button onClick={handleSaveMapping}>Save Mapping</Button>
-              <ToastContainer />
-            </div>
-          }
-        />
+  path="/mappings"
+  element={
+    <div className="mappingsContainer">
+      <div className="formWrapper">
+        <ReqForm setRequestData={setRequestData} resetForm={resetForm} />
+        <ResForm setResponseData={setResponseData} resetForm={resetForm} />
+      </div>
+      <Button onClick={handleSaveMapping}>Save Mapping</Button>
+      <ToastContainer />
+    </div>
+  }
+/>
+
         <Route
           path="/mapping/:mappingId"
           element={
@@ -247,7 +263,7 @@ const App = () => {
             />
           }
         />
-        <Route path="/traffic" element={<TrafficPage />} />
+        <Route path="/traffic" element={<TrafficPage savedMappings={mappings} />} />
       </Routes>
     </Router>
   );

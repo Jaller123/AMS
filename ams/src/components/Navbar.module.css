@@ -1,8 +1,9 @@
 .navbar {
+  width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #333;
+  background-color: #000000;
   padding: 10px 20px;
   color: white;
   font-family: "Century Gothic", sans-serif;
@@ -24,8 +25,8 @@
 }
 
 .logo {
-  width: 300px;
-  height: 190px;
+  width: 200px;
+  height: 120px;
   object-fit: contain;
 }
 

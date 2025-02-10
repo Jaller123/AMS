@@ -1,17 +1,28 @@
-.section {
-  margin-bottom: 20px;
+.ReqForm{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* Centrerar sektionen på hela sidan */
   padding: 20px;
+}
+.section {
+  width: 500px;
+  background: linear-gradient(to bottom right, #000000, #c1c1c1); /* Vit bakgrund för kort */
+  padding: 30px;
+  border-radius: 12px; /* Rundade hörn */
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .formGroup {
   margin-bottom: 15px;
+  padding: 15px;
 }
 
-.input {
-  width: 100%;
-  padding: 10px;
-  margin-top: 5px;
-  box-sizing: border-box;
+.formGroup label{
+  color: #ffffff;
+  padding: 8px 8px;
 }
 
 .textarea {

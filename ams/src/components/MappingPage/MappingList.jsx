@@ -15,7 +15,7 @@ const MappingList = ({
   handleDelete,
   handleUpdateRequest,
   handleUpdateResponse,
-  isActive,
+  autoExpandMappingId,  
 }) => {
   return (
     <ul>
@@ -35,7 +35,7 @@ const MappingList = ({
           handleDelete={handleDelete}
           handleUpdateRequest={handleUpdateRequest}
           handleUpdateResponse={handleUpdateResponse}
-          isActive={isActive}
+          autoExpandMappingId={autoExpandMappingId}  // pass it down
         />
       ))}
     </ul>
