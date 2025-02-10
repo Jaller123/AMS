@@ -28,11 +28,10 @@
   width: 100%;
 }
 
-.search-form input {
-  outline: none;
+
+.searchInput{
   border: none;
-  background-color: transparent;
-  color: #000000;
+  
 }
 .sectionn h2{
   color: white;

@@ -73,8 +73,6 @@ const TrafficPage = ({ savedMappings }) => {
   return (
     <div className={styles.trafficContainer}>
       <h2>WireMock Traffic Overview</h2>
-
-      {/* Search filter */}
       <input
         type="text"
         placeholder="Filter by URL or Method"
@@ -82,18 +80,6 @@ const TrafficPage = ({ savedMappings }) => {
         onChange={(e) => setFilter(e.target.value)}
         className={styles.filterInput}
       />
-
-      {/* Match Filter Dropdown */}
-      <select
-        value={matchFilter}
-        onChange={(e) => setMatchFilter(e.target.value)}
-        className={styles.filterDropdown}
-      >
-        <option value="all">Show All</option>
-        <option value="matched">Matched</option>
-        <option value="unmatched">Unmatched</option>
-      </select>
-
       <div className={styles.trafficTable}>
         <div className={styles.tableHeader}>
           <span>Method</span>
@@ -112,13 +98,12 @@ const TrafficPage = ({ savedMappings }) => {
                 {item?.matchedStubId ? (
                   "✅ Matched"
                 ) : (
+                  // Render a link for unmatched traffic that navigates back to the mappings page
                   <Link to="/mappings">❌ Unmatched</Link>
                 )}
               </span>
               <span>
-                {item.timestamp
-                  ? new Date(item.timestamp).toLocaleString()
-                  : "N/A"}
+                {item.timestamp ? new Date(item.timestamp).toLocaleString() : "N/A"}
               </span>
             </div>
           ))
