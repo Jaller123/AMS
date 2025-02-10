@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom"; // Import Link from react-router-dom
+import { Link } from "react-router-dom";
 import styles from "./TrafficPage.module.css";
 import { fetchWireMockTraffic } from "../backend/api";
 
@@ -7,6 +7,7 @@ const TrafficPage = () => {
   const [trafficData, setTrafficData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("");
+  const [matchFilter, setMatchFilter] = useState("all");
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -30,18 +31,26 @@ const TrafficPage = () => {
   const filteredData = trafficData.filter((item) => {
     const method = item?.request?.method || "";
     const url = item?.request?.url || "";
-    return (
+    const matchesSearch =
       method.toLowerCase().includes(filter.toLowerCase()) ||
-      url.toLowerCase().includes(filter.toLowerCase())
-    );
+      url.toLowerCase().includes(filter.toLowerCase());
+
+    // Apply match filter
+    if (matchFilter === "matched" && !item.matchedStubId) return false;
+    if (matchFilter === "unmatched" && item.matchedStubId) return false;
+
+    return matchesSearch;
   });
 
-  if (loading) return <div className={styles.loading}>Loading traffic data...</div>;
+  if (loading)
+    return <div className={styles.loading}>Loading traffic data...</div>;
   if (error) return <div className={styles.error}>Error: {error}</div>;
 
   return (
     <div className={styles.trafficContainer}>
       <h2>WireMock Traffic Overview</h2>
+
+      {/* Search filter */}
       <input
         type="text"
         placeholder="Filter by URL or Method"
@@ -49,6 +58,18 @@ const TrafficPage = () => {
         onChange={(e) => setFilter(e.target.value)}
         className={styles.filterInput}
       />
+
+      {/* Match Filter Dropdown */}
+      <select
+        value={matchFilter}
+        onChange={(e) => setMatchFilter(e.target.value)}
+        className={styles.filterDropdown}
+      >
+        <option value="all">Show All</option>
+        <option value="matched">Matched</option>
+        <option value="unmatched">Unmatched</option>
+      </select>
+
       <div className={styles.trafficTable}>
         <div className={styles.tableHeader}>
           <span>Method</span>
@@ -67,12 +88,13 @@ const TrafficPage = () => {
                 {item?.matchedStubId ? (
                   "✅ Matched"
                 ) : (
-                  // Render a link for unmatched traffic that navigates back to the mappings page
                   <Link to="/mappings">❌ Unmatched</Link>
                 )}
               </span>
               <span>
-                {item.timestamp ? new Date(item.timestamp).toLocaleString() : "N/A"}
+                {item.timestamp
+                  ? new Date(item.timestamp).toLocaleString()
+                  : "N/A"}
               </span>
             </div>
           ))

@@ -42,10 +42,17 @@ describe("Mappings Page - Response Functionalities", () => {
     cy.get('input[placeholder="Status"]').clear().type("202");
 
     // Modify response headers
-    cy.get('textarea').eq(0).clear().type('{"Content-Type":"application/xml"}', { parseSpecialCharSequences: false });
+    cy.get("textarea")
+      .eq(0)
+      .clear()
+      .type('{"Content-Type":"application/xml"}', {
+        parseSpecialCharSequences: false,
+      });
 
     // Modify response body
-    cy.get('textarea').eq(1).clear().type('{"body":"updated response"}', { parseSpecialCharSequences: false });
+    cy.get("textarea").eq(1).clear().type('{"body":"updated response"}', {
+      parseSpecialCharSequences: false,
+    });
 
     // Save the updated response
     cy.contains("Save Response").click();
@@ -65,8 +72,15 @@ describe("Mappings Page - Response Functionalities", () => {
 
     // Fill in new response details
     cy.get('input[placeholder="Status"]').type("201");
-    cy.get('textarea').eq(0).clear().type('{"Content-Type":"application/json"}', { parseSpecialCharSequences: false });
-    cy.get('textarea').eq(1).clear().type('{"body":"new response body"}', { parseSpecialCharSequences: false });
+    cy.get("textarea")
+      .eq(0)
+      .clear()
+      .type('{"Content-Type":"application/json"}', {
+        parseSpecialCharSequences: false,
+      });
+    cy.get("textarea").eq(1).clear().type('{"body":"new response body"}', {
+      parseSpecialCharSequences: false,
+    });
 
     // Mock the POST request for saving the response
     cy.intercept("POST", "http://localhost:8080/responses").as("saveResponse");
@@ -131,7 +145,9 @@ describe("Mappings Page - Response Functionalities", () => {
       .last()
       .then(($latestResponse) => {
         const latestResponseText = $latestResponse.text();
-        cy.get("select[placeholder='Select Response']").select(latestResponseText);
+        cy.get("select[placeholder='Select Response']").select(
+          latestResponseText
+        );
       });
 
     // Verify the latest response details dynamically
