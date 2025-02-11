@@ -33,8 +33,12 @@ const TrafficPage = ({ savedMappings }) => {
             });
             const newMappingId = foundMapping ? foundMapping.id : undefined;
             console.log(
-              `For traffic item ${item.id}, matchedStubId: "${item.matchedStubId}" -> mappingId: "${newMappingId}"`
+              `For traffic item ${item.id}, matchedStubId: "${item.matchedStubId}" -> mappingId: "${newMappingId}"`  
             );
+            console.log("Traffic item", item.id, "matchedStubId:", item.matchedStubId);
+            console.log("Found mapping:", foundMapping);
+            console.log("New mappingId:", newMappingId);
+            
             return { ...item, mappingId: newMappingId };
           }
           return item;
@@ -95,12 +99,20 @@ const TrafficPage = ({ savedMappings }) => {
               <span>{item?.request?.url || "N/A"}</span>
               <span>{item?.response?.status || "N/A"}</span>
               <span>
-                {item?.matchedStubId ? (
-                  "✅ Matched"
-                ) : (
-                  // Render a link for unmatched traffic that navigates back to the mappings page
-                  <Link to="/mappings">❌ Unmatched</Link>
-                )}
+              {item?.matchedStubId && item.mappingId ? (
+                <Link
+                  to="/" 
+                  state={{ expandMappingId: item.mappingId }}
+                  onClick={() =>
+                    console.log("Navigating with mappingId:", item.mappingId)
+                  }
+                >
+                  ✅ Matched
+                </Link>
+              ) : (
+                <Link to="/mappings">❌ Unmatched</Link>
+              )}
+
               </span>
               <span>
                 {item.timestamp ? new Date(item.timestamp).toLocaleString() : "N/A"}

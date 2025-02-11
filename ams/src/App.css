@@ -2,6 +2,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  font-family: "Century Gothic", sans-serif;
 }
 :root {
   --main-bg-color: rgb(255, 255, 255); /* Den färg du vill använda för både navbar och home */

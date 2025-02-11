@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styles from "./MappingsPage.module.css";
 import RequestEditor from "./RequestEditor";
 import ResponseEditor from "./ResponseEditor";
@@ -19,9 +19,11 @@ const MappingItem = ({
   handleUpdateResponse,
   autoExpandMappingId, // received from MappingList (or MappingsPage)
 }) => {
-  // Create a ref for the container element
+  // Create refs for the mapping item container and the toggle button
   const mappingItemRef = useRef(null);
   const toggleButtonRef = useRef(null);
+  // Local flag so that auto expansion only happens once
+  const [hasAutoExpanded, setHasAutoExpanded] = useState(false);
 
   const toggleExpanded = () => {
     setExpandedMappings((prev) => ({
@@ -33,6 +35,7 @@ const MappingItem = ({
   const relevantResponses = responses.filter((res) => res.reqId === mapping.id);
   const isActive = mapping.isActive ? "Active" : "Inactive";
 
+  // Initialize local editing state
   useEffect(() => {
     if (!editedRequests[mapping.id]) {
       setEditedRequests((prev) => ({
@@ -62,46 +65,46 @@ const MappingItem = ({
     setSelectedResponses,
   ]);
 
-  // Auto-trigger the toggle if this mapping should be auto-expanded
+  // Auto-trigger expansion only once when autoExpandMappingId is provided.
   useEffect(() => {
     if (
+      !hasAutoExpanded && // only if we haven't auto-expanded before
       autoExpandMappingId &&
       mapping.id === autoExpandMappingId &&
       !expandedMappings[mapping.id]
     ) {
       if (toggleButtonRef.current) {
         toggleButtonRef.current.click();
+        setHasAutoExpanded(true);
       }
     }
-  }, [autoExpandMappingId, mapping.id, expandedMappings]);
+  }, [hasAutoExpanded, autoExpandMappingId, mapping.id, expandedMappings]);
 
-  // After the mapping item is expanded, scroll it into view
+  // After expansion, scroll the mapping item into view
   useEffect(() => {
-    if (expandedMappings[mapping.id] && mapping.id === autoExpandMappingId && mappingItemRef.current) {
+    if (
+      expandedMappings[mapping.id] &&
+      mapping.id === autoExpandMappingId &&
+      mappingItemRef.current
+    ) {
       mappingItemRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   }, [expandedMappings, autoExpandMappingId, mapping.id]);
 
   return (
-    <li className={styles.mappingItem}>
+    <li className={styles.mappingItem} ref={mappingItemRef}>
       <div className={styles.titleRow} onClick={toggleExpanded}>
         <h3>{editedRequests[mapping.id]?.method || "Unidentified Method"}</h3>
         <h3>{editedRequests[mapping.id]?.url || "Unidentified URL"}</h3>
         <h3>{editedRequests[mapping.id]?.title || "Untitled Mapping"}</h3>
-
-        <span
-          className={
-            mapping.status === "Active" ? styles.active : styles.unmapped
-          }
-        >
+        <span className={mapping.status === "Active" ? styles.active : styles.unmapped}>
           {mapping.status}
         </span>
-        {/* ✅ Ensure Active/Inactive is displayed correctly */}
         <h3 className={mapping.isActive ? styles.active : styles.inactive}>
-  {mapping.isActive ? "✅ " : "❌ "}
-</h3>
-
-        <button className={styles.toggleButton}>
+          {mapping.isActive ? "✅ " : "❌ "}
+        </h3>
+        {/* Attach the ref so we can trigger click programmatically */}
+        <button ref={toggleButtonRef} className={styles.toggleButton}>
           {expandedMappings[mapping.id] ? "Hide Details" : "Show Details"}
         </button>
       </div>
@@ -138,7 +141,6 @@ const MappingItem = ({
             handleUpdateResponse={handleUpdateResponse}
           />
           <button
-            placeholder="Delete Button"
             onClick={() => handleDelete(mapping.id)}
             className={styles.deleteButton}
           >
