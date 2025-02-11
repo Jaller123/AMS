@@ -31,9 +31,12 @@ const TrafficPage = () => {
   const filteredData = trafficData.filter((item) => {
     const method = item?.request?.method || "";
     const url = item?.request?.url || "";
+    const timestampRaw = item?.request?.timestamp || "";
+
     const matchesSearch =
       method.toLowerCase().includes(filter.toLowerCase()) ||
       url.toLowerCase().includes(filter.toLowerCase());
+    timestampRaw.toLowerCase().includes(filter.toLowerCase());
 
     if (matchFilter === "matched" && !item.matchedStubId) return false;
     if (matchFilter === "unmatched" && item.matchedStubId) return false;
@@ -56,6 +59,16 @@ const TrafficPage = () => {
         className={styles.filterInput}
       />
       <div className={styles.trafficTable}>
+        <select
+          value={matchFilter}
+          onChange={(e) => setMatchFilter(e.target.value)}
+          className={styles.filterDropdown}
+        >
+          <option value="all">Show All</option>
+          <option value="matched">Matched</option>
+          <option value="unmatched">Unmatched</option>
+        </select>
+
         <div className={styles.tableHeader}>
           <span>Method</span>
           <span>URL</span>
@@ -63,12 +76,14 @@ const TrafficPage = () => {
           <span>Matched</span>
           <span>Timestamp</span>
         </div>
+
         {filteredData.length > 0 ? (
           filteredData.map((item) => (
             <div key={item.id} className={styles.tableRow}>
               <span>{item?.request?.method || "N/A"}</span>
               <span>{item?.request?.url || "N/A"}</span>
               <span>{item?.response?.status || "N/A"}</span>
+
               <span>
                 {item?.matchedStubId ? (
                   "✅ Matched"
@@ -78,7 +93,9 @@ const TrafficPage = () => {
                 )}
               </span>
               <span>
-                {item.timestamp ? new Date(item.timestamp).toLocaleString() : "N/A"}
+                {item.timestamp
+                  ? new Date(item.timestamp).toLocaleString()
+                  : "N/A"}
               </span>
             </div>
           ))
