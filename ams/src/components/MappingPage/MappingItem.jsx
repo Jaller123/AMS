@@ -20,6 +20,7 @@ const MappingItem = ({
   autoExpandMappingId, // received from MappingList (or MappingsPage)
 }) => {
   // Create a ref for the container element
+
   const mappingItemRef = useRef(null);
   const toggleButtonRef = useRef(null);
 
@@ -77,8 +78,15 @@ const MappingItem = ({
 
   // After the mapping item is expanded, scroll it into view
   useEffect(() => {
-    if (expandedMappings[mapping.id] && mapping.id === autoExpandMappingId && mappingItemRef.current) {
-      mappingItemRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (
+      expandedMappings[mapping.id] &&
+      mapping.id === autoExpandMappingId &&
+      mappingItemRef.current
+    ) {
+      mappingItemRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
     }
   }, [expandedMappings, autoExpandMappingId, mapping.id]);
 
@@ -98,8 +106,8 @@ const MappingItem = ({
         </span>
         {/* ✅ Ensure Active/Inactive is displayed correctly */}
         <h3 className={mapping.isActive ? styles.active : styles.inactive}>
-  {mapping.isActive ? "✅ " : "❌ "}
-</h3>
+          {mapping.isActive ? "✅ " : "❌ "}
+        </h3>
 
         <button className={styles.toggleButton}>
           {expandedMappings[mapping.id] ? "Hide Details" : "Show Details"}
