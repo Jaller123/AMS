@@ -87,7 +87,10 @@ const MappingItem = ({
       mapping.id === autoExpandMappingId &&
       mappingItemRef.current
     ) {
-      mappingItemRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+      mappingItemRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
     }
   }, [expandedMappings, autoExpandMappingId, mapping.id]);
 

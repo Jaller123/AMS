@@ -4,26 +4,22 @@ import { Link } from "react-router-dom";
 import styles from "./TrafficPage.module.css";
 import { fetchWireMockTraffic } from "../backend/api";
 
-const TrafficPage = ({ savedMappings }) => {
+const TrafficPage = ({ savedMappings }) => { // Add savedMappings here
   const [trafficData, setTrafficData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("");
   const [matchFilter, setMatchFilter] = useState("all");
   const [error, setError] = useState(null);
 
-  // Fetch the traffic data and join with savedMappings
   useEffect(() => {
     const loadTraffic = async () => {
       setLoading(true);
       setError(null);
       try {
         const data = await fetchWireMockTraffic();
-        // For each traffic item, if it has a matchedStubId, find the corresponding mapping
         const joinedData = data.trafficData.map((item) => {
           if (item.matchedStubId && savedMappings && savedMappings.length) {
-            // Compare using either mapping.uuid or mapping.wireMockUuid
             const foundMapping = savedMappings.find((mapping) => {
-              // Use the property that holds the WireMock UUID
               const mappingUuid = mapping.uuid || mapping.wireMockUuid;
               return (
                 mappingUuid &&
@@ -33,12 +29,8 @@ const TrafficPage = ({ savedMappings }) => {
             });
             const newMappingId = foundMapping ? foundMapping.id : undefined;
             console.log(
-              `For traffic item ${item.id}, matchedStubId: "${item.matchedStubId}" -> mappingId: "${newMappingId}"`  
+              `For traffic item ${item.id}, matchedStubId: "${item.matchedStubId}" -> mappingId: "${newMappingId}"`
             );
-            console.log("Traffic item", item.id, "matchedStubId:", item.matchedStubId);
-            console.log("Found mapping:", foundMapping);
-            console.log("New mappingId:", newMappingId);
-            
             return { ...item, mappingId: newMappingId };
           }
           return item;
@@ -51,28 +43,22 @@ const TrafficPage = ({ savedMappings }) => {
       }
     };
     loadTraffic();
-  }, [savedMappings]);
+  }, [savedMappings]); // add savedMappings to the dependency array
 
   const filteredData = trafficData.filter((item) => {
-    console.log(`Rendering traffic item ${item.id}: mappingId=${item.mappingId}`);
     const method = item?.request?.method || "";
     const url = item?.request?.url || "";
     const matchesSearch =
       method.toLowerCase().includes(filter.toLowerCase()) ||
       url.toLowerCase().includes(filter.toLowerCase());
-
-    // Apply match filter
     if (matchFilter === "matched" && !item.matchedStubId) return false;
     if (matchFilter === "unmatched" && item.matchedStubId) return false;
-
     return matchesSearch;
   });
 
   if (loading)
     return <div className={styles.loading}>Loading traffic data...</div>;
   if (error) return <div className={styles.error}>Error: {error}</div>;
-  if (error)
-    return <div className={styles.error}>Error: {error}</div>;
 
   return (
     <div className={styles.trafficContainer}>
@@ -84,6 +70,17 @@ const TrafficPage = ({ savedMappings }) => {
         onChange={(e) => setFilter(e.target.value)}
         className={styles.filterInput}
       />
+      <div className={styles.trafficTable}>
+        <select
+          value={matchFilter}
+          onChange={(e) => setMatchFilter(e.target.value)}
+          className={styles.filterDropdown}
+        >
+          <option value="all">Show All</option>
+          <option value="matched">Matched</option>
+          <option value="unmatched">Unmatched</option>
+        </select>
+      </div>
       <div className={styles.trafficTable}>
         <div className={styles.tableHeader}>
           <span>Method</span>
@@ -99,20 +96,19 @@ const TrafficPage = ({ savedMappings }) => {
               <span>{item?.request?.url || "N/A"}</span>
               <span>{item?.response?.status || "N/A"}</span>
               <span>
-              {item?.matchedStubId && item.mappingId ? (
-                <Link
-                  to="/" 
-                  state={{ expandMappingId: item.mappingId }}
-                  onClick={() =>
-                    console.log("Navigating with mappingId:", item.mappingId)
-                  }
-                >
-                  ✅ Matched
-                </Link>
-              ) : (
-                <Link to="/mappings">❌ Unmatched</Link>
-              )}
-
+                {item?.matchedStubId && item.mappingId ? (
+                  <Link
+                    to="/" 
+                    state={{ expandMappingId: item.mappingId }}
+                    onClick={() =>
+                      console.log("Navigating with mappingId:", item.mappingId)
+                    }
+                  >
+                    ✅ Matched
+                  </Link>
+                ) : (
+                  <Link to="/mappings">❌ Unmatched</Link>
+                )}
               </span>
               <span>
                 {item.timestamp ? new Date(item.timestamp).toLocaleString() : "N/A"}

@@ -2,19 +2,22 @@
 .trafficc {
   display: flex;
   justify-content: center; /* Centrerar horisontellt */
-  align-items: center;     /* Centrerar vertikalt */
+  align-items: center; /* Centrerar vertikalt */
   min-height: calc(100vh - 80px); /* Justera 80px beroende på navbarens höjd */
   width: 100%;
   background-color: #ffffff;
 }
-
 
 /* Main container for the content (Form-like container) */
 .trafficContainer {
   width: 50%; /* Set the width to a smaller percentage */
   max-width: 800px; /* Set max width to avoid it growing too large */
   padding: 2rem;
-  background: linear-gradient(to bottom right, #000000, #c1c1c1); /* Soft gradient */
+  background: linear-gradient(
+    to bottom right,
+    #000000,
+    #c1c1c1
+  ); /* Soft gradient */
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
