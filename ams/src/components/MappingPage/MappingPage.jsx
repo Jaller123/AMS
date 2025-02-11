@@ -96,7 +96,7 @@ const MappingsPage = ({
   // …
 
   return (
-    <section className={styles.sectionn}>
+    <section className={styles.section}>
       <h2>Saved Mappings</h2>
       <div className={styles["searchable-mappings"]}>
         <form

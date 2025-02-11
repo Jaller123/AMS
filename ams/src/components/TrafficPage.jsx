@@ -1,9 +1,10 @@
+// TrafficPage.jsx
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import styles from "./TrafficPage.module.css";
 import { fetchWireMockTraffic } from "../backend/api";
 
-const TrafficPage = () => {
+const TrafficPage = ({ savedMappings }) => { // Add savedMappings here
   const [trafficData, setTrafficData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("");
@@ -14,33 +15,46 @@ const TrafficPage = () => {
     const loadTraffic = async () => {
       setLoading(true);
       setError(null);
-
       try {
         const data = await fetchWireMockTraffic();
-        setTrafficData(data.trafficData || []);
+        const joinedData = data.trafficData.map((item) => {
+          if (item.matchedStubId && savedMappings && savedMappings.length) {
+            const foundMapping = savedMappings.find((mapping) => {
+              const mappingUuid = mapping.uuid || mapping.wireMockUuid;
+              return (
+                mappingUuid &&
+                mappingUuid.trim().toLowerCase() ===
+                  item.matchedStubId.trim().toLowerCase()
+              );
+            });
+            const newMappingId = foundMapping ? foundMapping.id : undefined;
+            console.log(
+              `For traffic item ${item.id}, matchedStubId: "${item.matchedStubId}" -> mappingId: "${newMappingId}"`
+            );
+            return { ...item, mappingId: newMappingId };
+          }
+          return item;
+        });
+        setTrafficData(joinedData);
       } catch (err) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
-
     loadTraffic();
-  }, []);
+  }, [savedMappings]); // add savedMappings to the dependency array
 
   const filteredData = trafficData.filter((item) => {
     const method = item?.request?.method || "";
     const url = item?.request?.url || "";
-    const timestampRaw = item?.request?.timestamp || "";
 
     const matchesSearch =
       method.toLowerCase().includes(filter.toLowerCase()) ||
       url.toLowerCase().includes(filter.toLowerCase());
-    timestampRaw.toLowerCase().includes(filter.toLowerCase());
 
     if (matchFilter === "matched" && !item.matchedStubId) return false;
     if (matchFilter === "unmatched" && item.matchedStubId) return false;
-
     return matchesSearch;
   });
 
@@ -69,6 +83,8 @@ const TrafficPage = () => {
           <option value="unmatched">Unmatched</option>
         </select>
 
+      </div>
+      <div className={styles.trafficTable}>
         <div className={styles.tableHeader}>
           <span>Method</span>
           <span>URL</span>
@@ -85,10 +101,17 @@ const TrafficPage = () => {
               <span>{item?.response?.status || "N/A"}</span>
 
               <span>
-                {item?.matchedStubId ? (
-                  "✅ Matched"
+                {item?.matchedStubId && item.mappingId ? (
+                  <Link
+                    to="/" 
+                    state={{ expandMappingId: item.mappingId }}
+                    onClick={() =>
+                      console.log("Navigating with mappingId:", item.mappingId)
+                    }
+                  >
+                    ✅ Matched
+                  </Link>
                 ) : (
-                  // Render a link for unmatched traffic that navigates back to the mappings page
                   <Link to="/mappings">❌ Unmatched</Link>
                 )}
               </span>

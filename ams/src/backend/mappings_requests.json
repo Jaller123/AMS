@@ -1,59 +1,6 @@
 [
   {
-    "id": "2",
-    "resJson": {
-      "title": "Hello",
-      "url": "/hello",
-      "method": "GET",
-      "headers": {},
-      "body": {}
-    },
-    "wireMockUuid": "31bac5e2-2935-48de-97fa-4ef657ee8189"
-  },
-  {
-    "id": "4",
-    "resJson": {
-      "method": "POST",
-      "url": "/test-endpoint",
-      "headers": {
-        "Content-Type": "application/json"
-      },
-      "body": {
-        "key": "value"
-      }
-    },
-    "wireMockUuid": "e8502220-ff3f-428f-84ca-1525c53216be"
-  },
-  {
-    "id": "5",
-    "resJson": {
-      "url": "/getUser",
-      "method": "POST",
-      "headers": {
-        "Content-Type": "application/json"
-      },
-      "body": {
-        "body": "hello world"
-      }
-    },
-    "wireMockUuid": "f5289cbd-57d8-45f6-aa5f-8bf0ea4ae53b"
-  },
-  {
-    "id": "6",
-    "resJson": {
-      "url": "/noUser",
-      "method": "POST",
-      "headers": {
-        "Content-Type": "application/json"
-      },
-      "body": {
-        "body": " hello there"
-      }
-    },
-    "wireMockUuid": "452fe4f7-4ab0-410f-a85c-ef0fad27df68"
-  },
-  {
-    "id": "7",
+    "id": "1",
     "resJson": {
       "title": "fetching ",
       "url": "/hello",
@@ -66,20 +13,5 @@
       }
     },
     "wireMockUuid": "2bdb3c7f-7dd5-4acb-a8ec-a4435d89d989"
-  },
-  {
-    "id": "8",
-    "resJson": {
-      "title": "reg user",
-      "url": "/reg",
-      "method": "POST",
-      "headers": {
-        "Content-Type": "application/json"
-      },
-      "body": {
-        "body": "hello wireMock"
-      }
-    },
-    "wireMockUuid": "5ad4dd81-f139-4e0e-bf1b-3f8295067f51"
   }
 ]

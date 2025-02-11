@@ -15,7 +15,7 @@ const MappingList = ({
   handleDelete,
   handleUpdateRequest,
   handleUpdateResponse,
-  autoExpandMappingId,  
+  autoExpandMappingId,  // receive the auto-expand id here
 }) => {
   return (
     <ul>
