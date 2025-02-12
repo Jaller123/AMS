@@ -98,10 +98,10 @@ const RequestEditor = ({
           {/* Display the request without title */}
           <pre>{JSON.stringify(
             {
-              url: editedRequest.url,
-              method: editedRequest.method,
-              headers: editedRequest.headers,
-              body: editedRequest.body,
+              url: editedRequest?.url || "",
+              method: editedRequest?.method || "",
+              headers: editedRequest?.headers || "",
+              body: editedRequest?.body || "",
             },
             null,
             2
