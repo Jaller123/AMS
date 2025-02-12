@@ -4,12 +4,15 @@ import { Link } from "react-router-dom";
 import styles from "./TrafficPage.module.css";
 import { fetchWireMockTraffic } from "../backend/api";
 
-const TrafficPage = ({ savedMappings }) => { // Add savedMappings here
+const TrafficPage = ({ savedMappings }) => {
+  // Add savedMappings here
   const [trafficData, setTrafficData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("");
   const [matchFilter, setMatchFilter] = useState("all");
   const [error, setError] = useState(null);
+  const [startTime, setStartTime] = useState(""); // Start time input
+  const [endTime, setEndTime] = useState(""); // End time input
 
   useEffect(() => {
     const loadTraffic = async () => {
@@ -48,6 +51,23 @@ const TrafficPage = ({ savedMappings }) => { // Add savedMappings here
   const filteredData = trafficData.filter((item) => {
     const method = item?.request?.method || "";
     const url = item?.request?.url || "";
+    const timestampRaw = item.timestamp;
+
+    if (!timestampRaw) return false; // Ignore items without a timestamp
+
+    // Convert timestamp to Date object
+    const timestampDate = new Date(timestampRaw);
+    const timestampHours = timestampDate.getHours().toString().padStart(2, "0");
+    const timestampMinutes = timestampDate
+      .getMinutes()
+      .toString()
+      .padStart(2, "0");
+    const timestampFormatted = `${timestampHours}:${timestampMinutes}`;
+
+    // Convert filter times to comparable formats
+    const isInTimeRange =
+      (!startTime || timestampFormatted >= startTime) &&
+      (!endTime || timestampFormatted <= endTime);
 
     const matchesSearch =
       method.toLowerCase().includes(filter.toLowerCase()) ||
@@ -55,7 +75,7 @@ const TrafficPage = ({ savedMappings }) => { // Add savedMappings here
 
     if (matchFilter === "matched" && !item.matchedStubId) return false;
     if (matchFilter === "unmatched" && item.matchedStubId) return false;
-    return matchesSearch;
+    return matchesSearch, isInTimeRange;
   });
 
   if (loading)
@@ -65,6 +85,22 @@ const TrafficPage = ({ savedMappings }) => { // Add savedMappings here
   return (
     <div className={styles.trafficContainer}>
       <h2>WireMock Traffic Overview</h2>
+      <div className={styles.filterContainer}>
+        <label>Start Time:</label>
+        <input
+          type="time"
+          value={startTime}
+          onChange={(e) => setStartTime(e.target.value)}
+        />
+
+        <label>End Time:</label>
+        <input
+          type="time"
+          value={endTime}
+          onChange={(e) => setEndTime(e.target.value)}
+        />
+      </div>
+
       <input
         type="text"
         placeholder="Filter by URL or Method"
@@ -72,6 +108,7 @@ const TrafficPage = ({ savedMappings }) => { // Add savedMappings here
         onChange={(e) => setFilter(e.target.value)}
         className={styles.filterInput}
       />
+
       <div className={styles.trafficTable}>
         <select
           value={matchFilter}
@@ -82,8 +119,8 @@ const TrafficPage = ({ savedMappings }) => { // Add savedMappings here
           <option value="matched">Matched</option>
           <option value="unmatched">Unmatched</option>
         </select>
-
       </div>
+
       <div className={styles.trafficTable}>
         <div className={styles.tableHeader}>
           <span>Method</span>
@@ -103,7 +140,7 @@ const TrafficPage = ({ savedMappings }) => { // Add savedMappings here
               <span>
                 {item?.matchedStubId && item.mappingId ? (
                   <Link
-                    to="/" 
+                    to="/"
                     state={{ expandMappingId: item.mappingId }}
                     onClick={() =>
                       console.log("Navigating with mappingId:", item.mappingId)
@@ -117,7 +154,9 @@ const TrafficPage = ({ savedMappings }) => { // Add savedMappings here
               </span>
               <span>
                 {item.timestamp
-                  ? new Date(item.timestamp).toLocaleString()
+                  ? `${new Date(item.timestamp).toLocaleString()}.${new Date(
+                      item.timestamp
+                    ).getMilliseconds()}`
                   : "N/A"}
               </span>
             </div>

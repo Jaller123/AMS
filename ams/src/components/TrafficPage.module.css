@@ -21,6 +21,7 @@
   overflow: hidden;
   margin-top: 30px; /* Optional: Add margin to give space from navbar */
   height: auto; /* Adjust height automatically based on content */
+  gap: 1rem;
 }
 
 /* Heading style */
