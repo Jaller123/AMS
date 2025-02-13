@@ -101,7 +101,7 @@
         "body": "hello world"
       }
     },
-    "wireMockUuid": null
+    "wireMockUuid": "6642ea4a-a1fe-4e7a-a0ed-24bce4aef0c2"
   },
   {
     "id": "8",
@@ -147,5 +147,20 @@
       }
     },
     "wireMockUuid": "b9968348-bbd3-4b10-9529-dcc8acc8d22e"
+  },
+  {
+    "id": "11",
+    "resJson": {
+      "title": "test wireMock",
+      "url": "/wireMock",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "body": "hello"
+      }
+    },
+    "wireMockUuid": null
   }
 ]

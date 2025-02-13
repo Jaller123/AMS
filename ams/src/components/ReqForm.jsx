@@ -3,8 +3,8 @@ import styles from "./ReqForm.module.css";
 import { useLocation } from "react-router-dom";
 
 const isValidJson = (jsonString) => {
-  if (typeof jsonString !== "string") return true
-  if (jsonString.trim()) return true;
+  if (typeof jsonString !== "string") return false;
+  if (!jsonString.trim()) return false;
   try {
     JSON.parse(jsonString);
     return true;
@@ -14,18 +14,20 @@ const isValidJson = (jsonString) => {
 };
 
 const ReqForm = ({ setRequestData, resetForm }) => {
-  const location = useLocation()
-  // Kolla om det finns redan ifylld data genom state 
-  const prefillMapping = location.state?.prefillMapping || {}
-  
-  const initialHeaders = 
+  const location = useLocation();
+  // Kolla om det finns redan ifylld data genom state
+  const prefillMapping = location.state?.prefillMapping || {};
+
+  const initialHeaders =
     typeof prefillMapping.headers === "string"
       ? prefillMapping.headers
-      : JSON.stringify(prefillMapping.headers || {})
-    const initialBody = typeof prefillMapping.body === "string"
-    ? prefillMapping.body
-    : JSON.stringify(prefillMapping.body || {});
-  
+      : JSON.stringify(
+          prefillMapping.headers || { "Content-Type": "application/json" }
+        );
+  const initialBody =
+    typeof prefillMapping.body === "string"
+      ? prefillMapping.body
+      : JSON.stringify(prefillMapping.body);
 
   const [url, setUrl] = useState(prefillMapping.url || "");
   const [method, setMethod] = useState(prefillMapping.method || "GET");
@@ -33,8 +35,6 @@ const ReqForm = ({ setRequestData, resetForm }) => {
   const [body, setBody] = useState(initialBody);
   const [title, setTitle] = useState("");
   const [errors, setErrors] = useState({ headers: false, body: false });
-  
-  
 
   useEffect(() => {
     const headersValid = isValidJson(headers);
@@ -60,81 +60,78 @@ const ReqForm = ({ setRequestData, resetForm }) => {
     if (resetForm) {
       setUrl("");
       setMethod("GET");
-      setHeaders("");
-      setBody("");
+      setHeaders("{}");
+      setBody("{}");
       setTitle("");
       setErrors({ headers: false, body: false });
     }
   }, [resetForm]);
 
   return (
-    
-      <div className={styles.ReqForm}>
-        <section className={styles.section}>
-          <h2>Request</h2>
-          <div className={styles.formGroup}>
-            <label htmlFor="title">Title</label>
-            <input
-              id="title"
-              type="text"
-              data-testid="title-input"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Enter request title"
-            />
-          </div>
-          <div className={styles.formGroup}>
-            <label htmlFor="url">URL</label>
-            <input
-              id="url"
-              type="text"
-              value={url}
-               data-testid="url-input"
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="Enter the request URL"
-            />
-          </div>
-          <div className={styles.formGroup}>
-            <label htmlFor="method">Method</label>
-            <select
-              id="method"
-               data-testid="method-select"
-              value={method}
-              onChange={(e) => setMethod(e.target.value)}
-            >
-              <option value="GET">GET</option>
-              <option value="POST">POST</option>
-              <option value="PUT">PUT</option>
-              <option value="DELETE">DELETE</option>
-            </select>
-          </div>
-          <div className={styles.formGroup}>
-            <label htmlFor="headers">Headers (JSON format)</label>
-            <textarea
-              id="headers"
-              value={headers}
-              data-testid="headers-input-req"
-              onChange={(e) => setHeaders(e.target.value)}
-              rows={4}
-              placeholder='{"Content-Type": "application/json"}'
-            />
-          </div>
-          <div className={styles.formGroup}>
-            <label htmlFor="body">Body (JSON format)</label>
-            <textarea
-              id="body"
-              value={body}
-              data-testid="body-input-req"
-              onChange={(e) => setBody(e.target.value)}
-              rows={4}
-              placeholder='{"key": "value"}'
-            />
-          </div>
-        </section>
-      </div>
-    );
-    
-  
+    <div className={styles.ReqForm}>
+      <section className={styles.section}>
+        <h2>Request</h2>
+        <div className={styles.formGroup}>
+          <label htmlFor="title">Title</label>
+          <input
+            id="title"
+            type="text"
+            data-testid="title-input"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Enter request title"
+          />
+        </div>
+        <div className={styles.formGroup}>
+          <label htmlFor="url">URL</label>
+          <input
+            id="url"
+            type="text"
+            value={url}
+            data-testid="url-input"
+            onChange={(e) => setUrl(e.target.value)}
+            placeholder="Enter the request URL"
+          />
+        </div>
+        <div className={styles.formGroup}>
+          <label htmlFor="method">Method</label>
+          <select
+            id="method"
+            data-testid="method-select"
+            value={method}
+            onChange={(e) => setMethod(e.target.value)}
+          >
+            <option value="GET">GET</option>
+            <option value="POST">POST</option>
+            <option value="PUT">PUT</option>
+            <option value="DELETE">DELETE</option>
+          </select>
+        </div>
+        <div className={styles.formGroup}>
+          <label htmlFor="headers">Headers (JSON format)</label>
+          <textarea
+            id="headers"
+            value={headers}
+            data-testid="headers-input-req"
+            onChange={(e) => setHeaders(e.target.value)}
+            rows={4}
+            placeholder='{"Content-Type": "application/json"}'
+          />
+        </div>
+        <div className={styles.formGroup}>
+          <label htmlFor="body">Body (JSON format)</label>
+          <textarea
+            id="body"
+            value={body}
+            data-testid="body-input-req"
+            onChange={(e) => setBody(e.target.value)}
+            rows={4}
+            placeholder='{"key": "value" }'
+          />
+        </div>
+      </section>
+    </div>
+  );
 };
 
 export default ReqForm;
