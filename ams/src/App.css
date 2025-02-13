@@ -4,23 +4,22 @@
   padding: 0;
   font-family: "Century Gothic", sans-serif;
 }
-:root {
-  --main-bg-color: rgb(255, 255, 255); /* Den färg du vill använda för både navbar och home */
+
+
+
+
+
+body {
+  background: linear-gradient(120deg, #2C3E50, #3498DB);
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
-
-
-
-html, body {
-  width: 100%;
-  background-color: var(--main-bg-color);
-  height: 100%;
-}
 .pageContainer {
-  width: 100%;
- padding: 20px;
- background-color: var(--main-bg-color);
-  min-height: 100vh; 
+  min-height: 100vh;
+  padding: 20px;
+  background-color: transparent; 
+  
 }
 .custom-shape-divider-top-1738768978 {
   position: absolute;
@@ -40,9 +39,10 @@ html, body {
 }
 
 .custom-shape-divider-top-1738768978 .shape-fill {
-  fill: #000000;  /* Justera färgen om det behövs */
+  fill: #2C3E50;  
 }
 .mappingsContainer {
+  background-color: rgba(216, 195, 168, 0.555);
   display: flex;
   justify-content: center;
   flex-direction: column;

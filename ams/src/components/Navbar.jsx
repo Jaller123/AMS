@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom"; // Använd Link istället för <a>
+import { NavLink } from "react-router-dom";
 import styles from "./Navbar.module.css";
 import logo from "../assets/AMSlogo.png";
 
@@ -11,22 +11,24 @@ const Navbar = () => {
       </div>
       <ul className={styles.navbarMenu}>
         <li className={styles.menuItem}>
-          <Link to="/" className={styles.link}>
-            Home
-          </Link>{" "}
-          {/* Länk till startsidan */}
-        </li>
-        <li className={styles.menuItem}>
-          <Link to="/mappings" className={styles.link}>
+          <NavLink
+            to="/"
+            className={({ isActive }) =>
+              isActive ? `${styles.link} ${styles.active}` : styles.link
+            }
+          >
             Mappings
-          </Link>{" "}
-          {/* Länk till mappningar */}
+          </NavLink>
         </li>
         <li className={styles.menuItem}>
-          <Link to="/traffic" className={styles.link}>
+          <NavLink
+            to="/traffic"
+            className={({ isActive }) =>
+              isActive ? `${styles.link} ${styles.active}` : styles.link
+            }
+          >
             Traffic
-          </Link>{" "}
-          {/* New link */}
+          </NavLink>
         </li>
       </ul>
     </nav>

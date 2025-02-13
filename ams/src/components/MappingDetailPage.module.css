@@ -1,5 +1,48 @@
 .container {
-  margin: 20px;
+  width: 100%;
+  max-width: 600px; /* Justera maxbredden efter behov */
+  background-color: rgba(255, 255, 255, 0.85); 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  height: auto; /* Gör så att containern anpassar sig efter innehållet */
+  min-height: 10vh; /* Gör så att den inte tar upp hela skärmen, utan 80% av höjden */
+  padding: 50px;
+  margin: 10vh auto; /* Skapar avstånd från toppen och botten */
+  border-radius: 12px; /* Lägg till om du vill ha rundade hörn */
+  position: relative;
+  overflow: hidden;
+}
+
+.container::before{
+  content: "";
+  position: absolute;
+  top: -40px; 
+  left: 50%;
+  width: 120%;
+  height: 197px; 
+  background-color: #2c3e50; 
+  border-radius: 70%; 
+  transform: translateX(-50%);
+}
+
+.formContainer{
+  width: 500px;
+ 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 15px;
+  position: relative;
+  overflow: hidden;
+}
+.co pre{
+  position: relative;
+  overflow: hidden;
+  width: 400px;
+  height: 230px;
 }
 
 .textarea {
@@ -7,20 +50,32 @@
   height: 150px;
   margin: 10px 0;
 }
-
+h2{
+  color: rgb(255, 255, 255);
+}
+.co h3{
+  position: relative;
+  overflow: hidden;
+  color: white;
+}
 .buttons {
   display: flex;
   gap: 10px;
 }
 
-.saveButton {
-  background-color: green;
-  color: white;
-  padding: 10px;
+.saveButton ,.backButton {
+  background: rgb(4, 84, 127);
+  margin: 20px;
   border: none;
+  color: rgb(251, 251, 251);
+  padding: 15px;
+  border-radius: 30px;
   cursor: pointer;
 }
 
+.saveButton:hover, .backButton:hover{
+  background-color: #062749;
+}
 .editButton {
   background-color: blue;
   color: white;
@@ -35,4 +90,4 @@
   padding: 10px;
   border: none;
   cursor: pointer;
-}
+} 

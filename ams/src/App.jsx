@@ -235,9 +235,8 @@ const App = () => {
     <div className="mappingsContainer">
       <div className="formWrapper">
         <ReqForm setRequestData={setRequestData} resetForm={resetForm} />
-        <ResForm setResponseData={setResponseData} resetForm={resetForm} />
+        <ResForm setResponseData={setResponseData} resetForm={resetForm} onSave={handleSaveMapping} />
       </div>
-      <Button onClick={handleSaveMapping}>Save Mapping</Button>
       <ToastContainer />
     </div>
   }

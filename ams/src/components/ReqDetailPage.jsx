@@ -42,7 +42,7 @@ const ReqDetailPage = ({ mappings, handleSaveResponse }) => {
         <p>No request found for ID: {mappingId}</p>
       ) : (
         <>
-          <div>
+          <div className={styles.co}>
             <h3>Request</h3>
             <pre>{JSON.stringify(mapping.request, null, 2)}</pre>
           </div>

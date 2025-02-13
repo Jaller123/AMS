@@ -4,27 +4,55 @@
   align-items: center;
   min-height: 100vh; /* Centrerar sektionen på hela sidan */
   padding: 20px;
-  margin-bottom: 90px;
+  margin-bottom: 200px;
+ 
 }
 
 .section {
   width: 500px;
-  background: linear-gradient(to bottom right, #000000, #c1c1c1); /* Vit bakgrund för kort */
+  background-color: rgba(255, 255, 255, 0.85); 
   padding: 30px;
   border-radius: 12px; /* Rundade hörn */
   display: flex;
   flex-direction: column;
   gap: 15px;
+  position: relative;
+  overflow: hidden;
+  
+}
+.section::before{
+  content: "";
+  position: absolute;
+  top: -40px; 
+  left: 50%;
+  width: 120%;
+  height: 144px; 
+  background-color: #2c3e50; 
+  border-radius: 70%; 
+  transform: translateX(-50%);
 }
 
+button {
+  position: relative;
+  z-index: 2; /* Detta ser till att knappen ligger över bakgrunden */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 h2 {
+  position: relative;
+  z-index: 1;
   text-align: center;
   color: #ffffff;
   font-size: 24px;
   margin-bottom: 20px;
 }
-
+.section h2{
+  color: white;
+}
 .formGroup {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
 }
@@ -32,7 +60,7 @@ h2 {
 label {
   font-weight: bold;
   margin-bottom: 5px;
-  color: #ffffff;
+  color: #000000;
 }
 
 input,
