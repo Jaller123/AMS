@@ -52,7 +52,7 @@ const TrafficPage = ({ savedMappings }) => {
     const method = item?.request?.method || "";
     const url = item?.request?.url || "";
     const timestampRaw = item.timestamp;
-
+    console.log(item?.request)
     if (!timestampRaw) return false; // Ignore items without a timestamp
 
     // Convert timestamp to Date object
@@ -78,6 +78,13 @@ const TrafficPage = ({ savedMappings }) => {
     return matchesSearch, isInTimeRange;
   });
 
+  const getHeaderValue = (headers, headerName) => {
+    const key = Object.keys(headers).find(
+      (key) => key.toLowerCase() === headerName.toLowerCase()
+    )
+    return key ? headers[key] : null
+  }
+  
   if (loading)
     return <div className={styles.loading}>Loading traffic data...</div>;
   if (error) return <div className={styles.error}>Error: {error}</div>;
@@ -149,7 +156,16 @@ const TrafficPage = ({ savedMappings }) => {
                     ✅ Matched
                   </Link>
                 ) : (
-                  <Link to="/mappings">❌ Unmatched</Link>
+                  <Link to="/mappings"
+                  state={{
+                    prefillMapping: {
+                      url: item?.request.url,
+                      method: item?.request.method,
+                      headers: { "Content-Type": getHeaderValue(item?.request?.headers, "Content-Type") },
+                      body: item?.request.body                      
+                    }
+                  }}
+                  >❌ Unmatched</Link>
                 )}
               </span>
               <span>

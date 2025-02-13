@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import styles from "./ReqForm.module.css";
+import { useLocation } from "react-router-dom";
 
 const isValidJson = (jsonString) => {
-  if (!jsonString.trim()) return true;
+  if (typeof jsonString !== "string") return true
+  if (jsonString.trim()) return true;
   try {
     JSON.parse(jsonString);
     return true;
@@ -12,12 +14,27 @@ const isValidJson = (jsonString) => {
 };
 
 const ReqForm = ({ setRequestData, resetForm }) => {
-  const [url, setUrl] = useState("");
-  const [method, setMethod] = useState("GET");
-  const [headers, setHeaders] = useState("");
-  const [body, setBody] = useState("");
+  const location = useLocation()
+  // Kolla om det finns redan ifylld data genom state 
+  const prefillMapping = location.state?.prefillMapping || {}
+  
+  const initialHeaders = 
+    typeof prefillMapping.headers === "string"
+      ? prefillMapping.headers
+      : JSON.stringify(prefillMapping.headers || {})
+    const initialBody = typeof prefillMapping.body === "string"
+    ? prefillMapping.body
+    : JSON.stringify(prefillMapping.body || {});
+  
+
+  const [url, setUrl] = useState(prefillMapping.url || "");
+  const [method, setMethod] = useState(prefillMapping.method || "GET");
+  const [headers, setHeaders] = useState(initialHeaders);
+  const [body, setBody] = useState(initialBody);
   const [title, setTitle] = useState("");
   const [errors, setErrors] = useState({ headers: false, body: false });
+  
+  
 
   useEffect(() => {
     const headersValid = isValidJson(headers);

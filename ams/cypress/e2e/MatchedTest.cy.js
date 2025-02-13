@@ -62,7 +62,7 @@ describe('Traffic Row Matched Link & Auto-Expand Mapping', () => {
     cy.wait('@getWiremockRequests');
     
     cy.contains('✅ Matched').should('exist');
-    cy.wait(1000);
+    cy.wait(500);
 
     // Step 3: Click the "✅ Matched" link.
     cy.contains('✅ Matched').click({ force: true });
@@ -103,4 +103,74 @@ describe('Traffic Row Matched Link & Auto-Expand Mapping', () => {
       expect(rect.bottom).to.be.greaterThan(0);
     });
   });
+  /// <reference types="cypress" />
+
+describe('Traffic Row Unmatched Link & Prefill Create Mapping', () => {
+  beforeEach(() => {
+    cy.viewport(1280, 800);
+
+    // Stub GET __admin/requests to return an unmatched traffic row.
+    cy.intercept('GET', '**/__admin/requests', {
+      statusCode: 200,
+      body: {
+        requests: [
+          {
+            id: "row2",
+            request: {
+              method: "POST",
+              url: "/unmatched",
+              headers: {
+                "Content-Type": "application/json",
+                "Other-Header": "value"
+              },
+              body: '{"test": "value"}'
+            },
+            response: {
+              status: 404,
+              headers: {},
+              body: ""
+            },
+            // No matchedStubId makes this an unmatched row.
+            timestamp: "2/11/2025, 11:00:00 AM"
+          }
+        ]
+      }
+    }).as('getWiremockRequests');
+
+    // Stub GET /mappings to return an empty list (no saved mappings).
+    cy.intercept('GET', '**/mappings', {
+      statusCode: 200,
+      body: {
+        requests: [],
+        responses: []
+      }
+    }).as('getMappings');
+  });
+
+  it('navigates from Traffic to create mapping page with prefilled data from unmatched traffic', () => {
+    // Step 1: Visit the Traffic page.
+    cy.visit('http://localhost:5173/traffic');
+    cy.wait('@getWiremockRequests');
+    cy.wait(500);
+
+    // Verify that the unmatched row renders a "❌ Unmatched" link.
+    cy.contains('❌ Unmatched').should('exist');
+    cy.wait(500);
+
+    // Step 2: Click the "❌ Unmatched" link.
+    cy.contains('❌ Unmatched').click({ force: true });
+
+    // Step 3: Verify that we are redirected to the create mapping page ("/mappings").
+    cy.url().should('include', '/mappings');
+    cy.wait(500);
+
+    // Step 4: Verify that the request form is prefilled with the unmatched traffic row's data.
+    // Assumes that the ReqForm component uses these data-testid attributes:
+    cy.get('[data-testid="url-input"]').should('have.value', '/unmatched');
+    cy.get('[data-testid="method-select"]').should('have.value', 'POST');
+    cy.get('[data-testid="headers-input-req"]').should('have.value', '{"Content-Type":"application/json"}');
+    cy.get('[data-testid="body-input-req"]').should('have.value', '{"test": "value"}');
+  });
+});
+
 });
