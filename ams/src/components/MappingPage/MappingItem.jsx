@@ -25,6 +25,32 @@ const MappingItem = ({
   const toggleButtonRef = useRef(null);
   // Local flag so that auto expansion only happens once
   const [hasAutoExpanded, setHasAutoExpanded] = useState(false);
+  const hasInitialized = useRef(false)
+
+  useEffect(() => {
+    if (!hasInitialized.current) {
+      if (!editedRequests[mapping.id]) {
+        setEditedRequests((prev) => ({
+          ...prev,
+          [mapping.id]: mapping.request || {},
+        }));
+      }
+      if (!editedResponses[mapping.id]) {
+        const firstResponse = responses.filter((res) => res.reqId === mapping.id)[0] || {};
+        setEditedResponses((prev) => ({
+          ...prev,
+          [mapping.id]: firstResponse.resJson || {},
+        }));
+      }
+      if (!selectedResponses[mapping.id] && responses.filter((res) => res.reqId === mapping.id).length > 0) {
+        setSelectedResponses((prev) => ({
+          ...prev,
+          [mapping.id]: responses.filter((res) => res.reqId === mapping.id)[0].id,
+        }));
+      }
+      hasInitialized.current = true;
+    }
+  }, [mapping.id, responses, editedRequests, editedResponses, selectedResponses, setEditedRequests, setEditedResponses, setSelectedResponses]);
 
   const toggleExpanded = () => {
     setExpandedMappings((prev) => ({
@@ -90,13 +116,13 @@ const MappingItem = ({
     ) {
       mappingItemRef.current.scrollIntoView({
         behavior: "smooth",
-        block: "center",
+        block: "start",
       });
     }
   }, [expandedMappings, autoExpandMappingId, mapping.id]);
 
   return (
-    <li className={styles.mappingItem} ref={mappingItemRef}>
+    <li className={styles.mappingItem} ref={mappingItemRef} data-testid="mapping-item">
       <div className={styles.titleRow} onClick={toggleExpanded}>
         <h3>{editedRequests[mapping.id]?.method || "Unidentified Method"}</h3>
         <h3>{editedRequests[mapping.id]?.url || "Unidentified URL"}</h3>
@@ -112,7 +138,7 @@ const MappingItem = ({
           {mapping.isActive ? "✅ " : "❌ "}
         </h3>
         {/* Attach the ref so we can trigger click programmatically */}
-        <button ref={toggleButtonRef} className={styles.toggleButton}>
+        <button ref={toggleButtonRef} className={styles.toggleButton} data-testid="toggle-button">
           {expandedMappings[mapping.id] ? "Hide Details" : "Show Details"}
         </button>
       </div>
