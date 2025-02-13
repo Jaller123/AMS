@@ -3,6 +3,7 @@ import MappingItem from "./MappingItem";
 
 const MappingList = ({
   mappings,
+  handleSendToWireMock,
   responses,
   expandedMappings,
   setExpandedMappings,
@@ -15,7 +16,7 @@ const MappingList = ({
   handleDelete,
   handleUpdateRequest,
   handleUpdateResponse,
-  autoExpandMappingId,  // receive the auto-expand id here
+  autoExpandMappingId, // receive the auto-expand id here
 }) => {
   return (
     <ul>
@@ -35,7 +36,8 @@ const MappingList = ({
           handleDelete={handleDelete}
           handleUpdateRequest={handleUpdateRequest}
           handleUpdateResponse={handleUpdateResponse}
-          autoExpandMappingId={autoExpandMappingId}  // pass it down
+          handleSendToWireMock={handleSendToWireMock}
+          autoExpandMappingId={autoExpandMappingId} // pass it down
         />
       ))}
     </ul>

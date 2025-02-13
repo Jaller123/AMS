@@ -8,6 +8,7 @@ import MappingList from "./MappingList";
 
 const MappingsPage = ({
   mappings,
+
   responses,
   handleUpdateRequest,
   handleUpdateResponse,
@@ -28,6 +29,29 @@ const MappingsPage = ({
   const [search, setSearch] = useState("");
 
   const location = useLocation();
+
+  const handleSendToWireMock = async (mappingId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8080/mappings/${mappingId}/send`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert("Mapping sent to WireMock successfully!");
+      } else {
+        alert("Failed to send mapping to WireMock.");
+      }
+    } catch (error) {
+      console.error("Error sending mapping to WireMock:", error);
+      alert("Error sending mapping. Check console for details.");
+    }
+  };
 
   useEffect(() => {
     // Uppdatera val av responses när mappings ändras
@@ -133,6 +157,7 @@ const MappingsPage = ({
         handleDelete={handleDelete}
         handleUpdateRequest={handleUpdateRequest}
         handleUpdateResponse={handleUpdateResponse}
+        handleSendToWireMock={handleSendToWireMock}
         autoExpandMappingId={autoExpandMappingId} // Pass the auto-expand id down
       />
 

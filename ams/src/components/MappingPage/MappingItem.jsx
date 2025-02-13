@@ -5,6 +5,7 @@ import ResponseEditor from "./ResponseEditor";
 
 const MappingItem = ({
   mapping,
+  handleSendToWireMock,
   responses,
   expandedMappings,
   setExpandedMappings,
@@ -100,7 +101,11 @@ const MappingItem = ({
         <h3>{editedRequests[mapping.id]?.method || "Unidentified Method"}</h3>
         <h3>{editedRequests[mapping.id]?.url || "Unidentified URL"}</h3>
         <h3>{editedRequests[mapping.id]?.title || "Untitled Mapping"}</h3>
-        <span className={mapping.status === "Active" ? styles.active : styles.unmapped}>
+        <span
+          className={
+            mapping.status === "Active" ? styles.active : styles.unmapped
+          }
+        >
           {mapping.status}
         </span>
         <h3 className={mapping.isActive ? styles.active : styles.inactive}>
@@ -143,6 +148,14 @@ const MappingItem = ({
             }
             handleUpdateResponse={handleUpdateResponse}
           />
+
+          <button
+            onClick={() => handleSendToWireMock(mapping.id)}
+            className={styles.sendButton}
+          >
+            Send to WireMock
+          </button>
+
           <button
             onClick={() => handleDelete(mapping.id)}
             className={styles.deleteButton}
