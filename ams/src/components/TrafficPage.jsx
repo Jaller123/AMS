@@ -13,6 +13,8 @@ const TrafficPage = ({ savedMappings }) => {
   const [error, setError] = useState(null);
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
+  const [showStartDropdown, setShowStartDropdown] = useState(false);
+  const [showEndDropdown, setShowEndDropdown] = useState(false);
 
   useEffect(() => {
     const loadTraffic = async () => {
@@ -88,6 +90,13 @@ const TrafficPage = ({ savedMappings }) => {
     return matchesSearch && isInTimeRange;
   });
 
+  const timeOptions = Array.from({ length: 24 * 60 * 60 }, (_, i) => {
+    const hours = String(Math.floor(i / 3600)).padStart(2, "0");
+    const minutes = String(Math.floor((i % 3600) / 60)).padStart(2, "0");
+    const seconds = String(i % 60).padStart(2, "0");
+    return `${hours}:${minutes}:${seconds}.000`; // Skapa tider i format HH:mm:ss.SSS
+  });
+
   const getHeaderValue = (headers, headerName) => {
     const key = Object.keys(headers).find(
       (key) => key.toLowerCase() === headerName.toLowerCase()
@@ -103,18 +112,23 @@ const TrafficPage = ({ savedMappings }) => {
     <div className={styles.trafficContainer}>
       <h2>WireMock Traffic Overview</h2>
       <div className={styles.filterContainer}>
-        <label>Start Time </label>
-        <input
-          type="text"
-          placeholder="12:30:15.123"
-          value={startTime}
-          onChange={(e) => setStartTime(e.target.value)}
-        />
+        <label htmlFor="startTime">Start Time</label>
+        <div className={styles.dropdownContainer}>
+          <input
+            id="startTime"
+            type="text"
+            placeholder="HH:MM:SS.SSS"
+            value={startTime}
+            onFocus={() => setShowStartDropdown(true)}
+            onBlur={() => setTimeout(() => setShowStartDropdown(false), 200)}
+            onChange={(e) => setStartTime(e.target.value)}
+          />
+        </div>
 
         <label>End Time :</label>
         <input
           type="text"
-          placeholder="14:45:20.500"
+          placeholder="HH:MM:SS.SSS"
           value={endTime}
           onChange={(e) => setEndTime(e.target.value)}
         />
