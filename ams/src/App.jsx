@@ -50,7 +50,6 @@ const App = () => {
     try {
       const savedResponse = await saveResponse(responseToSave);
       setResponses((prevResponses) => [...prevResponses, savedResponse]);
-      alert("Response saved successfully!");
     } catch (error) {
       console.error("Failed to save response:", error);
       alert("Failed to save response. Please try again.");

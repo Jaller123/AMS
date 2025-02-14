@@ -19,6 +19,12 @@ const ReqDetailPage = ({ mappings, handleSaveResponse }) => {
 
   const handleSaveNewResponse = () => {
     try {
+      
+      if (!newResponse.status.trim() || newResponse.headers.trim() === "{}" || newResponse.body.trim() === "{}") {
+        alert("Please fill in all fields before saving a response.");
+        return;
+      }
+    
       const parsedHeaders = JSON.parse(newResponse.headers || "{}");
       const parsedBody = JSON.parse(newResponse.body || "{}");
 

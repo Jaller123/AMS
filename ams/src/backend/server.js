@@ -93,18 +93,34 @@ const sendMappingToWireMock = async (request, response) => {
 };
 
 // Skapa ny mapping (sparas lokalt, skickas INTE till WireMock direkt)
+// Skapa ny mapping (sparas lokalt, skickas INTE till WireMock direkt)
 app.post("/mappings", (req, res) => {
   const { request, response } = req.body;
 
   const requests = JSON.parse(fs.readFileSync(requestsFile, "utf-8"));
   const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"));
 
-  const requestId = getNextId(requests);
-  requests.push({ id: requestId, resJson: request, wireMockUuid: null });
+  // Check if there is already a mapping with the same request details.
+  // (This comparison may need to be adjusted depending on which fields you consider for uniqueness.)
+  const existingMapping = requests.find((r) => {
+    return JSON.stringify(r.resJson) === JSON.stringify(request);
+  });
 
-  fs.writeFileSync(requestsFile, JSON.stringify(requests, null, 2));
+  let requestId;
+  if (existingMapping) {
+    // Use the existing mapping's ID
+    requestId = existingMapping.id;
+  } else {
+    // Otherwise, create a new mapping
+    requestId = getNextId(requests);
+    requests.push({ id: requestId, resJson: request, wireMockUuid: null });
+    fs.writeFileSync(requestsFile, JSON.stringify(requests, null, 2));
+  }
 
-  const responseId = `${requestId}.1`;
+  // Create a new response entry for this mapping.
+  // Count how many responses are already associated with this mapping.
+  const matchingResponses = responses.filter((r) => r.reqId === requestId);
+  const responseId = `${requestId}.${matchingResponses.length + 1}`;
   const timestamp = new Date().toLocaleString("sv-SE", {
     timeZone: "Europe/Stockholm",
   });
@@ -242,6 +258,36 @@ app.delete("/mappings/:id", (req, res) => {
   res.json({ success: true });
 });
 
+app.post("/responses", (req, res) => {
+  const { reqId, resJson, timestamp } = req.body;
+  if (
+    !reqId ||
+    !resJson ||
+    !resJson.status ||
+    !resJson.headers ||
+    !resJson.body
+  ) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid data. Ensure reqId and resJson fields are valid.",
+    });
+  }
+  const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"));
+  const matchingResponses = responses.filter(
+    (response) => response.reqId === reqId
+  );
+  const responseId = `${reqId}.${matchingResponses.length + 1}`;
+  const newResponse = {
+    id: responseId,
+    reqId,
+    resJson,
+    timestamp: timestamp || new Date().toISOString(),
+  };
+  responses.push(newResponse);
+  fs.writeFileSync(responseFile, JSON.stringify(responses, null, 2));
+  res.json({ success: true, newResponse });
+});
+
 app.get("/traffic", async (req, res) => {
   try {
     // Read AMS mappings
@@ -262,6 +308,7 @@ app.get("/traffic", async (req, res) => {
         `Failed to fetch WireMock logs: ${wireMockResponse.status}`
       );
     }
+    
 
     const wireMockData = await wireMockResponse.json();
     const wireMockLogs = wireMockData.requests || [];

@@ -71,9 +71,9 @@
   
   /* The container for the MappingsPage, ensuring it sits below the welcome section */
   .mappingPageContainer {
-    width: 780px; /* Ensure it's full-width */
+    width: 1000px;
     display: flex;
     justify-content: center;
-    margin-top: 10px; /* Center the MappingsPage */
-    /* Remove the margin-top to eliminate the space */
-  }   
+    margin-top: 10px;
+    margin-right: 163px;
+}
