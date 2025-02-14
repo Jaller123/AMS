@@ -11,8 +11,8 @@ const TrafficPage = ({ savedMappings }) => {
   const [filter, setFilter] = useState("");
   const [matchFilter, setMatchFilter] = useState("all");
   const [error, setError] = useState(null);
-  const [startTime, setStartTime] = useState(""); // Start time input
-  const [endTime, setEndTime] = useState(""); // End time input
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
 
   useEffect(() => {
     const loadTraffic = async () => {
@@ -52,22 +52,31 @@ const TrafficPage = ({ savedMappings }) => {
     const method = item?.request?.method || "";
     const url = item?.request?.url || "";
     const timestampRaw = item.timestamp;
-    console.log(item?.request)
-    if (!timestampRaw) return false; // Ignore items without a timestamp
 
-    // Convert timestamp to Date object
+    if (!timestampRaw) return false; // Ignorera poster utan timestamp
+
+    // Konvertera timestamp till millisekunder
     const timestampDate = new Date(timestampRaw);
-    const timestampHours = timestampDate.getHours().toString().padStart(2, "0");
-    const timestampMinutes = timestampDate
-      .getMinutes()
-      .toString()
-      .padStart(2, "0");
-    const timestampFormatted = `${timestampHours}:${timestampMinutes}`;
+    const timestampMs = timestampDate.getTime();
 
-    // Convert filter times to comparable formats
+    // Funktion för att parsa tid korrekt
+    const parseTimeInput = (timeStr) => {
+      if (!timeStr || !/^\d{2}:\d{2}:\d{2}(\.\d{1,3})?$/.test(timeStr))
+        return null; // Bara acceptera korrekt format
+      const [hh, mm, ssMs] = timeStr.split(":");
+      const [ss, ms] = (ssMs || "0").split(".");
+      const now = new Date();
+      now.setHours(Number(hh), Number(mm), Number(ss), Number(ms) || 0);
+      return now.getTime();
+    };
+
+    const startMs = parseTimeInput(startTime);
+    const endMs = parseTimeInput(endTime);
+
+    // Kolla om timestamp ligger inom intervallet
     const isInTimeRange =
-      (!startTime || timestampFormatted >= startTime) &&
-      (!endTime || timestampFormatted <= endTime);
+      (!startMs || timestampMs >= startMs) &&
+      (!endMs || timestampMs <= endMs + 1);
 
     const matchesSearch =
       method.toLowerCase().includes(filter.toLowerCase()) ||
@@ -75,16 +84,17 @@ const TrafficPage = ({ savedMappings }) => {
 
     if (matchFilter === "matched" && !item.matchedStubId) return false;
     if (matchFilter === "unmatched" && item.matchedStubId) return false;
-    return matchesSearch, isInTimeRange;
+
+    return matchesSearch && isInTimeRange;
   });
 
   const getHeaderValue = (headers, headerName) => {
     const key = Object.keys(headers).find(
       (key) => key.toLowerCase() === headerName.toLowerCase()
-    )
-    return key ? headers[key] : null
-  }
-  
+    );
+    return key ? headers[key] : null;
+  };
+
   if (loading)
     return <div className={styles.loading}>Loading traffic data...</div>;
   if (error) return <div className={styles.error}>Error: {error}</div>;
@@ -93,16 +103,18 @@ const TrafficPage = ({ savedMappings }) => {
     <div className={styles.trafficContainer}>
       <h2>WireMock Traffic Overview</h2>
       <div className={styles.filterContainer}>
-        <label>Start Time:</label>
+        <label>Start Time </label>
         <input
-          type="time"
+          type="text"
+          placeholder="12:30:15.123"
           value={startTime}
           onChange={(e) => setStartTime(e.target.value)}
         />
 
-        <label>End Time:</label>
+        <label>End Time :</label>
         <input
-          type="time"
+          type="text"
+          placeholder="14:45:20.500"
           value={endTime}
           onChange={(e) => setEndTime(e.target.value)}
         />
@@ -156,16 +168,24 @@ const TrafficPage = ({ savedMappings }) => {
                     ✅ Matched
                   </Link>
                 ) : (
-                  <Link to="/mappings"
-                  state={{
-                    prefillMapping: {
-                      url: item?.request.url,
-                      method: item?.request.method,
-                      headers: { "Content-Type": getHeaderValue(item?.request?.headers, "Content-Type") },
-                      body: item?.request.body                      
-                    }
-                  }}
-                  >❌ Unmatched</Link>
+                  <Link
+                    to="/mappings"
+                    state={{
+                      prefillMapping: {
+                        url: item?.request.url,
+                        method: item?.request.method,
+                        headers: {
+                          "Content-Type": getHeaderValue(
+                            item?.request?.headers,
+                            "Content-Type"
+                          ),
+                        },
+                        body: item?.request.body,
+                      },
+                    }}
+                  >
+                    ❌ Unmatched
+                  </Link>
                 )}
               </span>
               <span>
