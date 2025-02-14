@@ -3,19 +3,17 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #000000;
+  background-color:  #2C3E50;
   padding: 10px 20px;
   color: white;
   font-family: "Century Gothic", sans-serif;
   height: 90px;
   margin: 0;
 }
-
 .navbarBrand {
   font-size: 1.5rem;
   font-weight: bold;
 }
-
 .navbarMenu {
   list-style-type: none;
   display: flex;
@@ -23,7 +21,17 @@
   margin: 0;
   padding: 0;
 }
+.link:hover {
+  color: #00bcd4; /* Ändra färg på texten vid hover */
+  border-bottom: 2px solid #00bcd4; /* Lägg till understrykning vid hover */
+}
 
+/* Understrykning på den aktiva länken */
+.active {
+  color: #00bcd4; /* Färgen på den aktiva länken */
+  font-weight: bold; /* Gör den aktiva länken fetare */
+  border-bottom: 4px solid #00bcd4; /* Lägg till understrykning på den aktiva länken */
+}
 .logo {
   width: 200px;
   height: 120px;
@@ -44,4 +52,4 @@
 
 .link:hover { 
   color: #00bcd4;
-}
+}  

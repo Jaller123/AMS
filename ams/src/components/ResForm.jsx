@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styles from "./ResForm.module.css";
+import Button from "./Button";
 
 const isValidJson = (jsonString) => {
   if (!jsonString.trim()) return true; // Allow empty values
@@ -11,7 +12,7 @@ const isValidJson = (jsonString) => {
   }
 };
 
-const ResForm = ({ setResponseData, resetForm }) => {
+const ResForm = ({ setResponseData, resetForm ,onSave}) => {
   const [status, setStatus] = useState("");
   const [headers, setHeaders] = useState("");
   const [body, setBody] = useState("");
@@ -87,6 +88,7 @@ const ResForm = ({ setResponseData, resetForm }) => {
           <p className={styles.errorText}>Invalid JSON in body.</p>
         )}
       </div>
+      <Button onClick={onSave}>Save Mapping</Button>
     </section>
     </div>
   );

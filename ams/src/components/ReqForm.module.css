@@ -2,33 +2,46 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh; /* Centrerar sektionen på hela sidan */
+
   padding: 20px;
 }
 .section {
   width: 500px;
-  background: linear-gradient(to bottom right, #000000, #c1c1c1); /* Vit bakgrund för kort */
+  background-color: rgba(255, 255, 255, 0.85); 
   padding: 30px;
   border-radius: 12px; /* Rundade hörn */
   display: flex;
   flex-direction: column;
   gap: 15px;
+  position: relative;
+  overflow: hidden;
 }
-
+.section::before{
+  content: "";
+  position: absolute;
+  top: -40px; 
+  left: 50%;
+  width: 120%;
+  height: 147px; 
+  background-color: #2c3e50; 
+  border-radius: 70%; 
+  transform: translateX(-50%);
+}
 .formGroup {
   margin-bottom: 15px;
   padding: 15px;
 }
-
+.section h2{
+  color: rgb(255, 255, 255);
+}
 .formGroup label{
-  color: #ffffff;
+  color: #151212;
   padding: 8px 8px;
 }
-
 .textarea {
   width: 100%;
   padding: 10px;
   margin-top: 5px;
   box-sizing: border-box;
   resize: none;
-}
+} 
