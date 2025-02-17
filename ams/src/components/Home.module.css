@@ -16,9 +16,10 @@
   /* Welcome section with logo and text */
   .welcomeContainer {
     display: flex;
-    flex-direction: row;
-    margin-bottom: 150vh; /* Keep the items side by side */
+   flex-direction: column;
+
     align-items: center;
+    text-align: center;
     justify-content: center;
     color: rgb(255, 255, 255);
     position: relative; /* Ensures that z-index on the text works */
@@ -26,7 +27,7 @@
   }
   .laptopContainer{
     position: relative;
-  width: 300px; /* Set appropriate size for the laptop */
+  width: 200px; /* Set appropriate size for the laptop */
   height: 200px;
   display: flex;
   justify-content: center;
@@ -42,7 +43,7 @@
     top: 10%; /* Position the screen inside the laptop */
     left: 5%;
     width: 80%; /* Adjust screen size */
-    height: 70%; /* Adjust screen size */
+    height: 72%; /* Adjust screen size */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -64,16 +65,8 @@
   }
   
   .logoo {
-    width: 150px; /* Adjust the logo size */
-    height: 95px;
-    margin-left: 20px; /* Space between text and logo */
+    width: 121px; /* Adjust the logo size */
+    height: 76px;
+    margin-left: 18px; /* Space between text and logo */
   }
   
-  /* The container for the MappingsPage, ensuring it sits below the welcome section */
-  .mappingPageContainer {
-    width: 1000px;
-    display: flex;
-    justify-content: center;
-    margin-top: 10px;
-    margin-right: 163px;
-}
