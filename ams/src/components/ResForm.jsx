@@ -47,7 +47,7 @@ const ResForm = ({ setResponseData, resetForm ,onSave}) => {
 
   return (
     <div className={styles.ResForm}>
-    <section className={styles.section}>
+    <section className={styles.ResSection}>
       <h2>Response</h2>
       <div className={styles.formGroup}>
         <label htmlFor="status">Status Code</label>
@@ -91,7 +91,7 @@ const ResForm = ({ setResponseData, resetForm ,onSave}) => {
       <Button onClick={onSave}>Save Mapping</Button>
     </section>
     </div>
-  );
+  ); 
 };
 
 export default ResForm;

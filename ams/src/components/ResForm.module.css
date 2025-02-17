@@ -1,16 +1,17 @@
-.ResForm {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh; /* Centrerar sektionen på hela sidan */
-  padding: 20px;
-  margin-bottom: 200px;
+.ResForm{
+  width: 100%;
+  height: auto;
  
+  align-items: center;
+  padding: 20px;
 }
 
-.section {
-  width: 500px;
-  background-color: rgba(255, 255, 255, 0.85); 
+.ResSection {
+  width: 100%;
+  max-width: 400px;
+  height: 80%;
+  min-height: 400px; /* Sätter minimihöjd för att vara konsekvent med ResForm */
+  background-color: rgba(255, 255, 255, 0.85);
   padding: 30px;
   border-radius: 12px; /* Rundade hörn */
   display: flex;
@@ -20,10 +21,10 @@
   overflow: hidden;
   
 }
-.section::before{
+.ResSection::before{
   content: "";
   position: absolute;
-  top: -40px; 
+  top: -50px; 
   left: 50%;
   width: 120%;
   height: 144px; 
@@ -85,4 +86,4 @@ textarea {
   color: red;
   font-size: 14px;
   margin-top: 5px;
-}
+} 
