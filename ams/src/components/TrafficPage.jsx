@@ -1,11 +1,12 @@
 // TrafficPage.jsx
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import styles from "./TrafficPage.module.css";
 import { fetchWireMockTraffic } from "../backend/api";
 
 const TrafficPage = ({ savedMappings }) => {
   // Add savedMappings here
+  const location = useLocation()
   const [trafficData, setTrafficData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("");
@@ -15,6 +16,13 @@ const TrafficPage = ({ savedMappings }) => {
   const [endTime, setEndTime] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+
+  useEffect(() => {
+    const state = location.state || {};
+    setFilter(state.filterTraffic || "");
+    setMatchFilter(state.matchOnly ? "matched" : "all");
+  }, [location]);
+  
 
   useEffect(() => {
     const loadTraffic = async () => {
@@ -176,7 +184,7 @@ const TrafficPage = ({ savedMappings }) => {
 
         {filteredData.length > 0 ? (
           filteredData.map((item) => (
-            <div key={item.id} className={styles.tableRow}>
+            <div key={item.id} data-testid="table-row" className={styles.tableRow}>
               <span>{item?.request?.method || "N/A"}</span>
               <span>{item?.request?.url || "N/A"}</span>
               <span>{item?.response?.status || "N/A"}</span>

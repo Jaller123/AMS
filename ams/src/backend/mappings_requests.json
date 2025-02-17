@@ -2,31 +2,16 @@
   {
     "id": "1",
     "resJson": {
-      "title": "fetching ",
-      "url": "/hello",
+      "title": "Traffic",
+      "url": "/traffic",
       "method": "GET",
       "headers": {
         "Content-Type": "application/json"
       },
       "body": {
-        "body": "hello world"
+        "message": "test"
       }
     },
-    "wireMockUuid": "f66dc102-aa63-423a-af88-1714beb7d25b"
-  },
-  {
-    "id": "2",
-    "resJson": {
-      "title": "hello user",
-      "url": "/allUser",
-      "method": "POST",
-      "headers": {
-        "Content-Type": "application/json"
-      },
-      "body": {
-        "body": "hello user"
-      }
-    },
-    "wireMockUuid": "b7e74ab6-1738-43fb-a484-23a4f1b3cecb"
+    "wireMockUuid": "d6bcf9fd-1084-41db-86de-4056eab49cd4"
   }
 ]

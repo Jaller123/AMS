@@ -3,42 +3,14 @@
     "id": "1.1",
     "reqId": "1",
     "resJson": {
-      "status": 200,
+      "status": "209",
       "headers": {
         "Content-Type": "application/json"
       },
       "body": {
-        "message": "hello world"
+        "message": "test"
       }
     },
-    "timestamp": "2025-02-14 13:40:07"
-  },
-  {
-    "id": "1.2",
-    "reqId": "1",
-    "resJson": {
-      "status": "200",
-      "headers": {
-        "Content-Type": "application/json"
-      },
-      "body": {
-        "body": "lets go"
-      }
-    },
-    "timestamp": "2025-02-14T13:35:52.106Z"
-  },
-  {
-    "id": "2.1",
-    "reqId": "2",
-    "resJson": {
-      "status": "203",
-      "headers": {
-        "Content-Type": "application/json"
-      },
-      "body": {
-        "body": "all users"
-      }
-    },
-    "timestamp": "2025-02-17 09:26:05"
+    "timestamp": "2025-02-17 09:46:14"
   }
 ]

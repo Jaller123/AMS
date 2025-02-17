@@ -70,15 +70,15 @@ describe('Traffic Row Matched Link & Auto-Expand Mapping', () => {
 
     // Step 4: Wait for the mappings to load.
     cy.wait('@getMappings');
-    cy.wait(1000);
+    
 
     // Step 5: Verify that at least one mapping item is rendered.
     cy.get('[data-testid="mapping-item"]').should('exist');
-    cy.wait(1000);
+    
 
     // Alias the first mapping item for easier reference.
     cy.get('[data-testid="mapping-item"]').first().as('mappingItem');
-    cy.wait(500);
+    
 
     // Step 6: Within that mapping item, if the toggle button text is "Show Details", click it.
     cy.get('@mappingItem')
@@ -172,5 +172,135 @@ describe('Traffic Row Unmatched Link & Prefill Create Mapping', () => {
     cy.get('[data-testid="body-input-req"]').should('have.value', '{"test": "value"}');
   });
 });
+/// <reference types="cypress" />
+
+/// <reference types="cypress" />
+
+describe('Traffic Button for Active Mapping', () => {
+  beforeEach(() => {
+    cy.viewport(1280, 800);
+
+    // Stub the GET /mappings call to return one active mapping.
+    cy.intercept('GET', '**/mappings', {
+      statusCode: 200,
+      body: {
+        requests: [
+          {
+            id: "1",
+            resJson: {
+              title: "Active Mapping",
+              url: "/active-endpoint",
+              method: "GET",
+              headers: { "Content-Type": "application/json" },
+              body: { key: "value" }
+            },
+            // This mapping is active because it has a valid WireMock UUID.
+            wireMockUuid: "active-wiremock-uuid"
+          }
+        ],
+        responses: [
+          {
+            id: "1.1",
+            reqId: "1",
+            resJson: {
+              status: 200,
+              headers: { "Content-Type": "application/json" },
+              body: { message: "Success" }
+            },
+            timestamp: "2025-02-14 13:29:21"
+          }
+        ]
+      }
+    }).as('getMappings');
+
+    // Stub the GET /__admin/mappings to return the mapping's WireMock UUID.
+    cy.intercept('GET', '**/__admin/mappings', {
+      statusCode: 200,
+      body: {
+        mappings: [
+          { id: "active-wiremock-uuid" }
+        ]
+      }
+    }).as('getWiremockMappings');
+
+    // Stub the GET request for WireMock traffic.
+    cy.intercept('GET', '**/__admin/requests', {
+      statusCode: 200,
+      body: {
+        requests: [
+          {
+            id: "row1",
+            request: {
+              method: "GET",
+              url: "/active-endpoint",
+              headers: {},
+              body: ""
+            },
+            response: {
+              status: 200,
+              headers: { "Matched-Stub-Id": "active-wiremock-uuid" },
+              body: "{\"message\":\"Success\"}"
+            },
+            matchedStubId: "active-wiremock-uuid",
+            timestamp: "2025-02-14 14:00:00"
+          },
+          {
+            id: "row2",
+            request: {
+              method: "GET",
+              url: "/active-endpoint",
+              headers: {},
+              body: ""
+            },
+            response: {
+              status: 404,
+              headers: {},
+              body: ""
+            },
+            timestamp: "2025-02-14 14:05:00"
+          }
+        ]
+      }
+    }).as('getWiremockRequests');
+  });
+
+  it('navigates from home to traffic page and shows only matched traffic for an active mapping', () => {
+    // Visit the home page (assuming Home is rendered at "/")
+    cy.visit('http://localhost:5173/');
+
+    // Wait for the mappings to load.
+    cy.wait('@getMappings');
+
+    // Verify that the active mapping appears on the home page.
+    cy.contains("Active Mapping").should("exist");
+
+    // Expand the mapping details.
+    cy.get('[data-testid="mapping-item"]')
+      .first()
+      .within(() => {
+        cy.get('[data-testid="toggle-button"]').click();
+      });
+
+    // Within the expanded mapping, verify that the "Traffic" button is visible.
+    // (It only renders for active mappings.)
+    cy.get('[data-testid="mapping-item"]')
+      .first()
+      .within(() => {
+        cy.contains("Traffic").should("exist").click();
+      });
+
+    // Now, the Traffic page should be displayed.
+    cy.url().should('include', '/traffic');
+
+    // Wait for the WireMock traffic to load.
+    cy.wait('@getWiremockRequests');
+
+    // Verify that the matched traffic row (row1) is visible.
+    cy.get('[data-testid="table-row"]').should('exist');
+    // Verify that the unmatched row (row2) is not visible.
+    cy.contains("row2").should("not.exist");
+  });
+});
+
 
 });
