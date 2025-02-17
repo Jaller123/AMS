@@ -12,6 +12,21 @@
         "body": "hello world"
       }
     },
-    "wireMockUuid": "22a3f711-60d9-422e-a5a3-318eeab56f0f"
+    "wireMockUuid": "f66dc102-aa63-423a-af88-1714beb7d25b"
+  },
+  {
+    "id": "2",
+    "resJson": {
+      "title": "hello user",
+      "url": "/allUser",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "body": "hello user"
+      }
+    },
+    "wireMockUuid": "b7e74ab6-1738-43fb-a484-23a4f1b3cecb"
   }
 ]
