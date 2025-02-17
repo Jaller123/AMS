@@ -236,7 +236,9 @@ const App = () => {
         <ReqForm setRequestData={setRequestData} resetForm={resetForm} />
         <ResForm setResponseData={setResponseData} resetForm={resetForm} onSave={handleSaveMapping} />
       </div>
-      <ToastContainer />
+      <ToastContainer
+      pauseOnHover={false}
+      />
     </div>
   }
 />

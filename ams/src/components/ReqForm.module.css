@@ -1,13 +1,18 @@
-.ReqForm{
+.ReqForm {
+  width: 100%;
+  height: auto;
   display: flex;
   justify-content: center;
   align-items: center;
-
   padding: 20px;
 }
+
 .section {
-  width: 500px;
-  background-color: rgba(255, 255, 255, 0.85); 
+  width: 100%;
+  max-width: 400px;
+  height: 10%;
+  min-height: 680px; /* Sätter minimihöjd för att vara konsekvent med ResForm */
+  background-color: rgba(255, 255, 255, 0.85);
   padding: 30px;
   border-radius: 12px; /* Rundade hörn */
   display: flex;
@@ -16,32 +21,43 @@
   position: relative;
   overflow: hidden;
 }
-.section::before{
+
+.section::before {
   content: "";
   position: absolute;
-  top: -40px; 
+  top: -50px;
   left: 50%;
   width: 120%;
-  height: 147px; 
-  background-color: #2c3e50; 
-  border-radius: 70%; 
+  height: 147px;
+  background-color: #2c3e50;
+  border-radius: 70%;
   transform: translateX(-50%);
 }
 .formGroup {
-  margin-bottom: 15px;
-  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
-.section h2{
-  color: rgb(255, 255, 255);
-}
-.formGroup label{
-  color: #151212;
-  padding: 8px 8px;
-}
-.textarea {
+
+
+input,
+textarea {
   width: 100%;
   padding: 10px;
-  margin-top: 5px;
+  border: 1px solid #a70c0c;
+  border-radius: 6px;
   box-sizing: border-box;
-  resize: none;
+  transition: border-color 0.3s ease-in-out;
+  font-size: 16px;
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.errorText {
+  color: red;
+  font-size: 14px;
+  margin-top: 5px;
 } 

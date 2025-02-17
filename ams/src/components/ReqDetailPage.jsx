@@ -42,6 +42,7 @@ const ReqDetailPage = ({ mappings, handleSaveResponse }) => {
   };
 
   return (
+    <div className={styles.ReqDetail}>
     <div className={styles.container}>
       <h2>Request Details</h2>
       {!mapping ? (
@@ -100,7 +101,8 @@ const ReqDetailPage = ({ mappings, handleSaveResponse }) => {
         Back to Mappings
       </button>
     </div>
-  );
+    </div>
+  ); 
 };
 
 export default ReqDetailPage;

@@ -14,8 +14,8 @@ const TrafficPage = ({ savedMappings }) => {
   const [error, setError] = useState(null);
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
-  const [showStartDropdown, setShowStartDropdown] = useState(false);
-  const [showEndDropdown, setShowEndDropdown] = useState(false);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   useEffect(() => {
     const state = location.state || {};
@@ -70,23 +70,32 @@ const TrafficPage = ({ savedMappings }) => {
     const timestampMs = timestampDate.getTime();
 
     // Funktion för att parsa tid korrekt
-    const parseTimeInput = (timeStr) => {
-      if (!timeStr || !/^\d{2}:\d{2}:\d{2}(\.\d{1,3})?$/.test(timeStr))
-        return null; // Bara acceptera korrekt format
-      const [hh, mm, ssMs] = timeStr.split(":");
-      const [ss, ms] = (ssMs || "0").split(".");
-      const now = new Date();
-      now.setHours(Number(hh), Number(mm), Number(ss), Number(ms) || 0);
-      return now.getTime();
+    const parseDateTimeInput = (dateStr, timeStr) => {
+      if (!dateStr && !timeStr) return null;
+
+      let dateTimeStr = "";
+
+      if (dateStr) {
+        dateTimeStr = dateStr;
+      } else {
+        dateTimeStr = new Date().toISOString().split("T")[0]; // Använd dagens datum om inget anges
+      }
+
+      if (timeStr) {
+        dateTimeStr += ` ${timeStr}`;
+      } else {
+        dateTimeStr += " 00:00:00.000"; // Om ingen tid anges, sätt start på dagen
+      }
+
+      return new Date(dateTimeStr.replace(" ", "T")).getTime();
     };
 
-    const startMs = parseTimeInput(startTime);
-    const endMs = parseTimeInput(endTime);
+    const startMs = parseDateTimeInput(startDate, startTime);
+    const endMs = parseDateTimeInput(endDate, endTime);
 
-    // Kolla om timestamp ligger inom intervallet
+    // Filtrera trafiken baserat på användarens val
     const isInTimeRange =
-      (!startMs || timestampMs >= startMs) &&
-      (!endMs || timestampMs <= endMs + 1);
+      (!startMs || timestampMs >= startMs) && (!endMs || timestampMs <= endMs);
 
     const matchesSearch =
       method.toLowerCase().includes(filter.toLowerCase()) ||
@@ -98,12 +107,7 @@ const TrafficPage = ({ savedMappings }) => {
     return matchesSearch && isInTimeRange;
   });
 
-  const timeOptions = Array.from({ length: 24 * 60 * 60 }, (_, i) => {
-    const hours = String(Math.floor(i / 3600)).padStart(2, "0");
-    const minutes = String(Math.floor((i % 3600) / 60)).padStart(2, "0");
-    const seconds = String(i % 60).padStart(2, "0");
-    return `${hours}:${minutes}:${seconds}.000`; // Skapa tider i format HH:mm:ss.SSS
-  });
+  // Output: "2025-02-14"
 
   const getHeaderValue = (headers, headerName) => {
     const key = Object.keys(headers).find(
@@ -120,20 +124,30 @@ const TrafficPage = ({ savedMappings }) => {
     <div className={styles.trafficContainer}>
       <h2>WireMock Traffic Overview</h2>
       <div className={styles.filterContainer}>
-        <label htmlFor="startTime">Start Time</label>
-        <div className={styles.dropdownContainer}>
-          <input
-            id="startTime"
-            type="text"
-            placeholder="HH:MM:SS.SSS"
-            value={startTime}
-            onFocus={() => setShowStartDropdown(true)}
-            onBlur={() => setTimeout(() => setShowStartDropdown(false), 200)}
-            onChange={(e) => setStartTime(e.target.value)}
-          />
-        </div>
+        {/* Datumfilter */}
+        <label>Start Date:</label>
+        <input
+          type="date"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+        />
 
-        <label>End Time :</label>
+        <label>Start Time:</label>
+        <input
+          type="text"
+          placeholder="HH:MM:SS.SSS"
+          value={startTime}
+          onChange={(e) => setStartTime(e.target.value)}
+        />
+
+        <label>End Date:</label>
+        <input
+          type="date"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+        />
+
+        <label>End Time:</label>
         <input
           type="text"
           placeholder="HH:MM:SS.SSS"
