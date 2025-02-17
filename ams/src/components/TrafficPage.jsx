@@ -99,8 +99,6 @@ const TrafficPage = ({ savedMappings }) => {
     return matchesSearch && isInTimeRange;
   });
 
-  // Output: "2025-02-14"
-
   const getHeaderValue = (headers, headerName) => {
     const key = Object.keys(headers).find(
       (key) => key.toLowerCase() === headerName.toLowerCase()
@@ -116,7 +114,6 @@ const TrafficPage = ({ savedMappings }) => {
     <div className={styles.trafficContainer}>
       <h2>WireMock Traffic Overview</h2>
       <div className={styles.filterContainer}>
-        {/* Datumfilter */}
         <label>Start Date:</label>
         <input
           type="date"
