@@ -2,16 +2,16 @@
   {
     "id": "1",
     "resJson": {
-      "title": "fetching ",
-      "url": "/hello",
+      "title": "Traffic",
+      "url": "/traffic",
       "method": "GET",
       "headers": {
         "Content-Type": "application/json"
       },
       "body": {
-        "body": "hello world"
+        "message": "test"
       }
     },
-    "wireMockUuid": "22a3f711-60d9-422e-a5a3-318eeab56f0f"
+    "wireMockUuid": "d6bcf9fd-1084-41db-86de-4056eab49cd4"
   }
 ]

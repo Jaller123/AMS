@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom"
 import styles from "./MappingsPage.module.css";
 import RequestEditor from "./RequestEditor";
 import ResponseEditor from "./ResponseEditor";
@@ -20,12 +21,15 @@ const MappingItem = ({
   handleUpdateResponse,
   autoExpandMappingId, // received from MappingList (or MappingsPage)
 }) => {
+  const navigate = useNavigate()
   // Create refs for the mapping item container and the toggle button
   const mappingItemRef = useRef(null);
   const toggleButtonRef = useRef(null);
   // Local flag so that auto expansion only happens once
   const [hasAutoExpanded, setHasAutoExpanded] = useState(false);
   const hasInitialized = useRef(false)
+
+  
 
   useEffect(() => {
     if (!hasInitialized.current) {
@@ -174,7 +178,19 @@ const MappingItem = ({
             }
             handleUpdateResponse={handleUpdateResponse}
           />
-
+          {mapping.isActive && (
+          <button
+          className={styles.sendButton}
+          onClick={() =>
+            navigate("/traffic", {
+              state: { filterTraffic: mapping.request.url, matchOnly: true },
+            })
+          }
+        >
+          Traffic
+        </button>
+        
+        )}
           <button
             onClick={() => handleSendToWireMock(mapping.id)}
             className={styles.sendButton}
