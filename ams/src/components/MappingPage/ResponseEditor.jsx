@@ -89,7 +89,7 @@ const ResponseEditor = ({
               setLocalResponse({ ...localResponse, body: e.target.value })
             }
           />
-          <button onClick={saveResponse}>Save Response</button>
+          <button className={styles.saveResponseButton} onClick={saveResponse}>Save Response</button>
         </div>
       ) : (
         <div>
