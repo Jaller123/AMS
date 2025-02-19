@@ -28,10 +28,8 @@
   width: 100%;
 }
 
-
-.searchInput{
+.searchInput {
   border: none;
-  
 }
 .section h2 {
   color: rgb(9, 8, 8);
@@ -73,9 +71,8 @@ ul {
   border-radius: 4px;
 }
 
-.RequestEditor button ,
-.sendButton 
- {
+.RequestEditor button,
+.sendButton {
   display: block;
   margin: 20px auto; /* Auto på sidorna centrerar horisontellt */
   text-align: center;
@@ -92,8 +89,7 @@ ul {
   overflow: hidden;
 }
 .RequestEditor button::before,
-.sendButton::before 
- {
+.sendButton::before {
   content: "";
   position: absolute;
   left: 0;
@@ -104,20 +100,17 @@ ul {
   transition: 0.8s;
 }
 .RequestEditor button::before,
-.sendButton::before 
- {
+.sendButton::before {
   top: 0;
   border-radius: 0 0 50% 50%;
 }
 .RequestEditor button:hover,
-.sendButton:hover
- {
+.sendButton:hover {
   color: rgb(0, 0, 0);
   transform: scale(1.05);
 }
 .RequestEditor button:hover::before,
-.sendButton:hover::before 
- {
+.sendButton:hover::before {
   height: 180%; /* Gör bakgrundsfärgen fullt synlig vid hover */
 }
 /* response*/
@@ -262,6 +255,7 @@ textarea {
   white-space: nowrap;
   position: relative;
   overflow: hidden;
+  z-index: 10;
 }
 
 .detailsButton::before {

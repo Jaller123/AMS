@@ -12,6 +12,35 @@
         "message": "test"
       }
     },
-    "wireMockUuid": "d6bcf9fd-1084-41db-86de-4056eab49cd4"
+    "wireMockUuid": "37906fd9-32d3-4276-ba5a-be33a728b3a6"
+  },
+  {
+    "id": "2",
+    "resJson": {
+      "method": "POST",
+      "url": "/test-endpoint",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "key": "value"
+      }
+    },
+    "wireMockUuid": null
+  },
+  {
+    "id": "3",
+    "resJson": {
+      "method": "POST",
+      "url": "/test-endpoint",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "key": "value"
+      },
+      "title": "Test Mapping"
+    },
+    "wireMockUuid": null
   }
 ]

@@ -32,11 +32,11 @@ describe("Mappings Page Functionalities", () => {
     cy.visit("http://localhost:5173");
     cy.wait("@getMappings");
   });
-  
+
   it("the title", () => {
-   cy.get('[data-testid="search-input"]').type("title");
+    cy.get('[data-testid="search-input"]').type("title");
   });
-  
+
   it("should display method, URL, and title in collapsed mapping", () => {
     cy.contains("POST").should("exist");
     cy.contains("/test").should("exist");
@@ -49,31 +49,31 @@ describe("Mappings Page Functionalities", () => {
     cy.contains("POST").should("exist");
     cy.contains("/test").should("exist");
     cy.contains("test2").should("exist");
-  
+
     // Clear title filter and verify mapping is still visible
     cy.get('input[placeholder="Search by Title"]').clear();
     cy.contains("POST").should("exist");
     cy.contains("/test").should("exist");
     cy.contains("test2").should("exist");
-  
+
     // Check filtering by URL
     cy.get('input[placeholder="Search by URL"]').type("/test");
     cy.contains("POST").should("exist");
     cy.contains("/test").should("exist");
     cy.contains("test2").should("exist");
-  
+
     // Clear URL filter and verify mapping is still visible
     cy.get('input[placeholder="Search by URL"]').clear();
     cy.contains("POST").should("exist");
     cy.contains("/test").should("exist");
     cy.contains("test2").should("exist");
-  
+
     // Check filtering by method
     cy.get('input[placeholder="Search by Method"]').type("POST");
     cy.contains("POST").should("exist");
     cy.contains("/test").should("exist");
     cy.contains("test2").should("exist");
-  
+
     // Clear method filter and verify mapping is still visible
     cy.get('input[placeholder="Search by Method"]').clear();
     cy.contains("POST").should("exist");
@@ -117,18 +117,20 @@ describe("Mappings Page Functionalities", () => {
 
   it("should edit and save a response", () => {
     cy.contains("Show Details").click();
-  
+
     // Enter editing mode
     cy.contains("Edit Response").click();
-  
+
     // Clear and update the body field
     cy.get('textarea[placeholder="Body"]')
       .clear()
-      .type('{"body":"updated response body"}', { parseSpecialCharSequences: false });
-  
+      .type('{"body":"updated response body"}', {
+        parseSpecialCharSequences: false,
+      });
+
     // Save the updated response
     cy.contains("Save Response").click();
-  
+
     // Verify the updated response
     cy.get("pre").should("contain.text", '"body": "updated response body"');
   });
@@ -147,24 +149,28 @@ describe("Mappings Page Functionalities", () => {
     // Open the details view
     cy.contains("Show Details").click();
     cy.contains("Add New Response").click();
-  
+
     // Verify navigation to the add response page
     cy.url().should("eq", "http://localhost:5173/request/1");
-  
+
     // Fill in the new response details
     cy.get('input[placeholder="e.g., 200"]').type("201");
     cy.get('textarea[placeholder=\'{"Content-Type":"application/json"}\']')
       .clear()
-      .type('{"Content-Type":"application/json"}', { parseSpecialCharSequences: false });
+      .type('{"Content-Type":"application/json"}', {
+        parseSpecialCharSequences: false,
+      });
     cy.get('textarea[placeholder=\'{"key": "value"}\']')
       .clear()
-      .type('{"body":"new response body"}', { parseSpecialCharSequences: false });
-  
+      .type('{"body":"new response body"}', {
+        parseSpecialCharSequences: false,
+      });
+
     // Mock the POST response and ensure it completes
     cy.intercept("POST", "http://localhost:8080/responses").as("saveResponse");
     cy.contains("Save Response").click();
     cy.wait("@saveResponse");
-  
+
     // Register the intercept for updated mappings before navigating back
     cy.intercept("GET", "http://localhost:8080/mappings", {
       statusCode: 200,
@@ -173,7 +179,6 @@ describe("Mappings Page Functionalities", () => {
           {
             id: "1",
             resJson: {
-             
               url: "/test",
               method: "POST",
               headers: { "Content-Type": "text/plain" },
@@ -203,23 +208,25 @@ describe("Mappings Page Functionalities", () => {
         ],
       },
     }).as("updatedMappings");
-  
+
     // Navigate back to mappings
     cy.contains("Back to Mappings").click();
-  
+
     // Verify the dropdown contains the new response
     cy.contains("Show Details").click();
     cy.get("select[placeholder='Select Response'] option")
       .should("have.length", 2)
       .and("contain", "201");
-  
+
     // Select and verify the new response details
-    cy.get("select[placeholder='Select Response']").select("1.2").should("contain", "201");
+    cy.get("select[placeholder='Select Response']")
+      .select("1.2")
+      .should("contain", "201");
     cy.get("pre").should("contain.text", '"status": "201"');
     cy.get("pre").should("contain.text", '"Content-Type": "application/json"');
     cy.get("pre").should("contain.text", '"body": "new response body"');
   });
-  
+
   it("should delete a mapping", () => {
     cy.wait(500);
     cy.contains("Show Details").click();
