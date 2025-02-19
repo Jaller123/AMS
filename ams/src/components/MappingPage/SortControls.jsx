@@ -25,7 +25,7 @@ const SortControls = ({
           type="text"
           id="titleSearch"
           name="title"
-          placeholder="Search by Title"
+          placeholder=" Title"
           value={searchFilters.title || ""}
           onChange={handleSearchChange}
         />
@@ -35,7 +35,7 @@ const SortControls = ({
           type="text"
           id="urlSearch"
           name="url"
-          placeholder="Search by URL"
+          placeholder=" URL"
           value={searchFilters.url || ""}
           onChange={handleSearchChange}
         />
@@ -45,7 +45,7 @@ const SortControls = ({
           type="text"
           id="methodSearch"
           name="method"
-          placeholder="Search by Method"
+          placeholder="Method"
           value={searchFilters.method || ""}
           onChange={handleSearchChange}
         />

@@ -4,8 +4,9 @@ import MappingsPage from "../components/MappingPage/MappingPage";
 import style from "./Home.module.css";
 import laptop from "../assets/laptop.png";
 import logoo from "../assets/am.png";
+import { handleSendToWireMock } from "../backend/api";
 
-const Home = ({ mappings, responses, handleDelete, handleUpdateRequest, handleUpdateResponse }) => {
+const Home = ({ mappings, responses, handleDelete, handleUpdateRequest, handleUpdateResponse, setMappings }) => {
   return (
     <motion.div
       className={style.container}
@@ -44,6 +45,8 @@ const Home = ({ mappings, responses, handleDelete, handleUpdateRequest, handleUp
           handleDelete={handleDelete}
           handleUpdateRequest={handleUpdateRequest}
           handleUpdateResponse={handleUpdateResponse}
+          setMappings={setMappings}
+          handleSendToWireMock={handleSendToWireMock}
         />
       </div>
     </motion.div>

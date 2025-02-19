@@ -1,16 +1,21 @@
+.sectionContainer{
+
+ margin-right: 50px;
+ 
+}
 .section {
   padding: 40px;
-  width: 80%;
+  width: 100%;
+  height: auto;
   max-width: 800px; /* Sätter en maxbredd */
   border: 1px solid #000000;
   border-radius: 8px;
   background-color: #f0f3ef;
-  margin: 0 auto; /* Centrerar horisontellt */
   display: flex;
   flex-direction: column;
   align-items: center; /* Centrerar innehållet inuti sektionen */
   justify-content: center; /* Centrerar innehållet vertikalt */
-  /* Ger lite höjd för att det ska centreras bättre */
+  
 }
 
 .searchable-mappings {
@@ -46,7 +51,7 @@
 /* request*/
 .mappingItem {
   width: 450px;
-  padding: 10px;
+  padding: 2px;
   margin-bottom: 20px;
   border: 3px solid #073e63ae;
   border-radius: 4px;
@@ -73,6 +78,11 @@ ul {
 
 .RequestEditor button,
 .sendButton {
+.RequestEditor button ,
+.sendButton,
+.saveResponseButton
+ {
+  width: 50%;
   display: block;
   margin: 20px auto; /* Auto på sidorna centrerar horisontellt */
   text-align: center;
@@ -89,7 +99,8 @@ ul {
   overflow: hidden;
 }
 .RequestEditor button::before,
-.sendButton::before {
+.saveResponseButton::before
+ {
   content: "";
   position: absolute;
   left: 0;
@@ -101,16 +112,25 @@ ul {
 }
 .RequestEditor button::before,
 .sendButton::before {
+.sendButton::before,
+.saveResponseButton::before
+ {
   top: 0;
   border-radius: 0 0 50% 50%;
 }
 .RequestEditor button:hover,
 .sendButton:hover {
+.sendButton:hover,
+.saveResponseButton:hover
+ {
   color: rgb(0, 0, 0);
   transform: scale(1.05);
 }
 .RequestEditor button:hover::before,
 .sendButton:hover::before {
+.sendButton:hover::before ,
+.saveResponseButton:hover::before
+ {
   height: 180%; /* Gör bakgrundsfärgen fullt synlig vid hover */
 }
 /* response*/
@@ -208,10 +228,6 @@ textarea {
 .backButton:hover {
   background-color: #0056b3;
 }
-.section {
-  padding: 20px;
-  margin: 20px;
-}
 
 .mappingList {
   list-style-type: none;
@@ -243,6 +259,7 @@ textarea {
 }
 
 .detailsButton {
+  width: 28%;
   background: rgb(4, 84, 127);
   border: none;
   color: rgb(251, 251, 251);
@@ -281,6 +298,7 @@ textarea {
 }
 
 .ButtonEdit {
+  width: 28%;
   background: rgb(4, 84, 127);
   border: none;
   color: rgb(251, 251, 251);
@@ -316,6 +334,7 @@ textarea {
 }
 
 .deleteButton {
+  width: 30%;
   display: block;
   margin: 20px auto; /* Auto på sidorna centrerar horisontellt */
   text-align: center;
@@ -389,6 +408,8 @@ textarea {
 }
 
 .toggleButton {
+  width: 100px;
+  font-size: 10px;
   background-color: #007bff;
   color: white;
   border: none;
@@ -408,6 +429,7 @@ textarea {
 }
 
 .createMappingButton {
+  width: 100%;
   background-color: #007bff;
   color: white;
   border: none;

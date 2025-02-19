@@ -8,11 +8,12 @@ import MappingList from "./MappingList";
 
 const MappingsPage = ({
   mappings,
-
   responses,
   handleUpdateRequest,
   handleUpdateResponse,
   handleDelete,
+  setMappings,
+  handleSendToWireMock
 }) => {
   const navigate = useNavigate();
   const [expandedMappings, setExpandedMappings] = useState({});
@@ -30,28 +31,37 @@ const MappingsPage = ({
 
   const location = useLocation();
 
-  const handleSendToWireMock = async (mappingId) => {
-    try {
-      const response = await fetch(
-        `http://localhost:8080/mappings/${mappingId}/send`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-        }
+ 
+
+  // ✅ Call handleSendToWireMock directly instead of defining it again
+  const sendToWireMockAndUpdateUI = async (mappingId) => {
+    if (!handleSendToWireMock) {
+      console.error("❌ handleSendToWireMock is not defined");
+      return;
+    }
+  
+    const data = await handleSendToWireMock(mappingId); // ✅ Ensure it is used properly
+  
+    if (data && data.success) {
+      setMappings((prevMappings) =>
+        prevMappings.map((mapping) =>
+          mapping.id === mappingId
+            ? { ...mapping, isActive: true, wireMockUuid: data.wireMockUuid }
+            : mapping
+        )
       );
-
-      const data = await response.json();
-
-      if (data.success) {
-        alert("Mapping sent to WireMock successfully!");
-      } else {
-        alert("Failed to send mapping to WireMock.");
-      }
-    } catch (error) {
-      console.error("Error sending mapping to WireMock:", error);
-      alert("Error sending mapping. Check console for details.");
+  
+      setFilteredMappings((prevMappings) =>
+        prevMappings.map((mapping) =>
+          mapping.id === mappingId
+            ? { ...mapping, isActive: true, wireMockUuid: data.wireMockUuid }
+            : mapping
+        )
+      );
     }
   };
+  
+  
 
   useEffect(() => {
     // Uppdatera val av responses när mappings ändras
@@ -120,7 +130,8 @@ const MappingsPage = ({
   // …
 
   return (
-    <section className={styles.section}>
+    <div className={styles.sectionContainer}>
+      <section className={styles.section}>
       <h2>Saved Mappings</h2>
       <div className={styles["searchable-mappings"]}>
         <form
@@ -157,7 +168,7 @@ const MappingsPage = ({
         handleDelete={handleDelete}
         handleUpdateRequest={handleUpdateRequest}
         handleUpdateResponse={handleUpdateResponse}
-        handleSendToWireMock={handleSendToWireMock}
+        handleSendToWireMock={sendToWireMockAndUpdateUI}
         autoExpandMappingId={autoExpandMappingId} // Pass the auto-expand id down
       />
 
@@ -170,6 +181,7 @@ const MappingsPage = ({
         </button>
       </div>
     </section>
+    </div>
   );
 };
 
