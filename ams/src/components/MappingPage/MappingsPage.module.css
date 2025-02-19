@@ -1,7 +1,5 @@
-.sectionContainer{
-
- margin-right: 50px;
- 
+.sectionContainer {
+  margin-right: 50px;
 }
 .section {
   padding: 40px;
@@ -15,7 +13,6 @@
   flex-direction: column;
   align-items: center; /* Centrerar innehållet inuti sektionen */
   justify-content: center; /* Centrerar innehållet vertikalt */
-  
 }
 
 .searchable-mappings {
@@ -77,21 +74,18 @@ ul {
 }
 
 .RequestEditor button,
-.sendButton {
-.RequestEditor button ,
 .sendButton,
-.saveResponseButton
- {
+.saveResponseButton {
   width: 50%;
   display: block;
-  margin: 20px auto; /* Auto på sidorna centrerar horisontellt */
+  margin: 20px auto;
   text-align: center;
   background: rgb(4, 84, 127);
   border: none;
   color: rgb(251, 251, 251);
   border-radius: 30px;
   text-transform: uppercase;
-  padding: 15px 20px; /* Gör knapparna större */
+  padding: 15px 20px;
   font-size: 10px;
   cursor: pointer;
   transition: 0.8s;
@@ -99,8 +93,8 @@ ul {
   overflow: hidden;
 }
 .RequestEditor button::before,
-.saveResponseButton::before
- {
+.sendButton::before,
+.saveResponseButton::before {
   content: "";
   position: absolute;
   left: 0;
@@ -111,27 +105,21 @@ ul {
   transition: 0.8s;
 }
 .RequestEditor button::before,
-.sendButton::before {
 .sendButton::before,
-.saveResponseButton::before
- {
+.saveResponseButton::before {
   top: 0;
   border-radius: 0 0 50% 50%;
 }
 .RequestEditor button:hover,
-.sendButton:hover {
 .sendButton:hover,
-.saveResponseButton:hover
- {
+.saveResponseButton:hover {
   color: rgb(0, 0, 0);
   transform: scale(1.05);
 }
 .RequestEditor button:hover::before,
-.sendButton:hover::before {
-.sendButton:hover::before ,
-.saveResponseButton:hover::before
- {
-  height: 180%; /* Gör bakgrundsfärgen fullt synlig vid hover */
+.sendButton:hover::before,
+.saveResponseButton:hover::before {
+  height: 180%;
 }
 /* response*/
 
