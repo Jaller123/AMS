@@ -130,7 +130,8 @@ const MappingsPage = ({
   // …
 
   return (
-    <section className={styles.section}>
+    <div className={styles.sectionContainer}>
+      <section className={styles.section}>
       <h2>Saved Mappings</h2>
       <div className={styles["searchable-mappings"]}>
         <form
@@ -180,6 +181,7 @@ const MappingsPage = ({
         </button>
       </div>
     </section>
+    </div>
   );
 };
 

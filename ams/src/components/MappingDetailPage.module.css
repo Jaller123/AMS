@@ -1,25 +1,22 @@
 .ReqDetail {
   width: 100%;
-  height: auto;
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
-  padding: 5vh; 
-
+  padding: 15px 15px;
 }
 
 .container {
   width: 100%;
-  max-width: 400px; /* Minskat formulärbredd */
-  background-color: rgba(255, 255, 255, 0.85);
+  max-width: 480px; /* Ännu smalare */
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 15px;
+  border-radius: 8px;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  height: auto;
-  padding: 20px; /* Mindre padding för en kompaktare design */
-  border-radius: 10px;
+  gap: 6px;
   position: relative;
   overflow: hidden;
 }
@@ -27,10 +24,10 @@
 .container::before {
   content: "";
   position: absolute;
-  top: -40px; 
+  top: -20px;
   left: 50%;
   width: 120%;
-  height: 197px;  /* Håll den oförändrad */
+  height: 90px;  /* Håll den oförändrad */
   background-color: #2c3e50;
   border-radius: 70%;
   transform: translateX(-50%);
@@ -38,37 +35,44 @@
 
 .formContainer {
   width: 100%;
-  padding: 15px; /* Mindre padding */
+  padding: 3px;
   display: flex;
-  justify-content: center;
-  align-items: center;
   flex-direction: column;
-  gap: 15px;
-  position: relative;
-  overflow: hidden;
+  gap: 6px;
 }
-.co pre{
-  position: relative;
+
+.co pre {
   width: 400px;
-  height: 230px;
+  max-width: 660px;
+  height: 150px; /* Mindre */
+  background: #f3f3f3;
+  padding: 4px;
+  border-radius: 4px;
+  font-size: 11px;
+  overflow: auto;
 }
 
 input,
 textarea {
   width: 100%;
-  padding: 8px; /* Mindre padding */
-  font-size: 14px; /* Lite mindre text */
+  padding: 4px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  font-size: 11px;
 }
 
 textarea {
-  height: 80px; /* Mindre höjd på textarea */
+  resize: vertical;
+  min-height: 35px; /* Ännu mindre */
+  max-height: 60px;
 }
 
 .saveButton, .backButton {
-  padding: 10px;
-  font-size: 14px;
-  margin: 10px 0;
-  border-radius: 20px;
+  width: 100%;
+  padding: 5px;
+  font-size: 11px;
+  margin-top: 3px;
+  border-radius: 10px;
   background: rgb(4, 84, 127);
   border: none;
   color: white;
@@ -78,37 +82,22 @@ textarea {
 .saveButton:hover, .backButton:hover {
   background-color: #062749;
 }
-
-.co pre {
-  width: 100%;
-  max-width: 350px;
-  height: 190px; /* Minskat utrymme för pre */
- 
-  background: #f3f3f3;
-  padding: 10px;
-  border-radius: 6px;
-}
-
-h2 {
-  color: rgb(255, 255, 255);
-  font-size: 18px; /* Mindre text */
-}
-
-.co h3 {
-  color: white;
+h3 {
+  color: rgb(0, 0, 0);
   font-size: 16px;
+  text-align: center;
 }
 
 .buttons {
   display: flex;
-  gap: 10px;
+  gap: 6px;
 }
 
 .editButton {
   background-color: blue;
   color: white;
-  padding: 8px;
-  font-size: 14px;
+  padding: 5px;
+  font-size: 11px;
   border: none;
   cursor: pointer;
 }
@@ -116,8 +105,8 @@ h2 {
 .deleteButton {
   background-color: red;
   color: white;
-  padding: 8px;
-  font-size: 14px;
+  padding: 5px;
+  font-size: 11px;
   border: none;
   cursor: pointer;
 }
