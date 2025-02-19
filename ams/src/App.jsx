@@ -15,6 +15,7 @@ import {
   saveMapping,
   deleteMapping,
   saveResponse,
+  handleSendToWireMock 
 } from "./backend/api.js";
 import Home from "../src/components/Home.jsx"; // Import den nya komponenten
 
@@ -222,7 +223,8 @@ const App = () => {
                 handleDelete={handleDeleteMapping}
                 handleUpdateRequest={handleUpdateRequest}
                 handleUpdateResponse={handleUpdateResponse}
-                
+                setMappings={setMappings}
+                handleSendToWireMock={handleSendToWireMock}
               />
             </div>
            

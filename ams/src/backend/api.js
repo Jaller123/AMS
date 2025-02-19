@@ -127,8 +127,31 @@ export const fetchWireMockTraffic = async () => {
   }
 };
 
+export const handleSendToWireMock = async (mappingId) => {
+  try {
+    const response = await fetch(
+      `http://localhost:8080/mappings/${mappingId}/send`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      }
+    );
 
+    const data = await response.json();
 
+    if (data.success) {
+      alert("Mapping sent to WireMock successfully!");
+      return data; // ✅ Return the response so MappingsPage can handle updates
+    } else {
+      alert("Failed to send mapping to WireMock.");
+      return null;
+    }
+  } catch (error) {
+    console.error("Error sending mapping to WireMock:", error);
+    alert("Error sending mapping. Check console for details.");
+    return null;
+  }
+};
 
 
 export const saveMapping = async (mapping) => {
