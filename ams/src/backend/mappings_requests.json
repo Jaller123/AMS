@@ -1,5 +1,20 @@
 [
   {
+    "id": "1",
+    "resJson": {
+      "title": "Test",
+      "url": "/test",
+      "method": "GET",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "body": "text"
+      }
+    },
+    "wireMockUuid": null
+  },
+  {
     "id": "2",
     "resJson": {
       "method": "POST",
@@ -11,66 +26,6 @@
         "key": "value"
       }
     },
-    "wireMockUuid": "c94aa9e5-bd12-4755-a60d-9bea094da39d"
-  },
-  {
-    "id": "3",
-    "resJson": {
-      "title": "Traffic",
-      "url": "/traffic",
-      "method": "GET",
-      "headers": {
-        "Content-Type": "application/json"
-      },
-      "body": {
-        "body": "text"
-      }
-    },
-    "wireMockUuid": "37906fd9-32d3-4276-ba5a-be33a728b3a6"
-  },
-  {
-    "id": "2",
-    "resJson": {
-      "method": "POST",
-      "url": "/test-endpoint",
-    "wireMockUuid": "eae68b4f-2635-4ed3-9da3-96c3440e9780"
-  },
-  {
-    "id": "4",
-    "resJson": {
-      "title": "Aktiv",
-      "url": "/aktiv",
-      "method": "GET",
-      "headers": {
-        "Content-Type": "application/json"
-      },
-      "body": {
-        "key": "value"
-      }
-    },
-    "wireMockUuid": null
-  },
-  {
-    "id": "3",
-        "body": "text"
-      }
-    },
-    "wireMockUuid": "3b9bb18e-dda7-4abd-ae07-7ff9fd37d08c"
-  },
-  {
-    "id": "5",
-    "resJson": {
-      "method": "POST",
-      "url": "/test-endpoint",
-      "headers": {
-        "Content-Type": "application/json"
-      },
-      "body": {
-        "key": "value"
-      },
-      "title": "Test Mapping"
-    },
-    "wireMockUuid": null
-    "wireMockUuid": "c0644cd1-e96b-4c72-87de-b6a8181eb62b"
+    "wireMockUuid": "3849274f-3ca7-421d-9fbc-1df4115908b4"
   }
 ]
