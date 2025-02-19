@@ -1,16 +1,17 @@
 .container {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    position: relative; /* Ensures that z-index on the text works */
-    z-index: 2;/* Ensure that the whole content stack vertically */
-    align-items: flex-start;
-    margin-top: 90px;
-    padding: 20px;
-    background-color: var(--main-bg-color);
-    overflow: hidden; 
-    min-height: 100vh;
+  display: flex
+  ;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 2;
+      align-items: flex-start;
+      margin-top: -165px;
+      padding: 261px;
+      background-color: var(--main-bg-color);
+      overflow: hidden;
+      min-height: 100vh;
   }
   
   /* Welcome section with logo and text */
