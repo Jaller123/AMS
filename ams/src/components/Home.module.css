@@ -7,11 +7,12 @@
       position: relative;
       z-index: 2;
       align-items: flex-start;
-      margin-top: -165px;
+      margin-top: 0px;
       padding: 261px;
       background-color: var(--main-bg-color);
       overflow: hidden;
       min-height: 100vh;
+      
   }
   
   /* Welcome section with logo and text */
@@ -69,5 +70,12 @@
     width: 121px; /* Adjust the logo size */
     height: 76px;
     margin-left: 18px; /* Space between text and logo */
+  }
+  
+  @media only screen and (width: 1440px){
+    /* Your styles here */
+    .welcomeContainer {
+      right: 15%;
+    }
   }
   
