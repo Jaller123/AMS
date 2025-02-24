@@ -1,0 +1,248 @@
+/* ScenarioPage.module.css */
+
+/* Grundläggande stil för hela sidan */
+body {
+  font-family: "Arial", sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f4;
+  color: #333;
+}
+
+/* Container som håller hela scenarion */
+.scenarioPageContainer {
+  display: flex;
+  justify-content: center; /* Centrerar innehållet horisontellt */
+  align-items: center; /* Centrerar innehållet vertikalt */
+  flex-direction: column;
+  padding: 40px 20px;
+  min-height: 100vh; /* Fyller hela höjden */
+  width: 100%; /* Säkerställ att containern fyller hela bredden */
+}
+
+/* Sektionen som håller alla scenarioer */
+.scenarioSection {
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 1000px;
+  width: 100%;
+  padding: 40px;
+  margin-bottom: 20px; /* Avstånd mellan scenarierna och knappen */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centrerar innehållet i sektionen */
+}
+
+/* Rubrik för sidan */
+.scenarioSection h2 {
+  font-size: 28px;
+  text-align: center;
+  color: #4a4a4a;
+  margin-bottom: 30px;
+}
+
+/* Lista med scenarioer */
+.scenarioList {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  width: 100%; /* För att lista inte blir för bred */
+}
+
+/* Enkel stil för varje scenario */
+.scenarioItem {
+  background-color: #fafafa;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: transform 0.2s ease-in-out;
+  width: 100%;
+}
+
+/* Hover-effekt för varje scenario */
+.scenarioItem:hover {
+  transform: scale(1.02); /* Liten zoom-effekt */
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Titel för varje scenario */
+.scenarioTitle {
+  font-size: 18px;
+  font-weight: bold;
+  color: #2c3e50;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  width: 70%; /* Gör utrymme för knappar */
+}
+
+/* Buttons for each scenario */
+.buttonsContainer {
+  display: flex;
+  gap: 10px; /* Spacing between buttons */
+}
+
+.viewButton,
+.editButton,
+.deleteButton {
+  padding: 10px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 14px;
+  text-transform: uppercase;
+  transition: background-color 0.3s ease;
+}
+
+/* "View" button */
+.viewButton {
+  background-color: #007bff;
+  color: #ffffff;
+  border: none;
+}
+
+.viewButton:hover {
+  background-color: #0056b3;
+}
+
+/* "Edit" button */
+.editButton {
+  background-color: #f39c12;
+  color: #ffffff;
+  border: none;
+}
+
+.editButton:hover {
+  background-color: #e67e22;
+}
+
+/* "Delete" button */
+.deleteButton {
+  background-color: #e74c3c;
+  color: #ffffff;
+  border: none;
+}
+
+.deleteButton:hover {
+  background-color: #c0392b;
+}
+
+/* Knapp för att skapa nya scenarioer */
+.createScenarioButtonContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  width: 100%;
+  max-width: 1200px; /* Begränsa bredden på knappen */
+}
+
+.createScenarioButton {
+  width: 100%;
+  max-width: 250px; /* Maximera knappen till en lämplig bredd */
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 15px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.createScenarioButton:hover {
+  background-color: #0056b3;
+}
+
+/* Responsiv design för mindre skärmar */
+@media only screen and (max-width: 768px) {
+  .scenarioSection {
+    padding: 30px 20px;
+  }
+
+  .scenarioItem {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .scenarioTitle {
+    width: 100%; /* Gör titeln mer flexibel på mindre skärmar */
+    margin-bottom: 10px;
+  }
+
+  .buttonsContainer {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .createScenarioButton {
+    font-size: 14px;
+    width: 90%; /* Gör knappen mindre på små skärmar */
+  }
+}
+
+@media only screen and (max-width: 1024px) {
+  .scenarioSection {
+    padding: 30px;
+  }
+
+  .createScenarioButton {
+    font-size: 14px;
+  }
+}
+
+.createScenarioPage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.scenarioContent {
+  display: flex;
+  justify-content: space-between;
+  width: 80%;
+  max-width: 1200px;
+  margin-top: 20px;
+}
+
+.scenariosContainer,
+.savedMappingsContainer {
+  width: 45%;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+h3 {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.listItem {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.listItem:last-child {
+  border-bottom: none;
+}
+
+.cancelButton {
+  margin-top: 20px;
+  padding: 10px 20px;
+  border: none;
+  background: #e74c3c;
+  color: white;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.cancelButton:hover {
+  background: #c0392b;
+}

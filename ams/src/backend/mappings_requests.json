@@ -27,5 +27,20 @@
       }
     },
     "wireMockUuid": "3849274f-3ca7-421d-9fbc-1df4115908b4"
+  },
+  {
+    "id": "3",
+    "resJson": {
+      "title": "tile",
+      "url": "/title",
+      "method": "GET",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "body": "test"
+      }
+    },
+    "wireMockUuid": null
   }
 ]

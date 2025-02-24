@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom";
 import styles from "./MappingsPage.module.css";
 import RequestEditor from "./RequestEditor";
 import ResponseEditor from "./ResponseEditor";
@@ -21,15 +21,13 @@ const MappingItem = ({
   handleUpdateResponse,
   autoExpandMappingId, // received from MappingList (or MappingsPage)
 }) => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   // Create refs for the mapping item container and the toggle button
   const mappingItemRef = useRef(null);
   const toggleButtonRef = useRef(null);
   // Local flag so that auto expansion only happens once
   const [hasAutoExpanded, setHasAutoExpanded] = useState(false);
-  const hasInitialized = useRef(false)
-
-  
+  const hasInitialized = useRef(false);
 
   useEffect(() => {
     if (!hasInitialized.current) {
@@ -40,21 +38,35 @@ const MappingItem = ({
         }));
       }
       if (!editedResponses[mapping.id]) {
-        const firstResponse = responses.filter((res) => res.reqId === mapping.id)[0] || {};
+        const firstResponse =
+          responses.filter((res) => res.reqId === mapping.id)[0] || {};
         setEditedResponses((prev) => ({
           ...prev,
           [mapping.id]: firstResponse.resJson || {},
         }));
       }
-      if (!selectedResponses[mapping.id] && responses.filter((res) => res.reqId === mapping.id).length > 0) {
+      if (
+        !selectedResponses[mapping.id] &&
+        responses.filter((res) => res.reqId === mapping.id).length > 0
+      ) {
         setSelectedResponses((prev) => ({
           ...prev,
-          [mapping.id]: responses.filter((res) => res.reqId === mapping.id)[0].id,
+          [mapping.id]: responses.filter((res) => res.reqId === mapping.id)[0]
+            .id,
         }));
       }
       hasInitialized.current = true;
     }
-  }, [mapping.id, responses, editedRequests, editedResponses, selectedResponses, setEditedRequests, setEditedResponses, setSelectedResponses]);
+  }, [
+    mapping.id,
+    responses,
+    editedRequests,
+    editedResponses,
+    selectedResponses,
+    setEditedRequests,
+    setEditedResponses,
+    setSelectedResponses,
+  ]);
 
   const toggleExpanded = () => {
     setExpandedMappings((prev) => ({
@@ -126,7 +138,11 @@ const MappingItem = ({
   }, [expandedMappings, autoExpandMappingId, mapping.id]);
 
   return (
-    <li className={styles.mappingItem} ref={mappingItemRef} data-testid="mapping-item">
+    <li
+      className={styles.mappingItem}
+      ref={mappingItemRef}
+      data-testid="mapping-item"
+    >
       <div className={styles.titleRow} onClick={toggleExpanded}>
         <h3>{editedRequests[mapping.id]?.method || "Unidentified Method"}</h3>
         <h3>{editedRequests[mapping.id]?.url || "Unidentified URL"}</h3>
@@ -142,7 +158,11 @@ const MappingItem = ({
           {mapping.isActive ? "✅ " : "❌ "}
         </h3>
         {/* Attach the ref so we can trigger click programmatically */}
-        <button ref={toggleButtonRef} className={styles.toggleButton} data-testid="toggle-button">
+        <button
+          ref={toggleButtonRef}
+          className={styles.toggleButton}
+          data-testid="toggle-button"
+        >
           {expandedMappings[mapping.id] ? "Hide Details" : "Show Details"}
         </button>
       </div>
@@ -179,18 +199,20 @@ const MappingItem = ({
             handleUpdateResponse={handleUpdateResponse}
           />
           {mapping.isActive && (
-          <button
-          className={styles.sendButton}
-          onClick={() =>
-            navigate("/traffic", {
-              state: { filterTraffic: mapping.request.url, matchOnly: true },
-            })
-          }
-        >
-          Traffic
-        </button>
-        
-        )}
+            <button
+              className={styles.sendButton}
+              onClick={() =>
+                navigate("/traffic", {
+                  state: {
+                    filterTraffic: mapping.request.url,
+                    matchOnly: true,
+                  },
+                })
+              }
+            >
+              Traffic
+            </button>
+          )}
           <button
             onClick={() => handleSendToWireMock(mapping.id)}
             className={styles.sendButton}
