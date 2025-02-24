@@ -58,8 +58,8 @@ export const fetchMappings = async () => {
       requests.map((req) => ({
         id: req.id,
         request: req.resJson,
-        uuid: req.wireMockUuid,
-        isActive: wiremockRunning && wireMockMappings.has(req.wireMockUuid), // ✅ Inactive if WireMock is Down
+        uuid: req.wireMockId,
+        isActive: wiremockRunning && wireMockMappings.has(req.wireMockId), // ✅ Inactive if WireMock is Down
       }))
     );
 
@@ -67,8 +67,8 @@ export const fetchMappings = async () => {
       requests: requests.map((req) => ({
         id: req.id,
         request: req.resJson,
-        uuid: req.wireMockUuid,
-        isActive: wiremockRunning && wireMockMappings.has(req.wireMockUuid), // ✅ Automatically Inactive if WireMock is Down
+        uuid: req.wireMockId,
+        isActive: wiremockRunning && wireMockMappings.has(req.wireMockId), // ✅ Automatically Inactive if WireMock is Down
       })),
       responses: responses.map((res) => ({
         id: res.id,
@@ -166,7 +166,7 @@ export const saveMapping = async (mapping) => {
     return {
       id: newRequest.id,
       request: newRequest.resJson,
-      wireMockUuid: newRequest.wireMockUuid,
+      wireMockId: newRequest.wireMockId,
       response: newResponse.resJson,
     };
   } catch (error) {

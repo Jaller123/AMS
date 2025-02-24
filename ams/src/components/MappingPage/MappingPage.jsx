@@ -46,7 +46,7 @@ const MappingsPage = ({
       setMappings((prevMappings) =>
         prevMappings.map((mapping) =>
           mapping.id === mappingId
-            ? { ...mapping, isActive: true, wireMockUuid: data.wireMockUuid }
+            ? { ...mapping, isActive: true, wireMockId: data.wireMockId }
             : mapping
         )
       );
@@ -54,7 +54,7 @@ const MappingsPage = ({
       setFilteredMappings((prevMappings) =>
         prevMappings.map((mapping) =>
           mapping.id === mappingId
-            ? { ...mapping, isActive: true, wireMockUuid: data.wireMockUuid }
+            ? { ...mapping, isActive: true, wireMockId: data.wireMockId }
             : mapping
         )
       );
