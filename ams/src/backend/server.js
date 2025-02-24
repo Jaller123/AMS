@@ -353,17 +353,40 @@ app.put("/requests/:id", (req, res) => {
 
 
 // Ta bort mapping
-app.delete("/mappings/:id", (req, res) => {
+app.delete("/mappings/:id", async (req, res) => {
   const { id } = req.params;
   if (!id) {
     return res.status(400).json({ success: false, message: "Invalid ID" });
   }
 
-  // Read the data from files
+  // Read existing mappings from file
   const requests = JSON.parse(fs.readFileSync(requestsFile, "utf-8"));
   const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"));
 
-  // Filter out the specific request and associated responses
+  // Find the mapping to delete
+  const mappingToDelete = requests.find((req) => String(req.id) === String(id));
+
+  // If the mapping exists and has a WireMock ID, delete it from WireMock
+  if (mappingToDelete && mappingToDelete.wireMockId) {
+    try {
+      const wireMockDeleteResponse = await fetch(
+        `${WIREMOCK_BASE_URL}/${mappingToDelete.wireMockId}`,
+        { method: "DELETE" }
+      );
+      if (!wireMockDeleteResponse.ok) {
+        console.error(
+          "Failed to delete mapping from WireMock:",
+          await wireMockDeleteResponse.text()
+        );
+      } else {
+        console.log("Mapping deleted from WireMock successfully");
+      }
+    } catch (error) {
+      console.error("Error deleting mapping from WireMock:", error);
+    }
+  }
+
+  // Filter out the deleted mapping locally
   const updatedRequests = requests.filter(
     (req) => String(req.id) !== String(id)
   );
@@ -377,6 +400,7 @@ app.delete("/mappings/:id", (req, res) => {
 
   res.json({ success: true });
 });
+
 
 app.post("/responses", (req, res) => {
   const { reqId, resJson, timestamp } = req.body;
