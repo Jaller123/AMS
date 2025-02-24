@@ -34,8 +34,6 @@ const MappingItem = ({
   autoExpandMappingId,
 }) => {
   const navigate = useNavigate();
-  // Create refs for the mapping item container and the toggle button
->>>>>>> b6686ed097b71aa73e16528a7aac69d149672a37
   const mappingItemRef = useRef(null);
   const toggleButtonRef = useRef(null);
   const [hasAutoExpanded, setHasAutoExpanded] = useState(false);
@@ -102,19 +100,21 @@ const MappingItem = ({
         <h3>{requestData.method || "Unidentified Method"}</h3>
         <h3>{displayURL || "No URL"}</h3>
         <h3>{requestData.title || "Untitled Mapping"}</h3>
-        <span className={mapping.status === "Active" ? styles.active : styles.unmapped}>
+        <span
+          className={
+            mapping.status === "Active" ? styles.active : styles.unmapped
+          }
+        >
           {mapping.status}
         </span>
         <h3 className={mapping.isActive ? styles.active : styles.inactive}>
           {mapping.isActive ? "✅ " : "❌ "}
         </h3>
-        {/* Attach the ref so we can trigger click programmatically */}
         <button
           ref={toggleButtonRef}
           className={styles.toggleButton}
           data-testid="toggle-button"
         >
-        <button ref={toggleButtonRef} className={styles.toggleButton} data-testid="toggle-button">
           {expandedMappings[mapping.id] ? "Hide Details" : "Show Details"}
         </button>
       </div>
@@ -140,7 +140,10 @@ const MappingItem = ({
             }
             selectedResponse={selectedResponses[mapping.id]}
             setSelectedResponse={(responseId) =>
-              setSelectedResponses((prev) => ({ ...prev, [mapping.id]: responseId }))
+              setSelectedResponses((prev) => ({
+                ...prev,
+                [mapping.id]: responseId,
+              }))
             }
             handleUpdateResponse={handleUpdateResponse}
           />
@@ -149,10 +152,6 @@ const MappingItem = ({
               className={styles.sendButton}
               onClick={() =>
                 navigate("/traffic", {
-                  state: {
-                    filterTraffic: mapping.request.url,
-                    matchOnly: true,
-                  },
                   state: { filterTraffic: displayURL, matchOnly: true },
                 })
               }
@@ -164,10 +163,12 @@ const MappingItem = ({
             onClick={() => handleSendToWireMock(mapping.id)}
             className={styles.sendButton}
           >
-          <button onClick={() => handleSendToWireMock(mapping.id)} className={styles.sendButton}>
             Send to WireMock
           </button>
-          <button onClick={() => handleDelete(mapping.id)} className={styles.deleteButton}>
+          <button
+            onClick={() => handleDelete(mapping.id)}
+            className={styles.deleteButton}
+          >
             Delete Mapping
           </button>
         </>

@@ -1,33 +1,37 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { fetchMappings } from "../../backend/api";
 
 const CreateScenario = () => {
   const [mappings, setMappings] = useState([]);
+  const [responses, setResponses] = useState([]);
   const [selectedMapping, setSelectedMapping] = useState(null);
 
   useEffect(() => {
     const loadMappings = async () => {
       try {
-        const { requests } = await fetchMappings();
-        setMappings(requests);
+        const data = await fetchMappings();
+        console.log("API Response:", data); // Debug-logga API-datan
+        setMappings(data.requests);
+        setResponses(data.responses); // Spara responses separat
       } catch (error) {
         console.error("Error fetching mappings:", error);
-        xa;
       }
     };
 
     loadMappings();
   }, []);
 
+  // Filtrera ut rätt response för det valda mapping-id:t
+  const relevantResponses = responses.filter(
+    (res) => res.reqId === selectedMapping?.id
+  );
+
   return (
     <div style={{ display: "flex", gap: "20px" }}>
-      {/* Vänster sida: Scenarios */}
       <div style={{ flex: 1, borderRight: "1px solid #ccc", padding: "20px" }}>
         <h1>Create Scenario</h1>
-        {/* Här kan du lägga till UI för att skapa scenarion */}
       </div>
 
-      {/* Höger sida: Sparade mappningar */}
       <div style={{ flex: 1, padding: "20px" }}>
         <h2>Saved Mappings</h2>
         {mappings.length === 0 ? (
@@ -48,13 +52,12 @@ const CreateScenario = () => {
                 }}
               >
                 <strong>ID:</strong> {mapping.id} - <strong>URL:</strong>{" "}
-                {mapping.request.url}
+                {mapping.resJson?.url || "Ingen URL"}
               </li>
             ))}
           </ul>
         )}
 
-        {/* Detaljerad vy av vald mappning */}
         {selectedMapping && (
           <div
             style={{
@@ -67,21 +70,25 @@ const CreateScenario = () => {
             <p>
               <strong>ID:</strong> {selectedMapping.id}
             </p>
-            <p>
-              <strong>URL:</strong> {selectedMapping.request.url}
-            </p>
-            <p>
-              <strong>Title:</strong> {selectedMapping.request.title}
-            </p>
             <h4>Request:</h4>
             <pre style={{ background: "#eee", padding: "10px" }}>
               {JSON.stringify(selectedMapping.request, null, 2)}
             </pre>
-            <h4>Response:</h4>
-            {selectedMapping.response ? (
-              <pre style={{ background: "#eee", padding: "10px" }}>
-                {JSON.stringify(selectedMapping.response, null, 2)}
-              </pre>
+
+            <h4>Responses:</h4>
+            {relevantResponses.length > 0 ? (
+              relevantResponses.map((res) => (
+                <pre
+                  key={res.id}
+                  style={{
+                    background: "#eee",
+                    padding: "10px",
+                    marginTop: "10px",
+                  }}
+                >
+                  {JSON.stringify(res.resJson, null, 2)}
+                </pre>
+              ))
             ) : (
               <p>Ingen respons hittades för denna mappning.</p>
             )}
