@@ -33,7 +33,7 @@ const TrafficPage = ({ savedMappings }) => {
         const joinedData = data.trafficData.map((item) => {
           if (item.matchedStubId && savedMappings && savedMappings.length) {
             const foundMapping = savedMappings.find((mapping) => {
-              const mappingUuid = mapping.uuid || mapping.wireMockUuid;
+              const mappingUuid = mapping.uuid || mapping.wireMockId;
               return (
                 mappingUuid &&
                 mappingUuid.trim().toLowerCase() ===
