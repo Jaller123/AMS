@@ -59,6 +59,15 @@ const TrafficPage = ({ savedMappings }) => {
   }, [savedMappings]); // add savedMappings to the dependency array
 
   const filteredData = trafficData.filter((item) => {
+
+    if (matchFilter === "matched" && filter) {
+      console.log(item.matchedStubId)
+      return (
+        item.matchedStubId &&
+        item.matchedStubId.trim().toLowerCase() === filter.trim().toLowerCase()
+      );
+    }
+    
     const method = item?.request?.method || "";
     const url = item?.request?.url || "";
     const timestampRaw = item.timestamp;
