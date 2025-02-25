@@ -1,5 +1,7 @@
-.sectionContainer {
-  margin-right: 50px;
+.sectionContainer{
+
+ margin-right: 50px;
+ 
 }
 
 .section {
@@ -451,13 +453,3 @@ textarea {
 .createMappingButton:hover {
   background-color: #0056b3;
 }
-
-
-@media only screen and (max-width: 1440px) {
-  /* Your styles here */
-  .section {
-    right: 8%;
-    bottom: 200px
-  }
-}
-
