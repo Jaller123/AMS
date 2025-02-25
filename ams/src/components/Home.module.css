@@ -88,7 +88,7 @@
     }
   
     .laptopScreen {
-      top: 117%; /* Centrera vertikalt */
+      top: 110%; /* Centrera vertikalt */
       left: 45%; /* Centrera horisontellt */
       transform: translate(-50%, -50%); /* Justera till mitten */
       width: 80%; /* Justera om nödvändigt */
