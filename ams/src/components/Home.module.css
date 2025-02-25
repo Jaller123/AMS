@@ -70,3 +70,34 @@
     margin-left: 18px; /* Space between text and logo */
   }
   
+  @media screen and (min-width: 1440px) {
+    .container {
+      align-items: center;
+      text-align: center;
+      justify-content: space-around; /* Behåll denna för att centrera */
+    }
+    
+    .text {
+      font-size: 7rem;
+    }
+    
+    .laptopImage {
+      width: 50vh; /* Fortsätt använda 50vh */
+      height: auto;
+      padding-top: 10vh;
+    }
+  
+    .laptopScreen {
+      top: 99%; /* Centrera vertikalt */
+      left: 45%; /* Centrera horisontellt */
+      transform: translate(-50%, -50%); /* Justera till mitten */
+      width: 80%; /* Justera om nödvändigt */
+      height: 80%; /* Justera om nödvändigt */
+    }
+  
+    .logoo {
+      width: 287%; /* Gör logotypen så stor som skärmen tillåter */
+      height: 290px; /* Låt höjden justeras automatiskt för att behålla proportioner */
+    }
+  }
+  

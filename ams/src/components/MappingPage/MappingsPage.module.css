@@ -1,5 +1,5 @@
 .sectionContainer{
-
+width: 100vh;
  margin-right: 50px;
  
 }
@@ -439,4 +439,13 @@ textarea {
 
 .createMappingButton:hover {
   background-color: #0056b3;
+}
+/* Stor skärm (1440px och uppåt) */
+@media screen and (min-width: 1440px) {
+  .sectionContainer {
+    width: 100vh;
+    width: 800px; /* Samma maxbredd som .section */
+    margin-right: 50px; /* Behåll marginalen */
+  }
+
 }

@@ -3,14 +3,14 @@
     "id": "1.1",
     "reqId": "1",
     "resJson": {
-      "status": "209",
+      "status": "200",
       "headers": {
         "Content-Type": "application/json"
       },
       "body": {
-        "message": "test"
+        "key": "value"
       }
     },
-    "timestamp": "2025-02-17 09:46:14"
+    "timestamp": "2025-2-25 12:44:33"
   }
 ]
