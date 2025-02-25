@@ -1,17 +1,3 @@
 [
-  {
-    "id": "1",
-    "resJson": {
-      "title": "mn",
-      "url": "hi",
-      "method": "GET",
-      "headers": {
-        "Content-Type": "application/json"
-      },
-      "body": {
-        "key": "value"
-      }
-    },
-    "wireMockUuid": null
-  }
+  
 ]

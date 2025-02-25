@@ -1,14 +1,15 @@
 .sectionContainer {
-  width: 100%; /* Grundstorlek för mindre skärmar */
-  margin-right: 50px;
+  width: 100%; 
+  max-width: 1200px; 
+  margin: 0 auto; /* Centrera horisontellt */
   height: auto;
+  padding: 0 50px; 
 }
 
 .section {
   padding: 50px;
-  width: 100%;
+  width: 600px;
   height: auto;
-  max-width: 855px;
   border: 1px solid #000000;
   border-radius: 8px;
   background-color: #f0f3ef;
@@ -17,10 +18,9 @@
   flex-direction: column;
   align-items: center; /* Centrerar innehållet inuti sektionen */
   justify-content: center; /* Centrerar innehållet vertikalt */
-  align-items: center;
-  justify-content: center;
   position: relative;
 }
+
 
 .searchable-mappings {
   margin-top: 15px;
