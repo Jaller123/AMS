@@ -1,5 +1,5 @@
 .sectionContainer {
-  width: 100vh; /* Grundstorlek för mindre skärmar */
+  width: 100%; /* Grundstorlek för mindre skärmar */
   margin-right: 50px;
   height: auto;
 }

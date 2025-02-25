@@ -13,6 +13,8 @@ body {
   background: linear-gradient(120deg, #2C3E50, #3498DB);
   background-size: cover;
   background-repeat: no-repeat;  
+  min-height: 100vh; 
+  
 }
 
 .pageContainer {
