@@ -8,11 +8,12 @@ import MappingList from "./MappingList";
 
 const MappingsPage = ({
   mappings,
-
   responses,
   handleUpdateRequest,
   handleUpdateResponse,
   handleDelete,
+  setMappings,
+  handleSendToWireMock,
 }) => {
   const navigate = useNavigate();
   const [expandedMappings, setExpandedMappings] = useState({});
@@ -30,26 +31,31 @@ const MappingsPage = ({
 
   const location = useLocation();
 
-  const handleSendToWireMock = async (mappingId) => {
-    try {
-      const response = await fetch(
-        `http://localhost:8080/mappings/${mappingId}/send`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-        }
+  // ✅ Call handleSendToWireMock directly instead of defining it again
+  const sendToWireMockAndUpdateUI = async (mappingId) => {
+    if (!handleSendToWireMock) {
+      console.error("❌ handleSendToWireMock is not defined");
+      return;
+    }
+
+    const data = await handleSendToWireMock(mappingId); // ✅ Ensure it is used properly
+
+    if (data && data.success) {
+      setMappings((prevMappings) =>
+        prevMappings.map((mapping) =>
+          mapping.id === mappingId
+            ? { ...mapping, isActive: true, wireMockId: data.wireMockId }
+            : mapping
+        )
       );
 
-      const data = await response.json();
-
-      if (data.success) {
-        alert("Mapping sent to WireMock successfully!");
-      } else {
-        alert("Failed to send mapping to WireMock.");
-      }
-    } catch (error) {
-      console.error("Error sending mapping to WireMock:", error);
-      alert("Error sending mapping. Check console for details.");
+      setFilteredMappings((prevMappings) =>
+        prevMappings.map((mapping) =>
+          mapping.id === mappingId
+            ? { ...mapping, isActive: true, wireMockId: data.wireMockId }
+            : mapping
+        )
+      );
     }
   };
 
@@ -122,55 +128,55 @@ const MappingsPage = ({
   return (
     <div className={styles.sectionContainer}>
       <section className={styles.section}>
-      <h2>Saved Mappings</h2>
-      <div className={styles["searchable-mappings"]}>
-        <form
-          onSubmit={(e) => e.preventDefault()}
-          className={styles["search-form"]}
-        >
-          <input
-            type="text"
-            placeholder="Search "
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            data-testid="search-input"
-            className={styles.searchInput}
-          />
-        </form>
-      </div>
+        <h2>Saved Mappings</h2>
+        <div className={styles["searchable-mappings"]}>
+          <form
+            onSubmit={(e) => e.preventDefault()}
+            className={styles["search-form"]}
+          >
+            <input
+              type="text"
+              placeholder="Search "
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              data-testid="search-input"
+              className={styles.searchInput}
+            />
+          </form>
+        </div>
 
-      <SortControls
-        setSortCriterion={setSortCriterion}
-        searchFilters={searchFilters}
-        setSearchFilters={setSearchFilters}
-      />
-      <MappingList
-        mappings={filteredMappings}
-        responses={responses}
-        expandedMappings={expandedMappings}
-        setExpandedMappings={setExpandedMappings}
-        selectedResponses={selectedResponses}
-        setSelectedResponses={setSelectedResponses}
-        editedRequests={editedRequests}
-        setEditedRequests={setEditedRequests}
-        editedResponses={editedResponses}
-        setEditedResponses={setEditedResponses}
-        handleDelete={handleDelete}
-        handleUpdateRequest={handleUpdateRequest}
-        handleUpdateResponse={handleUpdateResponse}
-        handleSendToWireMock={handleSendToWireMock}
-        autoExpandMappingId={autoExpandMappingId} // Pass the auto-expand id down
-      />
+        <SortControls
+          setSortCriterion={setSortCriterion}
+          searchFilters={searchFilters}
+          setSearchFilters={setSearchFilters}
+        />
+        <MappingList
+          mappings={filteredMappings}
+          responses={responses}
+          expandedMappings={expandedMappings}
+          setExpandedMappings={setExpandedMappings}
+          selectedResponses={selectedResponses}
+          setSelectedResponses={setSelectedResponses}
+          editedRequests={editedRequests}
+          setEditedRequests={setEditedRequests}
+          editedResponses={editedResponses}
+          setEditedResponses={setEditedResponses}
+          handleDelete={handleDelete}
+          handleUpdateRequest={handleUpdateRequest}
+          handleUpdateResponse={handleUpdateResponse}
+          handleSendToWireMock={sendToWireMockAndUpdateUI}
+          autoExpandMappingId={autoExpandMappingId} // Pass the auto-expand id down
+        />
 
-      <div className={styles.createMappingContainer}>
-        <button
-          onClick={() => navigate("/mappings")}
-          className={styles.createMappingButton}
-        >
-          ➕ Create New Mapping
-        </button>
-      </div>
-    </section>
+        <div className={styles.createMappingContainer}>
+          <button
+            onClick={() => navigate("/mappings")}
+            className={styles.createMappingButton}
+          >
+            ➕ Create New Mapping
+          </button>
+        </div>
+      </section>
     </div>
   );
 };

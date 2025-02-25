@@ -92,43 +92,89 @@ const sendMappingToWireMock = async (request, response) => {
   }
 };
 
-// Skapa ny mapping (sparas lokalt, skickas INTE till WireMock direkt)
-// Skapa ny mapping (sparas lokalt, skickas INTE till WireMock direkt)
+
+// Ny endpoint för att skicka en specifik mapping till WireMock
 app.post("/mappings", (req, res) => {
   const { request, response } = req.body;
-
   const requests = JSON.parse(fs.readFileSync(requestsFile, "utf-8"));
   const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"));
 
-  // Check if there is already a mapping with the same request details.
-  // (This comparison may need to be adjusted depending on which fields you consider for uniqueness.)
+  // Check for an existing mapping based on request details.
   const existingMapping = requests.find((r) => {
     return JSON.stringify(r.resJson) === JSON.stringify(request);
   });
 
   let requestId;
+  let transformedRequest; // Declare variable outside if/else
+
   if (existingMapping) {
-    // Use the existing mapping's ID
+    // Use the existing mapping's values.
     requestId = existingMapping.id;
+    transformedRequest = existingMapping.resJson;
   } else {
-    // Otherwise, create a new mapping
     requestId = getNextId(requests);
-    requests.push({ id: requestId, resJson: request, wireMockUuid: null });
+
+    // Determine which URL key to use
+    let urlKey = "url"; // default
+    if (request.urlMatchType) {
+      if (request.urlMatchType === "urlPath") {
+        urlKey = "urlPath";
+      } else if (request.urlMatchType === "urlPathPattern") {
+        urlKey = "urlPathPattern";
+      } else if (request.urlMatchType === "urlPathTemplate") {
+        urlKey = "urlPathTemplate";
+      } else if (request.urlMatchType === "urlPattern") {
+        urlKey = "urlPattern";
+      }
+    }
+
+    // Build the transformed request object in the desired order.
+    transformedRequest = {};
+    // 1. Title (if provided)
+    if (request.title) {
+      transformedRequest.title = request.title;
+    }
+    // 2. URL using the chosen key
+    if (request.url) {
+      transformedRequest[urlKey] = request.url;
+    }
+    // 3. Method
+    transformedRequest.method = request.method.toUpperCase();
+    // 4. Headers (wrap each value with "equalTo")
+    transformedRequest.headers = Object.fromEntries(
+      Object.entries(request.headers || {}).map(([key, value]) => [
+        key,
+        { equalTo: value },
+      ])
+    );
+    // 5. Body as bodyPatterns (if provided)
+    if (request.body) {
+      transformedRequest.bodyPatterns = [{ equalToJson: request.body }];
+    }
+
+    // Save the new mapping (do not include urlMatchType)
+    requests.push({
+      id: requestId,
+      resJson: transformedRequest,
+      wireMockId: null,
+    });
     fs.writeFileSync(requestsFile, JSON.stringify(requests, null, 2));
   }
 
-  // Create a new response entry for this mapping.
-  // Count how many responses are already associated with this mapping.
+  // Create a new response entry.
   const matchingResponses = responses.filter((r) => r.reqId === requestId);
   const responseId = `${requestId}.${matchingResponses.length + 1}`;
   const timestamp = new Date().toLocaleString("sv-SE", {
     timeZone: "Europe/Stockholm",
   });
-
   const newResponse = {
     id: responseId,
     reqId: requestId,
-    resJson: response,
+    resJson: {
+      status: response.status,
+      headers: response.headers,
+      body: response.body, // Will be stringified when sending
+    },
     timestamp,
   };
 
@@ -137,44 +183,77 @@ app.post("/mappings", (req, res) => {
 
   res.json({
     success: true,
-    newRequest: { id: requestId, resJson: request },
+    newRequest: { id: requestId, resJson: transformedRequest },
     newResponse,
   });
 });
 
-// Ny endpoint för att skicka en specifik mapping till WireMock
+
+
+
+// POST /mappings/:id/send: Send a mapping to WireMock
 app.post("/mappings/:id/send", async (req, res) => {
   const { id } = req.params;
-
   const requests = JSON.parse(fs.readFileSync(requestsFile, "utf-8"));
   const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"));
 
-  const request = requests.find((r) => r.id === id);
-  const response = responses.find((r) => r.reqId === id);
+  const mappingEntry = requests.find((r) => r.id === id);
+  const mappingResponse = responses.find((r) => r.reqId === id);
 
-  if (!request || !response) {
-    return res
-      .status(404)
-      .json({ success: false, message: "Mapping not found" });
+  if (!mappingEntry || !mappingResponse) {
+    return res.status(404).json({ success: false, message: "Mapping not found" });
   }
 
-  // Skicka till WireMock
-  const wireMockId = await sendMappingToWireMock(
-    request.resJson,
-    response.resJson
-  );
-  if (!wireMockId) {
-    return res
-      .status(500)
-      .json({ success: false, message: "Failed to send to WireMock" });
+  // Start with the saved request (transformed)...
+  let requestMapping = { ...mappingEntry.resJson };
+
+  // Remove custom fields that WireMock does not expect (e.g. "title")
+  if (requestMapping.title) {
+    delete requestMapping.title;
   }
 
-  // Uppdatera den lagrade mappningen med WireMock UUID
-  request.wireMockUuid = wireMockId;
-  fs.writeFileSync(requestsFile, JSON.stringify(requests, null, 2));
+  // If the saved object contains a plain "body" (instead of bodyPatterns),
+  // wrap it into a bodyPatterns array (and remove the plain "body" key).
+  if (requestMapping.body) {
+    requestMapping.bodyPatterns = [{ equalToJson: requestMapping.body }];
+    delete requestMapping.body;
+  }
 
-  res.json({ success: true, wireMockUuid: wireMockId });
+  // Build the mapping object to send to WireMock.
+  const mappingToSend = {
+    request: requestMapping,
+    response: {
+      status: mappingResponse.resJson.status,
+      headers: mappingResponse.resJson.headers,
+      // Ensure the response body is a string (WireMock expects a JSON string)
+      body: JSON.stringify(mappingResponse.resJson.body),
+    },
+  };
+
+  console.log("Mapping to send to WireMock:", mappingToSend);
+
+  try {
+    const wireMockResponse = await fetch(WIREMOCK_BASE_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(mappingToSend),
+    });
+    const data = await wireMockResponse.json();
+    if (!wireMockResponse.ok) {
+      console.error("WireMock response not OK:", data);
+      return res.status(500).json({ success: false, message: "Failed to send to WireMock" });
+    }
+    // Update the saved mapping with the WireMock UUID
+    mappingEntry.wireMockId = data.id ?? data.uuid;
+    fs.writeFileSync(requestsFile, JSON.stringify(requests, null, 2));
+    return res.json({ success: true, wireMockIdd: mappingEntry.wireMockId });
+  } catch (error) {
+    console.error("❌ Error sending mapping to WireMock:", error);
+    return res.status(500).json({ success: false, message: error.message });
+  }
 });
+
+
 
 // Uppdatera en request
 app.put("/requests/:id", (req, res) => {
@@ -206,44 +285,108 @@ app.put("/requests/:id", (req, res) => {
 });
 
 // Uppdatera en respons
-app.put("/responses/:id", (req, res) => {
+app.put("/requests/:id", (req, res) => {
   const { id } = req.params;
-  const { resJson } = req.body;
+  const { resJson } = req.body; // Incoming data containing title, url, method, headers, (and optionally body or urlMatchType)
 
   if (!id || !resJson) {
     return res
       .status(400)
-      .json({ success: false, message: "ID and response data are required." });
+      .json({ success: false, message: "ID and request data are required." });
   }
 
-  const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"));
-  const responseIndex = responses.findIndex((res) => res.id === id);
+  const requests = JSON.parse(fs.readFileSync(requestsFile, "utf-8"));
+  const requestIndex = requests.findIndex((r) => String(r.id) === String(id));
 
-  if (responseIndex === -1) {
+  if (requestIndex === -1) {
     return res
       .status(404)
-      .json({ success: false, message: "Response not found." });
+      .json({ success: false, message: "Request not found." });
   }
 
-  // Uppdatera responsen
-  responses[responseIndex].resJson = resJson;
-  fs.writeFileSync(responseFile, JSON.stringify(responses, null, 2));
+  // Determine which URL key to use based on an optional urlMatchType field.
+  // (If not provided, default to "url")
+  let urlKey = "url";
+  if (resJson.urlMatchType) {
+    if (resJson.urlMatchType === "urlPath") {
+      urlKey = "urlPath";
+    } else if (resJson.urlMatchType === "urlPathPattern") {
+      urlKey = "urlPathPattern";
+    } else if (resJson.urlMatchType === "urlPathTemplate") {
+      urlKey = "urlPathTemplate";
+    } else if (resJson.urlMatchType === "urlPattern") {
+      urlKey = "urlPattern";
+    }
+  }
 
-  res.json({ success: true, updatedResponse: responses[responseIndex] });
+  // Build the transformed request object in the desired order:
+  // 1. Title (if provided)
+  // 2. URL (using the chosen key)
+  // 3. Method (uppercased)
+  // 4. Headers (each value wrapped with "equalTo")
+  // 5. Body as bodyPatterns (if provided)
+  let transformedRequest = {};
+  if (resJson.title) {
+    transformedRequest.title = resJson.title;
+  }
+  if (resJson.url) {
+    transformedRequest[urlKey] = resJson.url;
+  }
+  transformedRequest.method = resJson.method.toUpperCase();
+  transformedRequest.headers = Object.fromEntries(
+    Object.entries(resJson.headers || {}).map(([key, value]) => [
+      key,
+      { equalTo: value },
+    ])
+  );
+  if (resJson.body) {
+    transformedRequest.bodyPatterns = [{ equalToJson: resJson.body }];
+  }
+
+  // Update the saved mapping with the transformed object.
+  requests[requestIndex].resJson = transformedRequest;
+  fs.writeFileSync(requestsFile, JSON.stringify(requests, null, 2));
+
+  res.json({ success: true, updatedRequest: requests[requestIndex] });
 });
 
+
+
 // Ta bort mapping
-app.delete("/mappings/:id", (req, res) => {
+app.delete("/mappings/:id", async (req, res) => {
   const { id } = req.params;
   if (!id) {
     return res.status(400).json({ success: false, message: "Invalid ID" });
   }
 
-  // Read the data from files
+  // Read existing mappings from file
   const requests = JSON.parse(fs.readFileSync(requestsFile, "utf-8"));
   const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"));
 
-  // Filter out the specific request and associated responses
+  // Find the mapping to delete
+  const mappingToDelete = requests.find((req) => String(req.id) === String(id));
+
+  // If the mapping exists and has a WireMock ID, delete it from WireMock
+  if (mappingToDelete && mappingToDelete.wireMockId) {
+    try {
+      const wireMockDeleteResponse = await fetch(
+        `${WIREMOCK_BASE_URL}/${mappingToDelete.wireMockId}`,
+        { method: "DELETE" }
+      );
+      if (!wireMockDeleteResponse.ok) {
+        console.error(
+          "Failed to delete mapping from WireMock:",
+          await wireMockDeleteResponse.text()
+        );
+      } else {
+        console.log("Mapping deleted from WireMock successfully");
+      }
+    } catch (error) {
+      console.error("Error deleting mapping from WireMock:", error);
+    }
+  }
+
+  // Filter out the deleted mapping locally
   const updatedRequests = requests.filter(
     (req) => String(req.id) !== String(id)
   );
@@ -257,6 +400,7 @@ app.delete("/mappings/:id", (req, res) => {
 
   res.json({ success: true });
 });
+
 
 app.post("/responses", (req, res) => {
   const { reqId, resJson, timestamp } = req.body;
@@ -295,7 +439,7 @@ app.get("/traffic", async (req, res) => {
     const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"));
 
     const mappingLookup = storeRequests.reduce((lookup, mapping) => {
-      lookup[mapping.wireMockUuid] = mapping;
+      lookup[mapping.wireMockId] = mapping;
       return lookup;
     }, {});
 

@@ -33,7 +33,7 @@ const TrafficPage = ({ savedMappings }) => {
         const joinedData = data.trafficData.map((item) => {
           if (item.matchedStubId && savedMappings && savedMappings.length) {
             const foundMapping = savedMappings.find((mapping) => {
-              const mappingUuid = mapping.uuid || mapping.wireMockUuid;
+              const mappingUuid = mapping.uuid || mapping.wireMockId;
               return (
                 mappingUuid &&
                 mappingUuid.trim().toLowerCase() ===
@@ -59,6 +59,15 @@ const TrafficPage = ({ savedMappings }) => {
   }, [savedMappings]); // add savedMappings to the dependency array
 
   const filteredData = trafficData.filter((item) => {
+
+    if (matchFilter === "matched" && filter) {
+      console.log(item.matchedStubId)
+      return (
+        item.matchedStubId &&
+        item.matchedStubId.trim().toLowerCase() === filter.trim().toLowerCase()
+      );
+    }
+    
     const method = item?.request?.method || "";
     const url = item?.request?.url || "";
     const timestampRaw = item.timestamp;
@@ -107,8 +116,6 @@ const TrafficPage = ({ savedMappings }) => {
     return matchesSearch && isInTimeRange;
   });
 
-  // Output: "2025-02-14"
-
   const getHeaderValue = (headers, headerName) => {
     const key = Object.keys(headers).find(
       (key) => key.toLowerCase() === headerName.toLowerCase()
@@ -124,7 +131,6 @@ const TrafficPage = ({ savedMappings }) => {
     <div className={styles.trafficContainer}>
       <h2>WireMock Traffic Overview</h2>
       <div className={styles.filterContainer}>
-        {/* Datumfilter */}
         <label>Start Date:</label>
         <input
           type="date"

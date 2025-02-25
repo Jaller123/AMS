@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { ToastContainer, toast, Bounce } from 'react-toastify';
+import { ToastContainer, toast, Bounce } from "react-toastify";
 
 import Navbar from "./components/Navbar";
 import ReqForm from "./components/ReqForm";
@@ -9,12 +9,16 @@ import MappingsPage from "./components/MappingPage/MappingPage.jsx";
 import MappingDetailPage from "./components/MappingDetailPage";
 import TrafficPage from "./components/TrafficPage";
 import ReqDetailPage from "./components/ReqDetailPage";
-import Button from "./components/Button";
+import ScenariosPage from "./components/MappingPage/ScenariosPage.jsx";
+import CreateScenario from "./components/MappingPage/CreateScenario.jsx";
+
+import button from "./components/button.jsx";
 import {
   fetchMappings,
   saveMapping,
   deleteMapping,
   saveResponse,
+  handleSendToWireMock,
 } from "./backend/api.js";
 import Home from "../src/components/Home.jsx"; // Import den nya komponenten
 
@@ -81,7 +85,9 @@ const App = () => {
         setResponses((prevResponses) => [
           ...prevResponses,
           {
-            id: `${id}.${prevResponses.filter((r) => r.reqId === id).length + 1}`,
+            id: `${id}.${
+              prevResponses.filter((r) => r.reqId === id).length + 1
+            }`,
             reqId: id,
             resJson: response,
           },
@@ -198,11 +204,10 @@ const App = () => {
     <Router>
       <Navbar />
       <Routes>
-      <Route
+        <Route
           path="/"
           element={
             <div>
-            
               <div className="custom-shape-divider-top-1738768978">
                 <svg
                   data-name="Layer 1"
@@ -222,27 +227,31 @@ const App = () => {
                 handleDelete={handleDeleteMapping}
                 handleUpdateRequest={handleUpdateRequest}
                 handleUpdateResponse={handleUpdateResponse}
-                
+                setMappings={setMappings}
+                handleSendToWireMock={handleSendToWireMock}
               />
             </div>
-           
           }
         />
         <Route
-  path="/mappings"
-  element={
-    <div className="mappingsContainer">
-      <div className="formWrapper">
-        <ReqForm setRequestData={setRequestData} resetForm={resetForm} />
-        <ResForm setResponseData={setResponseData} resetForm={resetForm} onSave={handleSaveMapping} />
-      </div>
-      <ToastContainer
-      pauseOnHover={false}
-      />
-    </div>
-  }
-/>
-
+          path="/mappings"
+          element={
+            <div className="mappingsContainer">
+              <div className="formWrapper">
+                <ReqForm
+                  setRequestData={setRequestData}
+                  resetForm={resetForm}
+                />
+                <ResForm
+                  setResponseData={setResponseData}
+                  resetForm={resetForm}
+                  onSave={handleSaveMapping}
+                />
+              </div>
+              <ToastContainer pauseOnHover={false} />
+            </div>
+          }
+        />
         <Route
           path="/mapping/:mappingId"
           element={
@@ -263,7 +272,12 @@ const App = () => {
             />
           }
         />
-        <Route path="/traffic" element={<TrafficPage savedMappings={mappings} />} />
+        <Route
+          path="/traffic"
+          element={<TrafficPage savedMappings={mappings} />}
+        />
+        <Route path="/scenarios" element={<ScenariosPage />} />
+        <Route path="/create-scenario" element={<CreateScenario />} />/
       </Routes>
     </Router>
   );

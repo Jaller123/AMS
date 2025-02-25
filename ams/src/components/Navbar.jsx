@@ -30,6 +30,16 @@ const Navbar = () => {
             Traffic
           </NavLink>
         </li>
+        <li className={styles.menuItem}>
+          <NavLink
+            to="/scenarios"
+            className={({ isActive }) =>
+              isActive ? `${styles.link} ${styles.active}` : styles.link
+            }
+          >
+            Scenarios
+          </NavLink>
+        </li>
       </ul>
     </nav>
   );

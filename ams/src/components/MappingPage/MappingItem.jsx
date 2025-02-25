@@ -1,8 +1,20 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom";
 import styles from "./MappingsPage.module.css";
 import RequestEditor from "./RequestEditor";
 import ResponseEditor from "./ResponseEditor";
+
+// Helper: Extract the actual URL value from the request object.
+const extractURLValue = (reqObj) => {
+  return (
+    reqObj.url ||
+    reqObj.urlPath ||
+    reqObj.urlPathPattern ||
+    reqObj.urlPathTemplate ||
+    reqObj.urlPattern ||
+    ""
+  );
+};
 
 const MappingItem = ({
   mapping,
@@ -19,54 +31,14 @@ const MappingItem = ({
   handleDelete,
   handleUpdateRequest,
   handleUpdateResponse,
-  autoExpandMappingId, // received from MappingList (or MappingsPage)
+  autoExpandMappingId,
 }) => {
-  const navigate = useNavigate()
-  // Create refs for the mapping item container and the toggle button
+  const navigate = useNavigate();
   const mappingItemRef = useRef(null);
   const toggleButtonRef = useRef(null);
-  // Local flag so that auto expansion only happens once
   const [hasAutoExpanded, setHasAutoExpanded] = useState(false);
-  const hasInitialized = useRef(false)
 
-  
-
-  useEffect(() => {
-    if (!hasInitialized.current) {
-      if (!editedRequests[mapping.id]) {
-        setEditedRequests((prev) => ({
-          ...prev,
-          [mapping.id]: mapping.request || {},
-        }));
-      }
-      if (!editedResponses[mapping.id]) {
-        const firstResponse = responses.filter((res) => res.reqId === mapping.id)[0] || {};
-        setEditedResponses((prev) => ({
-          ...prev,
-          [mapping.id]: firstResponse.resJson || {},
-        }));
-      }
-      if (!selectedResponses[mapping.id] && responses.filter((res) => res.reqId === mapping.id).length > 0) {
-        setSelectedResponses((prev) => ({
-          ...prev,
-          [mapping.id]: responses.filter((res) => res.reqId === mapping.id)[0].id,
-        }));
-      }
-      hasInitialized.current = true;
-    }
-  }, [mapping.id, responses, editedRequests, editedResponses, selectedResponses, setEditedRequests, setEditedResponses, setSelectedResponses]);
-
-  const toggleExpanded = () => {
-    setExpandedMappings((prev) => ({
-      ...prev,
-      [mapping.id]: !prev[mapping.id],
-    }));
-  };
-
-  const relevantResponses = responses.filter((res) => res.reqId === mapping.id);
-  const isActive = mapping.isActive ? "Active" : "Inactive";
-
-  // Initialize local editing state
+  // Initialize local states if not already done.
   useEffect(() => {
     if (!editedRequests[mapping.id]) {
       setEditedRequests((prev) => ({
@@ -75,43 +47,53 @@ const MappingItem = ({
       }));
     }
     if (!editedResponses[mapping.id]) {
-      const firstResponse = relevantResponses[0] || {};
+      const firstResponse =
+        responses.filter((res) => res.reqId === mapping.id)[0] || {};
       setEditedResponses((prev) => ({
         ...prev,
         [mapping.id]: firstResponse.resJson || {},
       }));
     }
-    if (!selectedResponses[mapping.id] && relevantResponses.length > 0) {
+    if (
+      !selectedResponses[mapping.id] &&
+      responses.filter((res) => res.reqId === mapping.id).length > 0
+    ) {
       setSelectedResponses((prev) => ({
         ...prev,
-        [mapping.id]: relevantResponses[0].id,
+        [mapping.id]: responses.filter((res) => res.reqId === mapping.id)[0].id,
       }));
     }
   }, [
-    mapping,
-    relevantResponses,
+    mapping.id,
+    responses,
+    editedRequests,
+    editedResponses,
     selectedResponses,
     setEditedRequests,
     setEditedResponses,
     setSelectedResponses,
   ]);
 
-  // Auto-trigger expansion only once when autoExpandMappingId is provided.
+  const toggleExpanded = () => {
+    setExpandedMappings((prev) => ({
+      ...prev,
+      [mapping.id]: !prev[mapping.id],
+    }));
+  };
+
+  // Auto-expand the mapping if its ID matches autoExpandMappingId.
   useEffect(() => {
     if (
-      !hasAutoExpanded && // only if we haven't auto-expanded before
+      !hasAutoExpanded &&
       autoExpandMappingId &&
-      mapping.id === autoExpandMappingId &&
-      !expandedMappings[mapping.id]
+      mapping.id === autoExpandMappingId
     ) {
-      if (toggleButtonRef.current) {
-        toggleButtonRef.current.click();
-        setHasAutoExpanded(true);
-      }
+      setExpandedMappings((prev) => ({ ...prev, [mapping.id]: true }));
+      setHasAutoExpanded(true);
     }
-  }, [hasAutoExpanded, autoExpandMappingId, mapping.id, expandedMappings]);
+  }, [autoExpandMappingId, mapping.id, hasAutoExpanded, setExpandedMappings]);
 
-  // After expansion, scroll the mapping item into view
+  // After expansion, scroll the mapping item into view.
   useEffect(() => {
     if (
       expandedMappings[mapping.id] &&
@@ -125,12 +107,19 @@ const MappingItem = ({
     }
   }, [expandedMappings, autoExpandMappingId, mapping.id]);
 
+  const currentRequest = editedRequests[mapping.id] || {};
+  const displayURL = extractURLValue(currentRequest);
+
   return (
-    <li className={styles.mappingItem} ref={mappingItemRef} data-testid="mapping-item">
+    <li
+      className={styles.mappingItem}
+      ref={mappingItemRef}
+      data-testid="mapping-item"
+    >
       <div className={styles.titleRow} onClick={toggleExpanded}>
-        <h3>{editedRequests[mapping.id]?.method || "Unidentified Method"}</h3>
-        <h3>{editedRequests[mapping.id]?.url || "Unidentified URL"}</h3>
-        <h3>{editedRequests[mapping.id]?.title || "Untitled Mapping"}</h3>
+        <h3>{currentRequest.method || "Unidentified Method"}</h3>
+        <h3>{displayURL || "No URL"}</h3>
+        <h3>{currentRequest.title || "Untitled Mapping"}</h3>
         <span
           className={
             mapping.status === "Active" ? styles.active : styles.unmapped
@@ -141,8 +130,11 @@ const MappingItem = ({
         <h3 className={mapping.isActive ? styles.active : styles.inactive}>
           {mapping.isActive ? "✅ " : "❌ "}
         </h3>
-        {/* Attach the ref so we can trigger click programmatically */}
-        <button ref={toggleButtonRef} className={styles.toggleButton} data-testid="toggle-button">
+        <button
+          ref={toggleButtonRef}
+          className={styles.toggleButton}
+          data-testid="toggle-button"
+        >
           {expandedMappings[mapping.id] ? "Hide Details" : "Show Details"}
         </button>
       </div>
@@ -155,16 +147,15 @@ const MappingItem = ({
               setEditedRequests((prev) => ({ ...prev, [mapping.id]: data }))
             }
             handleUpdateRequest={(id, updatedRequest) => {
-              setEditedRequests((prev) => ({
-                ...prev,
-                [id]: updatedRequest,
-              }));
+              setEditedRequests((prev) => ({ ...prev, [id]: updatedRequest }));
               handleUpdateRequest(id, updatedRequest);
             }}
           />
           <ResponseEditor
             mappingId={mapping.id}
-            relevantResponses={relevantResponses}
+            relevantResponses={responses.filter(
+              (res) => res.reqId === mapping.id
+            )}
             editedResponse={editedResponses[mapping.id]}
             setEditedResponse={(data) =>
               setEditedResponses((prev) => ({ ...prev, [mapping.id]: data }))
@@ -179,25 +170,24 @@ const MappingItem = ({
             handleUpdateResponse={handleUpdateResponse}
           />
           {mapping.isActive && (
-          <button
-          className={styles.sendButton}
-          onClick={() =>
-            navigate("/traffic", {
-              state: { filterTraffic: mapping.request.url, matchOnly: true },
-            })
-          }
-        >
-          Traffic
-        </button>
-        
-        )}
+            <button
+              className={styles.sendButton}
+              onClick={() => {
+                const wireMockId = mapping.wireMockId || mapping.uuid;
+                navigate("/traffic", {
+                  state: { filterTraffic: wireMockId, matchOnly: true },
+                });
+              }}
+            >
+              Traffic
+            </button>
+          )}
           <button
             onClick={() => handleSendToWireMock(mapping.id)}
             className={styles.sendButton}
           >
             Send to WireMock
           </button>
-
           <button
             onClick={() => handleDelete(mapping.id)}
             className={styles.deleteButton}

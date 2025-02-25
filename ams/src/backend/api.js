@@ -58,8 +58,8 @@ export const fetchMappings = async () => {
       requests.map((req) => ({
         id: req.id,
         request: req.resJson,
-        uuid: req.wireMockUuid,
-        isActive: wiremockRunning && wireMockMappings.has(req.wireMockUuid), // ✅ Inactive if WireMock is Down
+        uuid: req.wireMockId,
+        isActive: wiremockRunning && wireMockMappings.has(req.wireMockId), // ✅ Inactive if WireMock is Down
       }))
     );
 
@@ -67,8 +67,8 @@ export const fetchMappings = async () => {
       requests: requests.map((req) => ({
         id: req.id,
         request: req.resJson,
-        uuid: req.wireMockUuid,
-        isActive: wiremockRunning && wireMockMappings.has(req.wireMockUuid), // ✅ Automatically Inactive if WireMock is Down
+        uuid: req.wireMockId,
+        isActive: wiremockRunning && wireMockMappings.has(req.wireMockId), // ✅ Automatically Inactive if WireMock is Down
       })),
       responses: responses.map((res) => ({
         id: res.id,
@@ -127,8 +127,31 @@ export const fetchWireMockTraffic = async () => {
   }
 };
 
+export const handleSendToWireMock = async (mappingId) => {
+  try {
+    const response = await fetch(
+      `http://localhost:8080/mappings/${mappingId}/send`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      }
+    );
 
+    const data = await response.json();
 
+    if (data.success) {
+      alert("Mapping sent to WireMock successfully!");
+      return data; // ✅ Return the response so MappingsPage can handle updates
+    } else {
+      alert("Failed to send mapping to WireMock.");
+      return null;
+    }
+  } catch (error) {
+    console.error("Error sending mapping to WireMock:", error);
+    alert("Error sending mapping. Check console for details.");
+    return null;
+  }
+};
 
 
 export const saveMapping = async (mapping) => {
@@ -143,7 +166,7 @@ export const saveMapping = async (mapping) => {
     return {
       id: newRequest.id,
       request: newRequest.resJson,
-      wireMockUuid: newRequest.wireMockUuid,
+      wireMockId: newRequest.wireMockId,
       response: newResponse.resJson,
     };
   } catch (error) {

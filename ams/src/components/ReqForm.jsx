@@ -13,6 +13,15 @@ const isValidJson = (jsonString) => {
   }
 };
 
+const urlMatchExamples = {
+  Url: "Example: /url",
+  urlEqualTo: "Example: /your/exact/url?with=query",
+  urlPattern: "Example: /your/([a-z]*)\\?with=query",
+  urlPath: "Example: /your/exact/url",
+  urlPathPattern: "Example: /your([a-z]*)",
+  urlPathTemplate: "Example: /contacts{contactId}/addresses/{addressId}"
+}
+
 const ReqForm = ({ setRequestData, resetForm }) => {
   const location = useLocation();
   // Kolla om det finns redan ifylld data genom state
@@ -30,6 +39,7 @@ const ReqForm = ({ setRequestData, resetForm }) => {
       : JSON.stringify(prefillMapping.body);
 
   const [url, setUrl] = useState(prefillMapping.url || "");
+  const [urlMatchType, setUrlMatchType] = useState(prefillMapping.urlMatchType || "Url");
   const [method, setMethod] = useState(prefillMapping.method || "GET");
   const [headers, setHeaders] = useState(initialHeaders);
   const [body, setBody] = useState(initialBody);
@@ -52,9 +62,10 @@ const ReqForm = ({ setRequestData, resetForm }) => {
         method: method || "GET",
         headers: headers ? JSON.parse(headers) : {},
         body: body ? JSON.parse(body) : {},
+        urlMatchType, 
       });
     }
-  }, [title, url, method, headers, body, setRequestData]);
+  }, [title, url, method, headers, body, urlMatchType, setRequestData]);
 
   useEffect(() => {
     if (resetForm) {
@@ -63,6 +74,7 @@ const ReqForm = ({ setRequestData, resetForm }) => {
       setHeaders("{}");
       setBody("{}");
       setTitle("");
+      setUrlMatchType("urlEqualTo")
       setErrors({ headers: false, body: false });
     }
   }, [resetForm]);
@@ -92,6 +104,23 @@ const ReqForm = ({ setRequestData, resetForm }) => {
             onChange={(e) => setUrl(e.target.value)}
             placeholder="Enter the request URL"
           />
+
+          <small className={styles.exampleText}>
+            {urlMatchExamples[urlMatchType]}
+            <label htmlFor="urlMatchType">URL Matching Option</label>
+          <select
+            id="urlMatchType"
+            value={urlMatchType}
+            onChange={(e) => setUrlMatchType(e.target.value)}
+          >
+            <option value="Url">Url</option>
+            <option value="urlEqualTo">urlEqualTo</option>
+            <option value="urlPattern">urlPattern</option>
+            <option value="urlPath">urlPath</option>
+            <option value="urlPathPattern">urlPathPattern</option>
+            <option value="urlPathTemplate">urlPathTemplate</option>
+          </select>
+          </small>
         </div>
         <div className={styles.formGroup}>
           <label htmlFor="method">Method</label>

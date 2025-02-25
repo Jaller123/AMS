@@ -1,13 +1,14 @@
 .sectionContainer{
-width: 100vh;
+
  margin-right: 50px;
  
 }
+
 .section {
-  padding: 40px;
-  width: 100%;
+  padding: 50px;
+  width: 170%;
   height: auto;
-  max-width: 800px; /* Sätter en maxbredd */
+  max-width: 855px;
   border: 1px solid #000000;
   border-radius: 8px;
   background-color: #f0f3ef;
@@ -15,15 +16,18 @@ width: 100vh;
   flex-direction: column;
   align-items: center; /* Centrerar innehållet inuti sektionen */
   justify-content: center; /* Centrerar innehållet vertikalt */
-  
+  align-items: center;
+  justify-content: center;
+  right: 50%;
+  position: relative;
 }
 
 .searchable-mappings {
   margin-top: 15px;
-
   display: flex;
   justify-content: center;
 }
+
 .search-form {
   margin-bottom: 50px;
   background-color: #ffffff;
@@ -33,11 +37,10 @@ width: 100vh;
   width: 100%;
 }
 
-
-.searchInput{
+.searchInput {
   border: none;
-  
 }
+
 .section h2 {
   color: rgb(9, 8, 8);
   padding: 8px;
@@ -50,7 +53,7 @@ width: 100vh;
   padding: 0;
 }
 
-/* request*/
+/* request */
 .mappingItem {
   width: 450px;
   padding: 2px;
@@ -59,6 +62,7 @@ width: 100vh;
   border-radius: 4px;
   background-color: #d1d1d1e3;
 }
+
 ul {
   color: rgb(0, 0, 0);
 }
@@ -66,10 +70,12 @@ ul {
 .RequestEditor {
   padding: 30px;
 }
+
 .RequestEditor textarea {
   height: 80px;
   margin: 25px auto;
 }
+
 .RequestEditor input {
   margin: 10px auto;
   padding: 8px;
@@ -78,30 +84,29 @@ ul {
   border-radius: 4px;
 }
 
-.RequestEditor button ,
+.RequestEditor button,
 .sendButton,
-.saveResponseButton
- {
+.saveResponseButton {
   width: 50%;
   display: block;
-  margin: 20px auto; /* Auto på sidorna centrerar horisontellt */
+  margin: 20px auto; /* Centers horizontally */
   text-align: center;
   background: rgb(4, 84, 127);
   border: none;
   color: rgb(251, 251, 251);
   border-radius: 30px;
   text-transform: uppercase;
-  padding: 15px 20px; /* Gör knapparna större */
+  padding: 15px 20px; /* Makes buttons larger */
   font-size: 10px;
   cursor: pointer;
   transition: 0.8s;
   position: relative;
   overflow: hidden;
 }
+
 .RequestEditor button::before,
-.sendButton::before ,
-.saveResponseButton::before
- {
+.sendButton::before,
+.saveResponseButton::before {
   content: "";
   position: absolute;
   left: 0;
@@ -111,41 +116,43 @@ ul {
   z-index: -1;
   transition: 0.8s;
 }
-.RequestEditor button::before,
-.sendButton::before,
-.saveResponseButton::before
- {
-  top: 0;
-  border-radius: 0 0 50% 50%;
-}
+
 .RequestEditor button:hover,
 .sendButton:hover,
-.saveResponseButton:hover
- {
+.saveResponseButton:hover {
   color: rgb(0, 0, 0);
   transform: scale(1.05);
 }
 .RequestEditor button:hover::before,
-.sendButton:hover::before ,
-.saveResponseButton:hover::before
- {
-  height: 180%; /* Gör bakgrundsfärgen fullt synlig vid hover */
+.sendButton:hover::before,
+.saveResponseButton:hover::before {
+  height: 180%;
 }
 /* response*/
 
+.RequestEditor button:hover::before,
+.sendButton:hover::before,
+.saveResponseButton:hover::before {
+  height: 180%; /* Makes background fully visible on hover */
+}
+
+/* response */
 .Response h4 {
   margin-bottom: 5px;
 }
+
 .Response textarea {
   height: 80px;
   margin: 25px auto;
 }
+
 .Response input {
   padding: 8px;
   width: 100%;
   margin: 10px auto;
   border-radius: 4px;
 }
+
 .SelectResponse {
   background-color: #ac0e0e;
   width: 100%;
@@ -162,6 +169,7 @@ pre {
   font-weight: bolder;
   font-family: monospace;
 }
+
 .selectDropdown {
   margin-top: 10px;
   padding: 5px;
@@ -231,6 +239,7 @@ textarea {
   list-style-type: none;
   padding: 0;
 }
+
 /* Active status styling with Font Awesome checkmark */
 .active {
   color: rgb(11, 252, 11); /* Green */
@@ -241,19 +250,19 @@ textarea {
 }
 
 .inactive {
-  color: red; /* Text color red for inactive */
+  color: red; /* Red text for inactive */
   font-weight: bold;
-  display: inline-flex; /* Use flex for center alignment */
-  align-items: center; /* Align checkmark vertically */
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
   font-size: 1.5rem;
 }
 
 .buttonContainer {
   display: flex;
-  gap: 150px; /* Öka mellanrummet mellan knapparna */
-  justify-content: center; /* Centrerar knapparna horisontellt */
-  margin-top: 20px; /* Lägger till avstånd ovanför */
+  gap: 150px; /* Increase spacing between buttons */
+  justify-content: center;
+  margin-top: 20px;
 }
 
 .detailsButton {
@@ -263,13 +272,14 @@ textarea {
   color: rgb(251, 251, 251);
   border-radius: 30px;
   text-transform: uppercase;
-  padding: 15px 20px; /* Gör knapparna större */
+  padding: 15px 20px;
   font-size: 10px;
   cursor: pointer;
   transition: 0.8s;
   white-space: nowrap;
   position: relative;
   overflow: hidden;
+  z-index: 10;
 }
 
 .detailsButton::before {
@@ -281,15 +291,15 @@ textarea {
   background-color: #ffffff;
   z-index: -1;
   transition: 0.9s;
-}
-.detailsButton::before {
   top: 0;
   border-radius: 0 0 50% 50%;
 }
+
 .detailsButton:hover {
   color: rgb(0, 0, 0);
   transform: scale(1.05);
 }
+
 .detailsButton:hover::before {
   height: 180%;
 }
@@ -308,6 +318,7 @@ textarea {
   position: relative;
   overflow: hidden;
 }
+
 .ButtonEdit::before {
   content: "";
   position: absolute;
@@ -317,36 +328,37 @@ textarea {
   background-color: #ffffff;
   z-index: -1;
   transition: 0.8s;
-}
-.ButtonEdit::before {
   top: 0;
   border-radius: 0 0 50% 50%;
 }
+
 .ButtonEdit:hover {
   color: rgb(0, 0, 0);
   transform: scale(1.05);
 }
+
 .ButtonEdit:hover::before {
-  height: 180%; /* Gör bakgrundsfärgen fullt synlig vid hover */
+  height: 180%; /* Background fully visible on hover */
 }
 
 .deleteButton {
   width: 30%;
   display: block;
-  margin: 20px auto; /* Auto på sidorna centrerar horisontellt */
+  margin: 20px auto; /* Centers horizontally */
   text-align: center;
   background: red;
   border: none;
   color: rgb(251, 251, 251);
   border-radius: 30px;
   text-transform: uppercase;
-  padding: 15px 20px; /* Gör knapparna större */
+  padding: 15px 20px;
   font-size: 10px;
   cursor: pointer;
   transition: 0.8s;
   position: relative;
   overflow: hidden;
 }
+
 .deleteButton::before {
   content: "";
   position: absolute;
@@ -356,18 +368,19 @@ textarea {
   background-color: rgb(123, 7, 7);
   z-index: -1;
   transition: 0.8s;
-}
-.deleteButton::before {
   top: 0;
   border-radius: 0 0 50% 50%;
 }
+
 .deleteButton:hover {
   color: rgb(255, 255, 255);
   transform: scale(1.05);
 }
+
 .deleteButton:hover::before {
-  height: 180%; /* Gör bakgrundsfärgen fullt synlig vid hover */
+  height: 180%;
 }
+
 .saveButton {
   background-color: #2196f3;
   color: white;
@@ -390,7 +403,7 @@ textarea {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 20px; /* Mellanrum mellan kolumner */
+  gap: 20px; /* Spacing between columns */
   cursor: pointer;
 }
 
@@ -398,15 +411,15 @@ textarea {
   margin: 0;
   font-size: 15px;
   font-weight: 10;
-  white-space: nowrap; /* Förhindra radbrytning */
-  overflow: hidden; /* Klipp text som inte får plats */
-  text-overflow: ellipsis; /* Lägg till "..." om texten klipps */
+  white-space: nowrap; /* Prevent wrapping */
+  overflow: hidden; /* Hide overflow */
+  text-overflow: ellipsis; /* Add ellipsis if truncated */
   flex: 1;
 }
 
 .toggleButton {
   width: 100px;
-  font-size: 10px;
+  font-size: 13px;
   background-color: #007bff;
   color: white;
   border: none;
@@ -439,13 +452,4 @@ textarea {
 
 .createMappingButton:hover {
   background-color: #0056b3;
-}
-/* Stor skärm (1440px och uppåt) */
-@media screen and (min-width: 1440px) {
-  .sectionContainer {
-    width: 100vh;
-    width: 800px; /* Samma maxbredd som .section */
-    margin-right: 50px; /* Behåll marginalen */
-  }
-
 }
