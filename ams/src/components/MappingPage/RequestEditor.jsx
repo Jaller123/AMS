@@ -95,6 +95,7 @@ const RequestEditor = ({
           <input
             placeholder="Title"
             type="text"
+            
             value={localRequest.title}
             onChange={(e) =>
               setLocalRequest({ ...localRequest, title: e.target.value })
@@ -103,6 +104,7 @@ const RequestEditor = ({
           <label htmlFor="urlMatchType">URL Matching Option</label>
           <select
             id="urlMatchType"
+            data-testid="url-match-type-select" 
             value={localRequest.urlMatchType}
             onChange={(e) =>
               setLocalRequest({ ...localRequest, urlMatchType: e.target.value })
@@ -118,7 +120,7 @@ const RequestEditor = ({
           <input
             placeholder="URL"
             type="text"
-            data-testid="search-url"
+            data-testid="url-input-field"
             value={localRequest.url}
             onChange={(e) =>
               setLocalRequest({ ...localRequest, url: e.target.value })
