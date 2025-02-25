@@ -1,24 +1,24 @@
-.sectionContainer{
-
- margin-right: 50px;
- 
+.sectionContainer {
+  width: 100vh; /* Grundstorlek för mindre skärmar */
+  margin-right: 50px;
+  height: auto;
 }
 
 .section {
   padding: 50px;
-  width: 170%;
+  width: 100%;
   height: auto;
   max-width: 855px;
   border: 1px solid #000000;
   border-radius: 8px;
   background-color: #f0f3ef;
+  margin: 0 auto; 
   display: flex;
   flex-direction: column;
   align-items: center; /* Centrerar innehållet inuti sektionen */
   justify-content: center; /* Centrerar innehållet vertikalt */
   align-items: center;
   justify-content: center;
-  right: 50%;
   position: relative;
 }
 
@@ -115,6 +115,8 @@ ul {
   background-color: #ffffff;
   z-index: -1;
   transition: 0.8s;
+  top: 0;
+  border-radius: 0 0 50% 50%;
 }
 
 .RequestEditor button:hover,
@@ -126,14 +128,14 @@ ul {
 .RequestEditor button:hover::before,
 .sendButton:hover::before,
 .saveResponseButton:hover::before {
-  height: 180%;
+  height: 190%;
 }
 /* response*/
 
 .RequestEditor button:hover::before,
 .sendButton:hover::before,
 .saveResponseButton:hover::before {
-  height: 180%; /* Makes background fully visible on hover */
+  height: 200%; /* Makes background fully visible on hover */
 }
 
 /* response */

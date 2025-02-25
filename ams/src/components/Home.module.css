@@ -70,7 +70,7 @@
     margin-left: 18px; /* Space between text and logo */
   }
   
-  @media screen and (min-width: 1440px) {
+  @media screen and (min-width: 1920px) {
     .container {
       align-items: center;
       text-align: center;
@@ -88,7 +88,7 @@
     }
   
     .laptopScreen {
-      top: 99%; /* Centrera vertikalt */
+      top: 117%; /* Centrera vertikalt */
       left: 45%; /* Centrera horisontellt */
       transform: translate(-50%, -50%); /* Justera till mitten */
       width: 80%; /* Justera om nödvändigt */

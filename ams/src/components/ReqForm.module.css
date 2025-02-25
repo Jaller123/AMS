@@ -10,7 +10,7 @@
 .section {
   width: 65%;
   max-width: 350px;
-  height: 494px;
+  height: auto;
   min-height: auto; /* Anpassad för att matcha ResForm */
   background-color: rgba(255, 255, 255, 0.9);
   padding: 15px;
