@@ -125,8 +125,8 @@ const CreateScenario = () => {
                     onClick={() => toggleDropdown(mapping.id)}
                   >
                     <span>
-                      <strong>{mapping.request?.method || "METHOD"}</strong> |{" "}
-                      {mapping.request?.url || "No URL"} |{" "}
+                      <strong>{mapping.request?.method || "METHOD"}</strong> -{" "}
+                      {mapping.request?.url || "No URL"} -{" "}
                       {mapping.request?.title || "No Title"}
                     </span>
                     <span className={styles.arrow}>
@@ -156,7 +156,7 @@ const CreateScenario = () => {
                         className={`${styles.button} ${styles.useButton}`}
                         onClick={() => useMappingForScenario(mapping)}
                       >
-                        Use This Mapping
+                        Add To Scenario
                       </button>
                     </div>
                   )}

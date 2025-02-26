@@ -1,3 +1,65 @@
 [
-  
+  {
+    "id": "1",
+    "resJson": {
+      "title": "fetching data",
+      "url": "/data",
+      "method": "GET",
+      "headers": {
+        "Content-Type": {
+          "equalTo": "application/json"
+        }
+      },
+      "bodyPatterns": [
+        {
+          "equalToJson": {
+            "body": "hello"
+          }
+        }
+      ]
+    },
+    "wireMockId": null
+  },
+  {
+    "id": "2",
+    "resJson": {
+      "title": "adding user",
+      "url": "/user",
+      "method": "POST",
+      "headers": {
+        "Content-Type": {
+          "equalTo": "application/json"
+        }
+      },
+      "bodyPatterns": [
+        {
+          "equalToJson": {
+            "body": "test"
+          }
+        }
+      ]
+    },
+    "wireMockId": null
+  },
+  {
+    "id": "3",
+    "resJson": {
+      "title": "test url",
+      "urlPattern": "/ /your/([a-z]*)\\?with=query",
+      "method": "GET",
+      "headers": {
+        "Content-Type": {
+          "equalTo": "application/json"
+        }
+      },
+      "bodyPatterns": [
+        {
+          "equalToJson": {
+            "body": "test url"
+          }
+        }
+      ]
+    },
+    "wireMockId": null
+  }
 ]
