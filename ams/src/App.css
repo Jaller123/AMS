@@ -12,7 +12,9 @@
 body {
   background: linear-gradient(120deg, #2C3E50, #3498DB);
   background-size: cover;
-  background-repeat: no-repeat;
+  background-repeat: no-repeat;  
+  min-height: 100vh; 
+  
 }
 
 .pageContainer {
@@ -42,7 +44,8 @@ body {
   fill: #2C3E50;  
 }
 .mappingsContainer {
-  background-color: rgba(216, 195, 168, 0.555);
+  width: 100%;
+  height: auto;
   display: flex;
   justify-content: center;
   flex-direction: column;

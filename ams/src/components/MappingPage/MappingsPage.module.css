@@ -1,24 +1,26 @@
 .sectionContainer {
-  margin-right: 50px;
+  width: 100%; 
+  max-width: 1200px; 
+  margin: 0 auto; /* Centrera horisontellt */
+  height: auto;
+  padding: 0 50px; 
 }
 
 .section {
   padding: 50px;
-  width: 170%;
+  width: 600px;
   height: auto;
-  max-width: 855px;
   border: 1px solid #000000;
   border-radius: 8px;
   background-color: #f0f3ef;
+  margin: 0 auto; 
   display: flex;
   flex-direction: column;
   align-items: center; /* Centrerar innehållet inuti sektionen */
   justify-content: center; /* Centrerar innehållet vertikalt */
-  align-items: center;
-  justify-content: center;
-  right: 50%;
   position: relative;
 }
+
 
 .searchable-mappings {
   margin-top: 15px;
@@ -113,6 +115,8 @@ ul {
   background-color: #ffffff;
   z-index: -1;
   transition: 0.8s;
+  top: 0;
+  border-radius: 0 0 50% 50%;
 }
 
 .RequestEditor button:hover,
@@ -124,14 +128,14 @@ ul {
 .RequestEditor button:hover::before,
 .sendButton:hover::before,
 .saveResponseButton:hover::before {
-  height: 180%;
+  height: 190%;
 }
 /* response*/
 
 .RequestEditor button:hover::before,
 .sendButton:hover::before,
 .saveResponseButton:hover::before {
-  height: 180%; /* Makes background fully visible on hover */
+  height: 200%; /* Makes background fully visible on hover */
 }
 
 /* response */
@@ -451,13 +455,3 @@ textarea {
 .createMappingButton:hover {
   background-color: #0056b3;
 }
-
-
-@media only screen and (max-width: 1440px) {
-  /* Your styles here */
-  .section {
-    right: 8%;
-    bottom: 200px
-  }
-}
-
