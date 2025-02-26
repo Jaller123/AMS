@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import MappingsPage from "../components/MappingPage/MappingPage";
+import MappingsPage from "./MappingPage/MappingPage";
 import style from "./Home.module.css";
 import laptop from "../assets/laptop.png";
 import logoo from "../assets/am.png";

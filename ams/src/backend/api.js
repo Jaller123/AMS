@@ -2,6 +2,8 @@ const API_BASE_URL = "http://localhost:8080";
 const API_WIREMOCK_URL = "http://localhost:8081/__admin"; 
 
 
+//AMS/WireMock--------------------------------------------------------------------------------------------------------------------------------
+
 const retryFetch = async (url, retries = 3, delay = 1000) => {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
@@ -84,7 +86,7 @@ export const fetchMappings = async () => {
 };
 
 
-// WireMock API
+// WireMock API--------------------------------------------------------------------------------------------------------------------------------
 
 export const fetchWireMockTraffic = async () => {
   try {
@@ -153,6 +155,7 @@ export const handleSendToWireMock = async (mappingId) => {
   }
 };
 
+//Mappings--------------------------------------------------------------------------------------------------------------------------------
 
 export const saveMapping = async (mapping) => {
   try {
@@ -248,5 +251,66 @@ export const updateResponse = async (responseId, updatedResponse) => {
   } catch (error) {
     console.error("Error updating response:", error);
     throw error;
+  }
+};
+
+// Scenarios ---------------------------------------------------------------------------------------------------------------------------
+
+
+export const fetchScenarios = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/scenarios`);
+    if (!response.ok) throw new Error("Failed to fetch scenarios");
+    const data = await response.json();
+    return data.scenarios;
+  } catch (error) {
+    console.error("Error fetching scenarios:", error);
+    return [];
+  }
+};
+
+export const saveScenario = async (scenario) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/scenarios`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ scenario }),
+    });
+    if (!response.ok) throw new Error("Failed to save scenario");
+    const data = await response.json();
+    return data.scenario;
+  } catch (error) {
+    console.error("Error saving scenario:", error);
+    return null;
+  }
+};
+
+export const updateScenario = async (scenarioId, scenario) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/scenarios/${scenarioId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ scenario }),
+    });
+    if (!response.ok) throw new Error("Failed to update scenario");
+    const data = await response.json();
+    return data.scenario;
+  } catch (error) {
+    console.error("Error updating scenario:", error);
+    return null;
+  }
+};
+
+export const deleteScenario = async (scenarioId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/scenarios/${scenarioId}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) throw new Error("Failed to delete scenario");
+    const data = await response.json();
+    return data.success;
+  } catch (error) {
+    console.error("Error deleting scenario:", error);
+    return false;
   }
 };

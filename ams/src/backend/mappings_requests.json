@@ -1,3 +1,44 @@
 [
-  
+  {
+    "id": "1",
+    "resJson": {
+      "title": "Test",
+      "urlPathPattern": "/test/testing",
+      "method": "GET",
+      "headers": {
+        "Content-Type": {
+          "equalTo": "application/json"
+        }
+      },
+      "bodyPatterns": [
+        {
+          "equalToJson": {
+            "body": "text"
+          }
+        }
+      ]
+    },
+    "wireMockId": "b822a99c-6ee5-48e2-a2b2-845e12a96816"
+  },
+  {
+    "id": "2",
+    "resJson": {
+      "title": "try",
+      "url": "/try ",
+      "method": "GET",
+      "headers": {
+        "Content-Type": {
+          "equalTo": "application/json"
+        }
+      },
+      "bodyPatterns": [
+        {
+          "equalToJson": {
+            "body": "text"
+          }
+        }
+      ]
+    },
+    "wireMockId": "f28972fa-f5a9-4fba-99c0-f50575556cfc"
+  }
 ]
