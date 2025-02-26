@@ -1,18 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { fetchMappings } from "../../backend/api";
+import styles from "./CreateScenario.module.css";
 
 const CreateScenario = () => {
   const [mappings, setMappings] = useState([]);
   const [responses, setResponses] = useState([]);
-  const [selectedMapping, setSelectedMapping] = useState(null);
+  const [openMappingId, setOpenMappingId] = useState(null);
+  const [scenarios, setScenarios] = useState([]);
+  const [openScenarioId, setOpenScenarioId] = useState(null);
 
   useEffect(() => {
     const loadMappings = async () => {
       try {
         const data = await fetchMappings();
-        console.log("API Response:", data); // Debug-logga API-datan
+        console.log("API Response:", data);
         setMappings(data.requests);
-        setResponses(data.responses); // Spara responses separat
+        setResponses(data.responses);
       } catch (error) {
         console.error("Error fetching mappings:", error);
       }
@@ -21,77 +24,145 @@ const CreateScenario = () => {
     loadMappings();
   }, []);
 
-  // Filtrera ut rätt response för det valda mapping-id:t
-  const relevantResponses = responses.filter(
-    (res) => res.reqId === selectedMapping?.id
-  );
+  const toggleDropdown = (mappingId) => {
+    setOpenMappingId(openMappingId === mappingId ? null : mappingId);
+  };
+
+  const toggleScenarioDropdown = (scenarioId) => {
+    setOpenScenarioId(openScenarioId === scenarioId ? null : scenarioId);
+  };
+
+  // Lägg till en mapping som ett nytt scenario
+  const useMappingForScenario = (mapping) => {
+    const relevantResponses = responses.filter(
+      (res) => res.reqId === mapping.id
+    );
+    const newScenario = {
+      id: scenarios.length + 1,
+      mapping,
+      responses: relevantResponses,
+    };
+    setScenarios([...scenarios, newScenario]);
+  };
+
+  // Ta bort ett scenario
+  const deleteScenario = (scenarioId) => {
+    const updatedScenarios = scenarios
+      .filter((scenario) => scenario.id !== scenarioId) // Ta bort det valda scenariot
+      .map((scenario, index) => ({ ...scenario, id: index + 1 })); // Uppdatera numreringen
+    setScenarios(updatedScenarios);
+  };
 
   return (
-    <div style={{ display: "flex", gap: "20px" }}>
-      <div style={{ flex: 1, borderRight: "1px solid #ccc", padding: "20px" }}>
+    <div className={styles.container}>
+      {/* Vänster sida - Scenarios */}
+      <div className={styles.leftPanel}>
         <h1>Create Scenario</h1>
+        {scenarios.length === 0 ? (
+          <p>No scenarios created yet.</p>
+        ) : (
+          <div className={styles.scenarioList}>
+            {scenarios.map((scenario) => (
+              <div key={scenario.id} className={styles.scenarioItem}>
+                <div
+                  className={styles.scenarioHeader}
+                  onClick={() => toggleScenarioDropdown(scenario.id)}
+                >
+                  <span>Scenario {scenario.id}</span>
+                  <span className={styles.arrow}>
+                    {openScenarioId === scenario.id ? "▲" : "▼"}
+                  </span>
+                </div>
+
+                {openScenarioId === scenario.id && (
+                  <div className={styles.scenarioDetails}>
+                    <h3>Request</h3>
+                    <pre className={styles.preFormatted}>
+                      {JSON.stringify(scenario.mapping.request, null, 2)}
+                    </pre>
+
+                    <h3>Responses</h3>
+                    {scenario.responses.length > 0 ? (
+                      scenario.responses.map((res) => (
+                        <pre key={res.id} className={styles.preFormatted}>
+                          {JSON.stringify(res.resJson, null, 2)}
+                        </pre>
+                      ))
+                    ) : (
+                      <p>No response found for this scenario.</p>
+                    )}
+
+                    <button
+                      className={`${styles.button} ${styles.deleteButton}`}
+                      onClick={() => deleteScenario(scenario.id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
-      <div style={{ flex: 1, padding: "20px" }}>
+      {/* Höger sida - Sparade Mappningar */}
+      <div className={styles.rightPanel}>
         <h2>Saved Mappings</h2>
         {mappings.length === 0 ? (
-          <p>Inga mappningar hittades.</p>
+          <p>No Mappings Found.</p>
         ) : (
-          <ul>
-            {mappings.map((mapping) => (
-              <li
-                key={mapping.id}
-                onClick={() => setSelectedMapping(mapping)}
-                style={{
-                  cursor: "pointer",
-                  padding: "10px",
-                  border: "1px solid #ddd",
-                  marginBottom: "10px",
-                  background:
-                    selectedMapping?.id === mapping.id ? "#f0f0f0" : "white",
-                }}
-              >
-                <strong>ID:</strong> {mapping.id} - <strong>URL:</strong>{" "}
-                {mapping.resJson?.url || "Ingen URL"}
-              </li>
-            ))}
-          </ul>
-        )}
+          <div className={styles.mappingList}>
+            {mappings.map((mapping) => {
+              const relevantResponses = responses.filter(
+                (res) => res.reqId === mapping.id
+              );
 
-        {selectedMapping && (
-          <div
-            style={{
-              marginTop: "20px",
-              borderTop: "1px solid #ccc",
-              paddingTop: "10px",
-            }}
-          >
-            <h3>Details</h3>
-            <p>
-              <strong>ID:</strong> {selectedMapping.id}
-            </p>
-            <h4>Request:</h4>
-            <pre style={{ background: "#eee", padding: "10px" }}>
-              {JSON.stringify(selectedMapping.request, null, 2)}
-            </pre>
+              return (
+                <div key={mapping.id} className={styles.mappingItem}>
+                  <div
+                    className={styles.mappingHeader}
+                    onClick={() => toggleDropdown(mapping.id)}
+                  >
+                    <span>
+                      <strong>{mapping.request?.method || "METHOD"}</strong> |{" "}
+                      {mapping.request?.url || "No URL"} |{" "}
+                      {mapping.request?.title || "No Title"}
+                    </span>
+                    <span className={styles.arrow}>
+                      {openMappingId === mapping.id ? "▲" : "▼"}
+                    </span>
+                  </div>
 
-            <h4>Responses:</h4>
-            {relevantResponses.length > 0 ? (
-              relevantResponses.map((res) => (
-                <pre
-                  key={res.id}
-                  style={{
-                    background: "#eee",
-                    padding: "10px",
-                    marginTop: "10px",
-                  }}
-                >
-                  {JSON.stringify(res.resJson, null, 2)}
-                </pre>
-              ))
-            ) : (
-              <p>Ingen respons hittades för denna mappning.</p>
-            )}
+                  {openMappingId === mapping.id && (
+                    <div className={styles.mappingDetails}>
+                      <h3>Request</h3>
+                      <pre className={styles.preFormatted}>
+                        {JSON.stringify(mapping.request, null, 2)}
+                      </pre>
+
+                      <h3>Responses</h3>
+                      {relevantResponses.length > 0 ? (
+                        relevantResponses.map((res) => (
+                          <pre key={res.id} className={styles.preFormatted}>
+                            {JSON.stringify(res.resJson, null, 2)}
+                          </pre>
+                        ))
+                      ) : (
+                        <p>No response found for this mapping.</p>
+                      )}
+
+                      <button
+                        className={`${styles.button} ${styles.useButton}`}
+                        onClick={() => useMappingForScenario(mapping)}
+                      >
+                        Use This Mapping
+                      </button>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
