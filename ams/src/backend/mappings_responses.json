@@ -40,5 +40,23 @@
       }
     },
     "timestamp": "2025-02-26 10:40:23"
+        "body": "text"
+      }
+    },
+    "timestamp": "2025-02-26 10:26:32"
+  },
+  {
+    "id": "2.1",
+    "reqId": "2",
+    "resJson": {
+      "status": "230",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "body": "text"
+      }
+    },
+    "timestamp": "2025-02-26 11:39:15"
   }
 ]

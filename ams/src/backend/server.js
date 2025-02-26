@@ -16,6 +16,7 @@ const __dirname = path.dirname(__filename);
 
 const requestsFile = path.join(__dirname, "./mappings_requests.json");
 const responseFile = path.join(__dirname, "./mappings_responses.json");
+const scenariosFile = path.join(__dirname, "./scenarios.json") 
 
 // Helper för nästa ID
 const getNextId = (mappings) => {
@@ -496,6 +497,103 @@ app.get("/traffic", async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 });
+
+//Detta läser Scenarion från filen
+const readScenarios = () => {
+  if (!fs.existsSync(scenariosFile)) return []
+  return JSON.parse(fs.readFileSync(scenariosFile, "utf-8"))
+}
+
+//Skriver Scenarion till filen
+const writeScenarios = (scenarios) => {
+  fs.writeFileSync(scenariosFile, JSON.stringify(scenarios, null, 2)) 
+}
+
+//Hämtar nästa scenarios Id
+const getNextScenarioId = (scenarios) => {
+  if (scenarios.length === 0) return "1"
+  const maxId = Math.max(...scenarios.map((s) => parseInt(s.id, 10)))
+  return String(maxId + 1)
+}
+
+//Gör GET anrop på /scenarios för att hämta alla scenarios
+app.get ("/scenarios", (req, res) => {
+  const scenarios = readScenarios()
+  res.json({ scenarios })
+})
+
+//Skapar en ny scenario
+app.post("/scenarios", (req, res) => {
+  const { scenario } = req.body
+  let scenarios = readScenarios()
+  const id = getNextScenarioId(scenarios)
+
+  if (scenario.mappings && Array.isArray(scenario.mappings)) {
+    scenario.mappings = scenario.mappings.map(mapping => ({
+      request: mapping.request,
+      response: mapping.response
+    }))
+  }
+  const newScenario =  { id, ...scenario }
+  scenarios.push(newScenario)
+  writeScenarios(scenarios)
+  res.json({ success: true, scenario: newScenario })
+})
+
+//Uppdaterar scenarios
+app.put("/scenarios/:id", (req, res) => {
+  const { id } = req.params;
+  const { scenario } = req.body; // scenario = { name, mappings: [...], responses: [...] }
+
+  let scenarios = readScenarios();
+  const index = scenarios.findIndex((s) => s.id === id);
+  if (index === -1) {
+    return res.status(404).json({ success: false, message: "Scenario not found" });
+  }
+
+  // Merge new data into existing scenario
+  const existingScenario = scenarios[index];
+
+  // Merge scenario name if provided
+  if (scenario.name) {  
+    existingScenario.name = scenario.name;
+  }
+
+  // Merge new mappings
+  if (scenario.mappings && scenario.mappings.length) {
+    const cleanMapping = scenario.mappings.map(mapping => ({
+      request: mapping.request,
+      response: mapping.response 
+    }))
+    existingScenario.mappings = [
+      ...(existingScenario.mappings || []),
+      ...cleanMapping
+    ];
+  }
+
+  if (scenario.responses && scenario.responses.length) {
+    existingScenario.responses = [
+      ...(existingScenario.responses || []),
+      ...scenario.responses,
+    ];
+  }
+
+  // Save updated scenario
+  scenarios[index] = existingScenario;
+  writeScenarios(scenarios);
+
+  res.json({ success: true, scenario: existingScenario });
+});
+
+
+//Tar bort scenarios
+app.delete("/scenarios/:id", (req, res) => {
+  const {id} = req.params
+  let scenarios = readScenarios()
+  scenarios = scenarios.filter((s) => s.id !== id)
+  writeScenarios(scenarios)
+  res.json({success: true})
+})
 
 app.listen(8080, () => {
   console.log("Server running on http://localhost:8080");

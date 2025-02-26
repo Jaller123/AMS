@@ -17,6 +17,7 @@
 .mappingList {
   list-style: none;
   padding: 0;
+  margin-top: 10px;
 }
 
 .mappingItem {
@@ -35,6 +36,7 @@
   justify-content: space-between;
   align-items: center;
   font-weight: bold;
+  transition: background 0.2s ease;
 }
 
 .mappingHeader:hover {
@@ -42,8 +44,7 @@
 }
 
 .arrow {
-  margin-left: auto;
-  font-size: 16px;
+  font-size: 18px;
 }
 
 .mappingDetails {
@@ -57,7 +58,9 @@
   padding: 10px;
   margin-top: 10px;
   border-radius: 4px;
+  overflow-x: auto;
 }
+
 .useButton {
   margin-top: 10px;
   padding: 8px 12px;
@@ -67,28 +70,32 @@
   border-radius: 5px;
   cursor: pointer;
   font-size: 14px;
-  transition: background 0.3s ease;
+  transition: background 0.3s ease, transform 0.2s ease;
 }
 
 .useButton:hover {
   background-color: #0056b3;
+  transform: scale(1.03);
 }
 
-.scenarioDetails {
-  border: 1px solid #ddd;
-  padding: 15px;
-  background: #f8f8f8;
+.deleteButton {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
   border-radius: 5px;
-  margin-top: 15px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.3s ease, transform 0.2s ease;
 }
 
-.scenarioDetails pre {
-  background: #eee;
-  padding: 10px;
-  border-radius: 5px;
-  overflow-x: auto;
+.deleteButton:hover {
+  background-color: #b02a37;
+  transform: scale(1.03);
 }
-/* Scenario-knapp */
+
+/* Scenario styles */
 .scenarioHeader {
   padding: 10px;
   background: #007bff;
@@ -100,10 +107,33 @@
   align-items: center;
   font-weight: bold;
   margin-bottom: 5px;
+  transition: background 0.2s ease;
 }
 
 .scenarioHeader:hover {
   background: #0056b3;
+}
+
+/* Highlight drop target */
+.dropHighlight {
+  background: #cceeff !important;
+  transition: background 0.3s ease;
+}
+
+/* Slide in animation */
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.slideIn {
+  animation: slideIn 0.5s ease-out;
 }
 
 .scenarioDetails {
@@ -121,24 +151,14 @@
   overflow-x: auto;
 }
 
-/* Stil för listan av scenarier */
+/* Scenario list styling */
 .scenarioList {
   margin-top: 10px;
 }
 
-/* Stil för listan av sparade mappningar */
-.mappingList {
-  margin-top: 10px;
-}
-
-/* Dropdown-pil */
-.arrow {
-  font-size: 18px;
-}
-
-/* Generell knappstil */
+/* General button style */
 .button {
-  width: 100%; /* Tar upp hela bredden av sin container */
+  width: 100%;
   padding: 12px;
   font-size: 16px;
   font-weight: bold;
@@ -147,26 +167,4 @@
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.3s ease, transform 0.2s ease;
-}
-
-/* Använd-knapp */
-.useButton {
-  background-color: #007bff;
-  color: white;
-}
-
-.useButton:hover {
-  background-color: #0056b3;
-  transform: scale(1.03);
-}
-
-/* Delete-knapp */
-.deleteButton {
-  background-color: #dc3545;
-  color: white;
-}
-
-.deleteButton:hover {
-  background-color: #b02a37;
-  transform: scale(1.03);
 }

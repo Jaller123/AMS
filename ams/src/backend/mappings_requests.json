@@ -4,6 +4,8 @@
     "resJson": {
       "title": "fetching data",
       "url": "/data",
+      "title": "Test",
+      "urlPathPattern": "/test/testing",
       "method": "GET",
       "headers": {
         "Content-Type": {
@@ -14,11 +16,13 @@
         {
           "equalToJson": {
             "body": "hello"
+            "body": "text"
           }
         }
       ]
     },
     "wireMockId": null
+    "wireMockId": "b822a99c-6ee5-48e2-a2b2-845e12a96816"
   },
   {
     "id": "2",
@@ -46,6 +50,8 @@
     "resJson": {
       "title": "test url",
       "urlPattern": "/ /your/([a-z]*)\\?with=query",
+      "title": "try",
+      "url": "/try ",
       "method": "GET",
       "headers": {
         "Content-Type": {
@@ -56,10 +62,12 @@
         {
           "equalToJson": {
             "body": "test url"
+            "body": "text"
           }
         }
       ]
     },
     "wireMockId": null
+    "wireMockId": "f28972fa-f5a9-4fba-99c0-f50575556cfc"
   }
 ]

@@ -455,3 +455,9 @@ textarea {
 .createMappingButton:hover {
   background-color: #0056b3;
 }
+
+@media only screen and (min-width: 1838px){
+  .section {
+    width: 825px;
+  }
+}
