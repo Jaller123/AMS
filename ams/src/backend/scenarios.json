@@ -1,3 +1,84 @@
 [
- 
+  {
+    "id": "1",
+    "name": "New Scenario 1",
+    "mappings": [
+      {
+        "request": {
+          "title": "title",
+          "url": "/title",
+          "method": "GET",
+          "headers": {
+            "Content-Type": {
+              "equalTo": "application/json"
+            }
+          },
+          "bodyPatterns": [
+            {
+              "equalToJson": {
+                "body": "req"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "responses": [
+      {
+        "id": "1.1",
+        "reqId": "1",
+        "resJson": {
+          "status": "200",
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "body": "res"
+          }
+        },
+        "timestamp": "2025-02-27 10:36:23"
+      }
+    ]
+  },
+  {
+    "id": "1",
+    "name": "New Scenario 1",
+    "mappings": [
+      {
+        "request": {
+          "title": "title",
+          "url": "/title",
+          "method": "GET",
+          "headers": {
+            "Content-Type": {
+              "equalTo": "application/json"
+            }
+          },
+          "bodyPatterns": [
+            {
+              "equalToJson": {
+                "body": "req"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "responses": [
+      {
+        "id": "1.1",
+        "reqId": "1",
+        "resJson": {
+          "status": "200",
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "body": "res"
+          }
+        },
+        "timestamp": "2025-02-27 10:36:23"
+      }
+    ]
+  }
 ]

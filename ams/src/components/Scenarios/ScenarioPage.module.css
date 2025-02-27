@@ -1,0 +1,160 @@
+/* Grundstil för sidan */
+body {
+  font-family: "Arial", sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f4;
+  color: #333;
+}
+
+/* Huvudcontainer för scenarier */
+.scenarioPageContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* Rubrik */
+h1 {
+  font-size: 28px;
+  color: #2c3e50;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Meddelande om inga scenarier */
+p {
+  font-size: 16px;
+  color: #666;
+  text-align: center;
+}
+
+/* Lista med sparade scenarier */
+.scenarioList {
+  width: 100%;
+  max-width: 600px; /* Smalare bredd för bättre centrerad layout */
+}
+
+/* Enskilt scenario */
+.scenarioItem {
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.scenarioItem:hover {
+  transform: scale(1.02);
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Scenario-header */
+.scenarioHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 18px;
+  font-weight: bold;
+  color: #2c3e50;
+  padding: 10px 0;
+  cursor: pointer;
+}
+
+.scenarioHeader .arrow {
+  font-size: 16px;
+  color: #555;
+}
+
+/* Detaljcontainer för requests och responses */
+.scenarioDetails {
+  background-color: #f8f8f8;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 10px;
+  border: 1px solid #ddd;
+}
+
+/* Stil för request/response innehåll */
+.scenarioDetails h3 {
+  font-size: 16px;
+  color: #444;
+  margin-bottom: 10px;
+}
+
+/* Ljusare bakgrund för att matcha sparade mappningar */
+.preFormatted {
+  background: #f0f0f0;
+  color: #333;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  border: 1px solid #ddd;
+}
+
+/* Delete-knapp */
+.deleteButton {
+  background-color: #e74c3c;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+  width: 100%;
+}
+
+.deleteButton:hover {
+  background-color: #c0392b;
+  transform: scale(1.03);
+}
+
+/* Skapa nytt scenario-knapp */
+.createScenarioContainer {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 20px;
+}
+
+/* Knappen för att skapa nya scenarier */
+.createScenarioButton {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 15px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease-in-out;
+  text-align: center;
+  max-width: 250px; /* Begränsar storleken så den ser snygg ut */
+  width: 100%;
+}
+
+/* Hover-effekt för att ge en bättre känsla */
+.createScenarioButton:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+
+/* Responsiv anpassning */
+@media (max-width: 768px) {
+  .scenarioList {
+    max-width: 90%; /* Gör listan mer responsiv */
+  }
+
+  .createScenarioButton {
+    font-size: 14px;
+    padding: 12px 15px;
+    max-width: 200px;
+  }
+}

@@ -9,8 +9,8 @@ import MappingsPage from "./components/MappingPage/MappingPage.jsx";
 import MappingDetailPage from "./components/MappingDetailPage";
 import TrafficPage from "./components/TrafficPage";
 import ReqDetailPage from "./components/ReqDetailPage";
-import ScenariosPage from "./components/MappingPage/ScenariosPage.jsx";
-import CreateScenario from "./components/MappingPage/CreateScenario.jsx";
+import ScenariosPage from "./components/Scenarios/ScenariosPage.jsx";
+import CreateScenario from "./components/Scenarios/CreateScenario.jsx";
 
 import button from "./components/button.jsx";
 import {

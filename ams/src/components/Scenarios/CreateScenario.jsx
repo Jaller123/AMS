@@ -3,7 +3,7 @@ import {
   fetchMappings,
   fetchScenarios,
   saveScenario,
-  updateScenario
+  updateScenario,
 } from "../../backend/api";
 import styles from "./CreateScenario.module.css";
 
@@ -53,11 +53,19 @@ const CreateScenario = () => {
     const newScenarioData = {
       name: `New Scenario ${scenarios.length + 1}`,
       mappings: [],
-      responses: []
+      responses: [],
     };
-    const savedScenario = await saveScenario(newScenarioData);
-    if (savedScenario) {
-      setScenarios([...scenarios, savedScenario]);
+    // Kolla om ett scenario med samma id eller name redan finns
+    const existingScenario = scenarios.find(
+      (sc) => sc.id === newScenarioData.id || sc.name === newScenarioData.name
+    );
+    if (!existingScenario) {
+      const savedScenario = await saveScenario(newScenarioData);
+      if (savedScenario) {
+        setScenarios([...scenarios, savedScenario]);
+      }
+    } else {
+      console.log("Scenario already exists");
     }
   };
 
@@ -98,17 +106,19 @@ const CreateScenario = () => {
       (res) => res.reqId === droppedMapping.id
     );
     const updatedScenarioData = {
-      // If you need the name updated, you can include scenario.name here
       mappings: [droppedMapping],
       responses: relevantResponses,
     };
-    
-    const updatedScenario = await updateScenario(scenario.id, updatedScenarioData);
+
+    const updatedScenario = await updateScenario(
+      scenario.id,
+      updatedScenarioData
+    );
 
     if (updatedScenario) {
-      // Update local state with the new scenario data.
-      setScenarios(scenarios.map((sc) => (sc.id === scenario.id ? updatedScenario : sc)));
-      // Trigger slide-in animation
+      setScenarios(
+        scenarios.map((sc) => (sc.id === scenario.id ? updatedScenario : sc))
+      );
       setDroppingScenarioId(scenario.id);
       setTimeout(() => {
         setDroppingScenarioId(null);
@@ -116,9 +126,23 @@ const CreateScenario = () => {
     }
   };
 
+  const handleSaveScenario = async (scenario) => {
+    try {
+      const savedScenario = await saveScenario(scenario);
+
+      if (savedScenario) {
+        setScenarios(scenarios.filter((sc) => sc.id !== scenario.id));
+
+        alert("Scenario saved and moved to ScenarioPage!");
+      }
+    } catch (error) {
+      console.error("Error saving scenario:", error);
+      alert("Failed to save scenario.");
+    }
+  };
+
   return (
     <div className={styles.container}>
-      {/* Left Panel – Scenarios */}
       <div className={styles.leftPanel}>
         <h1>Create Scenario</h1>
         <button onClick={handleCreateNewScenario} className={styles.button}>
@@ -128,12 +152,19 @@ const CreateScenario = () => {
           <p>No scenarios created yet.</p>
         ) : (
           <div className={styles.scenarioList}>
-            {scenarios.map((scenario) => (
-              <div key={scenario.id} className={styles.scenarioItem}>
+            {scenarios.map((scenario, index) => (
+              <div
+                key={`scenario-${scenario.id}-${scenario.name}-${index}`}
+                className={styles.scenarioItem}
+              >
                 <div
                   className={`${styles.scenarioHeader} ${
-                    highlightedScenarioId === scenario.id ? styles.dropHighlight : ""
-                  } ${droppingScenarioId === scenario.id ? styles.slideIn : ""}`}
+                    highlightedScenarioId === scenario.id
+                      ? styles.dropHighlight
+                      : ""
+                  } ${
+                    droppingScenarioId === scenario.id ? styles.slideIn : ""
+                  }`}
                   onClick={() => toggleScenarioDropdown(scenario.id)}
                   onDragOver={handleDragOverScenario}
                   onDragEnter={(e) => handleDragEnterScenario(e, scenario)}
@@ -152,7 +183,10 @@ const CreateScenario = () => {
                     <h3>Mappings</h3>
                     {scenario.mappings && scenario.mappings.length > 0 ? (
                       scenario.mappings.map((m) => (
-                        <pre key={m.id} className={styles.preFormatted}>
+                        <pre
+                          key={`mapping-${m.id}`}
+                          className={styles.preFormatted}
+                        >
                           {JSON.stringify(m.request, null, 2)}
                         </pre>
                       ))
@@ -162,7 +196,10 @@ const CreateScenario = () => {
                     <h3>Responses</h3>
                     {scenario.responses && scenario.responses.length > 0 ? (
                       scenario.responses.map((res) => (
-                        <pre key={res.id} className={styles.preFormatted}>
+                        <pre
+                          key={`response-${res.id}`}
+                          className={styles.preFormatted}
+                        >
                           {JSON.stringify(res.resJson, null, 2)}
                         </pre>
                       ))
@@ -172,10 +209,18 @@ const CreateScenario = () => {
                     <button
                       className={`${styles.button} ${styles.deleteButton}`}
                       onClick={() =>
-                        setScenarios(scenarios.filter((sc) => sc.id !== scenario.id))
+                        setScenarios(
+                          scenarios.filter((sc) => sc.id !== scenario.id)
+                        )
                       }
                     >
                       Delete Scenario
+                    </button>
+                    <button
+                      className={`${styles.button} ${styles.saveButton}`}
+                      onClick={() => handleSaveScenario(scenario)}
+                    >
+                      Save & Move to ScenarioPage
                     </button>
                   </div>
                 )}
@@ -185,46 +230,14 @@ const CreateScenario = () => {
         )}
       </div>
 
-      {/* Right Panel – Saved Mappings */}
       <div className={styles.rightPanel}>
         <h2>Saved Mappings</h2>
         {mappings.length === 0 ? (
           <p>No Mappings Found.</p>
         ) : (
           <div className={styles.mappingList}>
-            {mappings.map((mapping) => {
-              const relevantResponses = responses.filter(
-                (res) => res.reqId === mapping.id
-              );
-
-              return (
-                <div key={mapping.id} className={styles.mappingItem}>
-                  <div
-                    className={styles.mappingHeader}
-                    onClick={() => toggleDropdown(mapping.id)}
-                  >
-                    <span>
-                      <strong>{mapping.request?.method || "METHOD"}</strong> -{" "}
-                      {mapping.request?.url || "No URL"} -{" "}
-                      {mapping.request?.title || "No Title"}
-                    </span>
-                    <span className={styles.arrow}>
-                      {openMappingId === mapping.id ? "▲" : "▼"}
-                    </span>
-                  </div>
-
-                  {openMappingId === mapping.id && (
-                    <div className={styles.mappingDetails}>
-                      <h3>Request</h3>
-                      <pre className={styles.preFormatted}>
-                        {JSON.stringify(mapping.request, null, 2)}
-                      </pre>
-
-                      <h3>Responses</h3>
-                      {relevantResponses.length > 0 ? (
-                        relevantResponses.map((res) => (
             {mappings.map((mapping) => (
-              <div key={mapping.id} className={styles.mappingItem}>
+              <div key={`mapping-${mapping.id}`} className={styles.mappingItem}>
                 <div
                   className={styles.mappingHeader}
                   onClick={() => toggleMappingDropdown(mapping.id)}
@@ -234,7 +247,7 @@ const CreateScenario = () => {
                   style={{
                     cursor: "grab",
                     opacity: draggingMappingId === mapping.id ? 0.6 : 1,
-                    transition: "opacity 0.2s ease, transform 0.2s ease"
+                    transition: "opacity 0.2s ease, transform 0.2s ease",
                   }}
                 >
                   <span>
@@ -258,29 +271,18 @@ const CreateScenario = () => {
                       {JSON.stringify(mapping.request, null, 2)}
                     </pre>
                     <h3>Responses</h3>
-                    {responses.filter((res) => res.reqId === mapping.id).length > 0 ? (
+                    {responses.filter((res) => res.reqId === mapping.id)
+                      .length > 0 ? (
                       responses
                         .filter((res) => res.reqId === mapping.id)
                         .map((res) => (
-                          <pre key={res.id} className={styles.preFormatted}>
+                          <pre
+                            key={`response-${res.id}`}
+                            className={styles.preFormatted}
+                          >
                             {JSON.stringify(res.resJson, null, 2)}
                           </pre>
                         ))
-                      ) : (
-                        <p>No response found for this mapping.</p>
-                      )}
-
-                      <button
-                        className={`${styles.button} ${styles.useButton}`}
-                        onClick={() => useMappingForScenario(mapping)}
-                      >
-                        Add To Scenario
-                      </button>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
                     ) : (
                       <p>No response found for this mapping.</p>
                     )}

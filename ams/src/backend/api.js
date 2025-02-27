@@ -1,6 +1,5 @@
 const API_BASE_URL = "http://localhost:8080";
-const API_WIREMOCK_URL = "http://localhost:8081/__admin"; 
-
+const API_WIREMOCK_URL = "http://localhost:8081/__admin";
 
 //AMS/WireMock--------------------------------------------------------------------------------------------------------------------------------
 
@@ -12,30 +11,36 @@ const retryFetch = async (url, retries = 3, delay = 1000) => {
       return await response.json();
     } catch (error) {
       console.warn(`⚠️ Attempt ${attempt} failed: ${error.message}`);
-      
+
       if (attempt === retries) {
         console.error("❌ All retry attempts failed:", error.message);
         return { error: true }; // ✅ Return an error object instead of throwing
       }
-      
+
       await new Promise((res) => setTimeout(res, delay));
     }
   }
 };
 
-
 export const fetchMappings = async () => {
   try {
     // ✅ Step 1: Check if WireMock is running
-    let wiremockRunning = false
+    let wiremockRunning = false;
     try {
-    const healthResponse = await retryFetch(`${API_BASE_URL}/health`, 5, 1500);
-     wiremockRunning = healthResponse.wiremockRunning === true;
-    console.log(healthResponse)
-    } catch(error) {
-      console.log("🩺 WireMock Health Status:", wiremockRunning ? "Running ✅" : "Down ❌");
+      const healthResponse = await retryFetch(
+        `${API_BASE_URL}/health`,
+        5,
+        1500
+      );
+      wiremockRunning = healthResponse.wiremockRunning === true;
+      console.log(healthResponse);
+    } catch (error) {
+      console.log(
+        "🩺 WireMock Health Status:",
+        wiremockRunning ? "Running ✅" : "Down ❌"
+      );
     }
-    
+
     // ✅ Step 2: Fetch mappings from backend (Always available)
     const response = await fetch(`${API_BASE_URL}/mappings`);
     if (!response.ok) throw new Error("Failed to fetch mappings");
@@ -46,8 +51,14 @@ export const fetchMappings = async () => {
     // ✅ Step 3: Fetch WireMock mappings only if it's running
     if (wiremockRunning) {
       try {
-        const wireMockData = await retryFetch(`${API_WIREMOCK_URL}/mappings`, 3, 1000);
-        wireMockMappings = new Set(wireMockData.mappings.map(mapping => mapping.id));
+        const wireMockData = await retryFetch(
+          `${API_WIREMOCK_URL}/mappings`,
+          3,
+          1000
+        );
+        wireMockMappings = new Set(
+          wireMockData.mappings.map((mapping) => mapping.id)
+        );
 
         console.log("✅ WireMock Mappings:", wireMockMappings);
       } catch (error) {
@@ -84,7 +95,6 @@ export const fetchMappings = async () => {
     return { requests: [], responses: [] };
   }
 };
-
 
 // WireMock API--------------------------------------------------------------------------------------------------------------------------------
 
@@ -255,7 +265,6 @@ export const updateResponse = async (responseId, updatedResponse) => {
 };
 
 // Scenarios ---------------------------------------------------------------------------------------------------------------------------
-
 
 export const fetchScenarios = async () => {
   try {

@@ -8,10 +8,10 @@
         "Content-Type": "application/json"
       },
       "body": {
-        "body": "hello"
+        "body": "res"
       }
     },
-    "timestamp": "2025-02-26 10:28:51"
+    "timestamp": "2025-02-27 10:36:23"
   },
   {
     "id": "2.1",
@@ -22,41 +22,9 @@
         "Content-Type": "application/json"
       },
       "body": {
-        "body": "test"
+        "body": "hello"
       }
     },
-    "timestamp": "2025-02-26 10:30:04"
-  },
-  {
-    "id": "3.1",
-    "reqId": "3",
-    "resJson": {
-      "status": "203",
-      "headers": {
-        "Content-Type": "application/json"
-      },
-      "body": {
-        "body": "testing"
-      }
-    },
-    "timestamp": "2025-02-26 10:40:23"
-        "body": "text"
-      }
-    },
-    "timestamp": "2025-02-26 10:26:32"
-  },
-  {
-    "id": "2.1",
-    "reqId": "2",
-    "resJson": {
-      "status": "230",
-      "headers": {
-        "Content-Type": "application/json"
-      },
-      "body": {
-        "body": "text"
-      }
-    },
-    "timestamp": "2025-02-26 11:39:15"
+    "timestamp": "2025-02-27 10:38:46"
   }
 ]
