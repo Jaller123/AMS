@@ -3,7 +3,7 @@ import {
   fetchMappings,
   fetchScenarios,
   saveScenario,
-  updateScenario,
+  updateScenario
 } from "../../backend/api";
 import styles from "./CreateScenario.module.css";
 
@@ -11,12 +11,12 @@ const CreateScenario = () => {
   const [mappings, setMappings] = useState([]);
   const [responses, setResponses] = useState([]);
   const [scenarios, setScenarios] = useState([]);
-  const [expandMappingId, setExpandMappingId] = useState(null);
-  const [openScenarioId, setOpenScenarioId] = useState(null);
-  const [highlightedScenarioId, setHighlightedScenarioId] = useState(null);
+  const [newScenarioMappings, setNewScenarioMappings] = useState([])
   const [draggingMappingId, setDraggingMappingId] = useState(null);
-  const [droppingScenarioId, setDroppingScenarioId] = useState(null);
-
+  const [expandMappingIdLeft, setExpandMappingIdLeft] = useState(null)
+  const [expandMappingIdRight, setExpandMappingIdRight] = useState(null)
+  const [highlighted, setHighlighted] = useState(false)
+  
   // Load mappings and scenarios on component mount
   useEffect(() => {
     const loadData = async () => {
@@ -39,35 +39,14 @@ const CreateScenario = () => {
   }, []);
 
   // Toggle expanded state for a mapping
-  const toggleMappingDropdown = (mappingId) => {
-    setExpandMappingId(expandMappingId === mappingId ? null : mappingId);
+  const toggleMappingDropdownLeft = (mappingId) => {
+    setExpandMappingIdLeft(expandMappingIdLeft === mappingId ? null : mappingId);
   };
 
-  // Toggle expanded state for a scenario
-  const toggleScenarioDropdown = (scenarioId) => {
-    setOpenScenarioId(openScenarioId === scenarioId ? null : scenarioId);
+  const toggleMappingDropdownRight = (mappingId) => {
+    setExpandMappingIdRight(expandMappingIdRight === mappingId ? null : mappingId);
   };
-
-  // Create a new scenario with empty mappings/responses
-  const handleCreateNewScenario = async () => {
-    const newScenarioData = {
-      name: `New Scenario ${scenarios.length + 1}`,
-      mappings: [],
-      responses: [],
-    };
-    // Kolla om ett scenario med samma id eller name redan finns
-    const existingScenario = scenarios.find(
-      (sc) => sc.id === newScenarioData.id || sc.name === newScenarioData.name
-    );
-    if (!existingScenario) {
-      const savedScenario = await saveScenario(newScenarioData);
-      if (savedScenario) {
-        setScenarios([...scenarios, savedScenario]);
-      }
-    } else {
-      console.log("Scenario already exists");
-    }
-  };
+  
 
   // When a mapping is dragged, set its data and mark it as dragging.
   const handleDragStartMapping = (e, mapping) => {
@@ -79,168 +58,80 @@ const CreateScenario = () => {
     setDraggingMappingId(null);
   };
 
-  // Allow dropping by preventing default on the scenario header.
-  const handleDragOverScenario = (e) => {
-    e.preventDefault();
-  };
+  const handleDragOverDropZone = (e) => {
+    e.preventDefault()
+    setHighlighted(true)
+  }
 
-  // When a mapping enters a scenario drop target, highlight it.
-  const handleDragEnterScenario = (e, scenario) => {
-    e.preventDefault();
-    setHighlightedScenarioId(scenario.id);
-  };
+  const handleDragLeaveDropZone = (e) => {
+    e.preventDefault()
+    setHighlighted(false)
+  }
 
-  // Remove highlight when the draggable leaves the scenario drop target.
-  const handleDragLeaveScenario = (e, scenario) => {
-    setHighlightedScenarioId(null);
-  };
+  const handleDropOnDropZone = (e) => {
+    e.preventDefault()
+    setHighlighted(false)
+    const jsonData = e.dataTransfer.getData("application/json")
+    if (!jsonData) return
+    const droppedMapping = JSON.parse(jsonData)
+  
 
-  // When a mapping is dropped on a scenario, merge it into that scenario.
-  const handleDropOnScenario = async (e, scenario) => {
-    e.preventDefault();
-    setHighlightedScenarioId(null);
-    const jsonData = e.dataTransfer.getData("application/json");
-    if (!jsonData) return;
-    const droppedMapping = JSON.parse(jsonData);
-    const relevantResponses = responses.filter(
-      (res) => res.reqId === droppedMapping.id
-    );
-    const updatedScenarioData = {
-      mappings: [droppedMapping],
-      responses: relevantResponses,
+  const cleanMapping = {
+    request: droppedMapping.request,
+    response: droppedMapping.response,
+    id: droppedMapping.id
+  }
+
+  const cleanResponses = responses.filter(
+    (res) => res.reqId === droppedMapping.id
+  )
+
+
+  const alreadyExists = newScenarioMappings.some(
+    (m) => m.request.title === cleanMapping.request.title
+  )
+  if (!alreadyExists) {
+    setNewScenarioMappings([...newScenarioMappings, cleanMapping]);
+  }
+}
+
+
+
+  // Create a new scenario with empty mappings/responses
+  const handleSaveNewScenario = async () => {
+    const newScenarioData = {
+      name: `New Scenario ${scenarios.length + 1}`,
+      mappings: newScenarioMappings,
+      responses: []
     };
 
-    const updatedScenario = await updateScenario(
-      scenario.id,
-      updatedScenarioData
-    );
-
-    if (updatedScenario) {
-      setScenarios(
-        scenarios.map((sc) => (sc.id === scenario.id ? updatedScenario : sc))
-      );
-      setDroppingScenarioId(scenario.id);
-      setTimeout(() => {
-        setDroppingScenarioId(null);
-      }, 500); // duration matches CSS animation duration
+    const savedScenario = await saveScenario(newScenarioData);
+    if (savedScenario) {
+      setScenarios([...scenarios, savedScenario]);
+      setNewScenarioMappings([])
+      alert("New Scenario Saved Succesfully!")
     }
   };
-
-  const handleSaveScenario = async (scenario) => {
-    try {
-      const savedScenario = await saveScenario(scenario);
-
-      if (savedScenario) {
-        setScenarios(scenarios.filter((sc) => sc.id !== scenario.id));
-
-        alert("Scenario saved and moved to ScenarioPage!");
-      }
-    } catch (error) {
-      console.error("Error saving scenario:", error);
-      alert("Failed to save scenario.");
-    }
-  };
-
   return (
     <div className={styles.container}>
-      <div className={styles.leftPanel}>
-        <h1>Create Scenario</h1>
-        <button onClick={handleCreateNewScenario} className={styles.button}>
-          Create New Scenario
-        </button>
-        {scenarios.length === 0 ? (
-          <p>No scenarios created yet.</p>
+      {/* Left Panel – Scenarios */}
+      <div className={styles.leftPanel}
+      onDragOver={handleDragOverDropZone}
+      onDragLeave={handleDragLeaveDropZone}
+      onDrop={handleDropOnDropZone}
+      style={{ background: highlighted ? "#e6f7ff" : "" }}>
+        
+        <h1>Create a New Scenario</h1>
+        <p>Drag over which mappings you want to add to the right panel to create a new Scenario.</p>
+        {newScenarioMappings.length === 0 ? (
+          <p>No Mappings added yet</p>
         ) : (
-          <div className={styles.scenarioList}>
-            {scenarios.map((scenario, index) => (
-              <div
-                key={`scenario-${scenario.id}-${scenario.name}-${index}`}
-                className={styles.scenarioItem}
-              >
-                <div
-                  className={`${styles.scenarioHeader} ${
-                    highlightedScenarioId === scenario.id
-                      ? styles.dropHighlight
-                      : ""
-                  } ${
-                    droppingScenarioId === scenario.id ? styles.slideIn : ""
-                  }`}
-                  onClick={() => toggleScenarioDropdown(scenario.id)}
-                  onDragOver={handleDragOverScenario}
-                  onDragEnter={(e) => handleDragEnterScenario(e, scenario)}
-                  onDragLeave={(e) => handleDragLeaveScenario(e, scenario)}
-                  onDrop={(e) => handleDropOnScenario(e, scenario)}
-                >
-                  <span>
-                    Scenario {scenario.id}: {scenario.name}
-                  </span>
-                  <span className={styles.arrow}>
-                    {openScenarioId === scenario.id ? "▲" : "▼"}
-                  </span>
-                </div>
-                {openScenarioId === scenario.id && (
-                  <div className={styles.scenarioDetails}>
-                    <h3>Mappings</h3>
-                    {scenario.mappings && scenario.mappings.length > 0 ? (
-                      scenario.mappings.map((m) => (
-                        <pre
-                          key={`mapping-${m.id}`}
-                          className={styles.preFormatted}
-                        >
-                          {JSON.stringify(m.request, null, 2)}
-                        </pre>
-                      ))
-                    ) : (
-                      <p>No mappings in this scenario.</p>
-                    )}
-                    <h3>Responses</h3>
-                    {scenario.responses && scenario.responses.length > 0 ? (
-                      scenario.responses.map((res) => (
-                        <pre
-                          key={`response-${res.id}`}
-                          className={styles.preFormatted}
-                        >
-                          {JSON.stringify(res.resJson, null, 2)}
-                        </pre>
-                      ))
-                    ) : (
-                      <p>No responses in this scenario.</p>
-                    )}
-                    <button
-                      className={`${styles.button} ${styles.deleteButton}`}
-                      onClick={() =>
-                        setScenarios(
-                          scenarios.filter((sc) => sc.id !== scenario.id)
-                        )
-                      }
-                    >
-                      Delete Scenario
-                    </button>
-                    <button
-                      className={`${styles.button} ${styles.saveButton}`}
-                      onClick={() => handleSaveScenario(scenario)}
-                    >
-                      Save & Move to ScenarioPage
-                    </button>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <div className={styles.rightPanel}>
-        <h2>Saved Mappings</h2>
-        {mappings.length === 0 ? (
-          <p>No Mappings Found.</p>
-        ) : (
-          <div className={styles.mappingList}>
-            {mappings.map((mapping) => (
-              <div key={`mapping-${mapping.id}`} className={styles.mappingItem}>
+          <ul className={styles.mappingList}>
+            {newScenarioMappings.map((mapping, index) => (
+              <div key={mapping.id || index} className={styles.mappingItem}>
                 <div
                   className={styles.mappingHeader}
-                  onClick={() => toggleMappingDropdown(mapping.id)}
+                  onClick={() => toggleMappingDropdownLeft(mapping.id)}
                   draggable
                   onDragStart={(e) => handleDragStartMapping(e, mapping)}
                   onDragEnd={handleDragEndMapping}
@@ -260,11 +151,8 @@ const CreateScenario = () => {
                       "No URL"}{" "}
                     | {mapping.request?.title || "No Title"}
                   </span>
-                  <span className={styles.arrow}>
-                    {expandMappingId === mapping.id ? "▲" : "▼"}
-                  </span>
                 </div>
-                {expandMappingId === mapping.id && (
+                {expandMappingIdLeft === mapping.id && (
                   <div className={styles.mappingDetails}>
                     <h3>Request</h3>
                     <pre className={styles.preFormatted}>
@@ -276,10 +164,71 @@ const CreateScenario = () => {
                       responses
                         .filter((res) => res.reqId === mapping.id)
                         .map((res) => (
-                          <pre
-                            key={`response-${res.id}`}
-                            className={styles.preFormatted}
-                          >
+                          <pre key={res.id} className={styles.preFormatted}>
+                            {JSON.stringify(res.resJson, null, 2)}
+                          </pre>
+                        ))
+                    ) : (
+                      <p>No response found for this mapping.</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </ul>
+        )}
+        <button onClick={handleSaveNewScenario} className={styles.button}>
+          Save Scenario
+        </button>
+          
+ 
+      </div>
+
+      {/* Right Panel – Saved Mappings */}
+      <div className={styles.rightPanel}>
+        <h2>Saved Mappings</h2>
+        {mappings.length === 0 ? (
+          <p>No Mappings Found.</p>
+        ) : (
+          <div className={styles.mappingList}>
+            {mappings.map((mapping) => (
+              <div key={mapping.id} className={styles.mappingItem}>
+                <div
+                  className={styles.mappingHeader}
+                  onClick={() => toggleMappingDropdownRight(mapping.id)}
+                  draggable
+                  onDragStart={(e) => handleDragStartMapping(e, mapping)}
+                  onDragEnd={handleDragEndMapping}
+                  style={{
+                    cursor: "grab",
+                    opacity: draggingMappingId === mapping.id ? 0.6 : 1,
+                    transition: "opacity 0.2s ease, transform 0.2s ease",
+                  }}
+                >
+                  <span>
+                    <strong>{mapping.request?.method || "METHOD"}</strong> |{" "}
+                    {mapping.request?.url ||
+                      mapping.request?.urlPath ||
+                      mapping.request?.urlPathPattern ||
+                      mapping.request?.urlPathTemplate ||
+                      mapping.request?.urlPattern ||
+                      "No URL"}{" "}
+                    | {mapping.request?.title || "No Title"}
+                  </span>
+                </div>
+                {expandMappingIdRight === mapping.id && (
+                  <div className={styles.mappingDetails}>
+                    <h3>Request</h3>
+                    <pre className={styles.preFormatted}>
+                      {JSON.stringify(mapping.request, null, 2)}
+                    </pre>
+                    <h3>Responses</h3>
+                    {responses.filter((res) => res.reqId === mapping.id)
+                      .length > 0 ? (
+                      responses
+                        .filter((res) => res.reqId === mapping.id)
+                        .map((res) => (
+                          <pre key={res.id} className={styles.preFormatted}>
                             {JSON.stringify(res.resJson, null, 2)}
                           </pre>
                         ))
