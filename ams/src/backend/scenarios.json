@@ -20,34 +20,13 @@
               }
             }
           ]
-        }
-      }
-    ],
-    "responses": [
-      {
-        "id": "1.1",
-        "reqId": "1",
-        "resJson": {
-          "status": "200",
-          "headers": {
-            "Content-Type": "application/json"
-          },
-          "body": {
-            "body": "res"
-          }
         },
-        "timestamp": "2025-02-27 10:36:23"
-      }
-    ]
-  },
-  {
-    "id": "1",
-    "name": "New Scenario 1",
-    "mappings": [
+        "response": {}
+      },
       {
         "request": {
-          "title": "title",
-          "url": "/title",
+          "title": "/fetching",
+          "url": "/user",
           "method": "GET",
           "headers": {
             "Content-Type": {
@@ -57,27 +36,12 @@
           "bodyPatterns": [
             {
               "equalToJson": {
-                "body": "req"
+                "body": "hello"
               }
             }
           ]
-        }
-      }
-    ],
-    "responses": [
-      {
-        "id": "1.1",
-        "reqId": "1",
-        "resJson": {
-          "status": "200",
-          "headers": {
-            "Content-Type": "application/json"
-          },
-          "body": {
-            "body": "res"
-          }
         },
-        "timestamp": "2025-02-27 10:36:23"
+        "response": {}
       }
     ]
   }

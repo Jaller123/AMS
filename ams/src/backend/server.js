@@ -524,21 +524,30 @@ app.get ("/scenarios", (req, res) => {
 
 //Skapar en ny scenario
 app.post("/scenarios", (req, res) => {
-  const { scenario } = req.body
-  let scenarios = readScenarios()
-  const id = getNextScenarioId(scenarios)
+  const { scenario } = req.body;
+  let scenarios = readScenarios();
+  const id = getNextScenarioId(scenarios);
 
-  if (scenario.mappings && Array.isArray(scenario.mappings)) {
-    scenario.mappings = scenario.mappings.map(mapping => ({
-      request: mapping.request,
-      response: mapping.response
-    }))
-  }
-  const newScenario =  { id, ...scenario }
-  scenarios.push(newScenario)
-  writeScenarios(scenarios)
-  res.json({ success: true, scenario: newScenario })
-})
+  // Ensure each mapping has both "request" and "response"
+  const cleanMappings = (scenario.mappings && Array.isArray(scenario.mappings))
+    ? scenario.mappings.map(mapping => ({
+        request: mapping.request,
+        response: mapping.response || {} // ensure a response key is always present
+      }))
+    : [];
+
+  // Build new scenario object with only the desired keys
+  const newScenario = {
+    id,
+    name: scenario.name,
+    mappings: cleanMappings
+  };
+
+  scenarios.push(newScenario);
+  writeScenarios(scenarios);
+  res.json({ success: true, scenario: newScenario });
+});
+
 
 //Uppdaterar scenarios
 app.put("/scenarios/:id", (req, res) => {

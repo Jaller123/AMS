@@ -128,7 +128,7 @@ const MappingItem = ({
           {mapping.status}
         </span>
         <h3 className={mapping.isActive ? styles.active : styles.inactive}>
-          {mapping.isActive ? "✅ " : "❌ "}
+          {mapping.isActive ? "✅ " : "❌"}
         </h3>
         <button
           ref={toggleButtonRef}
