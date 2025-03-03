@@ -1,7 +1,7 @@
 [
   {
     "id": "1",
-    "name": "New Scenario 0",
+    "name": "New Scenario 1",
     "mappings": [
       {
         "request": {
@@ -17,25 +17,6 @@
             {
               "equalToJson": {
                 "body": "req"
-              }
-            }
-          ]
-        }
-      },
-      {
-        "request": {
-          "title": "/fetching",
-          "url": "/user",
-          "method": "GET",
-          "headers": {
-            "Content-Type": {
-              "equalTo": "application/json"
-            }
-          },
-          "bodyPatterns": [
-            {
-              "equalToJson": {
-                "body": "hello"
               }
             }
           ]
@@ -56,26 +37,12 @@
           }
         },
         "timestamp": "2025-02-27 10:36:23"
-      },
-      {
-        "id": "2.1",
-        "reqId": "2",
-        "resJson": {
-          "status": "200",
-          "headers": {
-            "Content-Type": "application/json"
-          },
-          "body": {
-            "body": "hello"
-          }
-        },
-        "timestamp": "2025-02-27 10:38:46"
       }
     ]
   },
   {
     "id": "1",
-    "name": "New Scenario 0",
+    "name": "New Scenario 1",
     "mappings": [
       {
         "request": {
@@ -91,25 +58,6 @@
             {
               "equalToJson": {
                 "body": "req"
-              }
-            }
-          ]
-        }
-      },
-      {
-        "request": {
-          "title": "/fetching",
-          "url": "/user",
-          "method": "GET",
-          "headers": {
-            "Content-Type": {
-              "equalTo": "application/json"
-            }
-          },
-          "bodyPatterns": [
-            {
-              "equalToJson": {
-                "body": "hello"
               }
             }
           ]
@@ -130,27 +78,7 @@
           }
         },
         "timestamp": "2025-02-27 10:36:23"
-      },
-      {
-        "id": "2.1",
-        "reqId": "2",
-        "resJson": {
-          "status": "200",
-          "headers": {
-            "Content-Type": "application/json"
-          },
-          "body": {
-            "body": "hello"
-          }
-        },
-        "timestamp": "2025-02-27 10:38:46"
       }
     ]
-  },
-  {
-    "id": "2",
-    "name": "New Scenario 0",
-    "mappings": [],
-    "responses": []
   }
 ]
