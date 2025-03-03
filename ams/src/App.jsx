@@ -12,7 +12,7 @@ import ReqDetailPage from "./components/ReqDetailPage";
 import ScenariosPage from "./components/Scenarios/ScenariosPage.jsx";
 import CreateScenario from "./components/Scenarios/CreateScenario.jsx";
 
-import button from "./components/button.jsx";
+import Button from "./components/Button.jsx";
 import {
   fetchMappings,
   saveMapping,
