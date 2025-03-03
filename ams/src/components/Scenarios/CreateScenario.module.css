@@ -168,3 +168,12 @@
   cursor: pointer;
   transition: background 0.3s ease, transform 0.2s ease;
 }
+
+.removeMapping{
+  color: red; /* Red text for inactive */
+  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.0rem;
+}

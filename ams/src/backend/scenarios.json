@@ -1,3 +1,48 @@
 [
- 
+  {
+    "id": "1",
+    "name": "New Scenario 1",
+    "mappings": [
+      {
+        "request": {
+          "title": "title",
+          "url": "/title",
+          "method": "GET",
+          "headers": {
+            "Content-Type": {
+              "equalTo": "application/json"
+            }
+          },
+          "bodyPatterns": [
+            {
+              "equalToJson": {
+                "body": "req"
+              }
+            }
+          ]
+        },
+        "response": {}
+      },
+      {
+        "request": {
+          "title": "/fetching",
+          "url": "/user",
+          "method": "GET",
+          "headers": {
+            "Content-Type": {
+              "equalTo": "application/json"
+            }
+          },
+          "bodyPatterns": [
+            {
+              "equalToJson": {
+                "body": "hello"
+              }
+            }
+          ]
+        },
+        "response": {}
+      }
+    ]
+  }
 ]

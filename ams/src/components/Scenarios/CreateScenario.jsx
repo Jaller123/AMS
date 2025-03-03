@@ -6,6 +6,8 @@ import {
   updateScenario
 } from "../../backend/api";
 import styles from "./CreateScenario.module.css";
+import useMappingSearch from "./useMappingSearch";
+import SortControls from "../MappingPage/SortControls";
 
 const CreateScenario = () => {
   const [mappings, setMappings] = useState([]);
@@ -37,6 +39,16 @@ const CreateScenario = () => {
     };
     loadData();
   }, []);
+
+  const {
+    filteredMappings,
+    search,
+    setSearch,
+    searchFilters,
+    setSearchFilters,
+    sortCriterion,
+    setSortCriterion,
+  } = useMappingSearch(mappings)
 
   // Toggle expanded state for a mapping
   const toggleMappingDropdownLeft = (mappingId) => {
@@ -85,7 +97,7 @@ const CreateScenario = () => {
   const cleanResponses = responses.filter(
     (res) => res.reqId === droppedMapping.id
   )
-
+  
 
   const alreadyExists = newScenarioMappings.some(
     (m) => m.request.title === cleanMapping.request.title
@@ -94,15 +106,17 @@ const CreateScenario = () => {
     setNewScenarioMappings([...newScenarioMappings, cleanMapping]);
   }
 }
-
-
-
   // Create a new scenario with empty mappings/responses
   const handleSaveNewScenario = async () => {
+    if (newScenarioMappings.length === 0) {
+      alert("Please add atleast one mapping to create a new Scenario.")
+      return
+    }
+
+    else {
     const newScenarioData = {
       name: `New Scenario ${scenarios.length + 1}`,
-      mappings: newScenarioMappings,
-      responses: []
+      mappings: newScenarioMappings
     };
 
     const savedScenario = await saveScenario(newScenarioData);
@@ -111,7 +125,16 @@ const CreateScenario = () => {
       setNewScenarioMappings([])
       alert("New Scenario Saved Succesfully!")
     }
+    }
   };
+  
+
+  const handleRemoveMapping = (mappingId) => {
+    setNewScenarioMappings((prevMappings) => {
+     return  prevMappings.filter((mapping) => mapping.id !== mappingId)
+    })
+  }
+
   return (
     <div className={styles.container}>
       {/* Left Panel – Scenarios */}
@@ -120,7 +143,15 @@ const CreateScenario = () => {
       onDragLeave={handleDragLeaveDropZone}
       onDrop={handleDropOnDropZone}
       style={{ background: highlighted ? "#e6f7ff" : "" }}>
-        
+        <SortControls 
+        setSortCriterion={setSortCriterion}
+        searchFilters={searchFilters}
+        setSearchFilters={setSearchFilters}
+        search={search}
+        filteredMappings={filteredMappings}
+        setSearch={setSearch}
+        sortCriterion={sortCriterion}
+        />
         <h1>Create a New Scenario</h1>
         <p>Drag over which mappings you want to add to the right panel to create a new Scenario.</p>
         {newScenarioMappings.length === 0 ? (
@@ -151,6 +182,11 @@ const CreateScenario = () => {
                       "No URL"}{" "}
                     | {mapping.request?.title || "No Title"}
                   </span>
+                  <button 
+                  className={styles.removeMapping}
+                  onClick={() => handleRemoveMapping(mapping.id)}>
+                    ❌
+                  </button>
                 </div>
                 {expandMappingIdLeft === mapping.id && (
                   <div className={styles.mappingDetails}>
@@ -187,11 +223,11 @@ const CreateScenario = () => {
       {/* Right Panel – Saved Mappings */}
       <div className={styles.rightPanel}>
         <h2>Saved Mappings</h2>
-        {mappings.length === 0 ? (
+        {filteredMappings.length === 0 ? (
           <p>No Mappings Found.</p>
         ) : (
           <div className={styles.mappingList}>
-            {mappings.map((mapping) => (
+            {filteredMappings.map((mapping) => (
               <div key={mapping.id} className={styles.mappingItem}>
                 <div
                   className={styles.mappingHeader}
@@ -204,7 +240,7 @@ const CreateScenario = () => {
                     opacity: draggingMappingId === mapping.id ? 0.6 : 1,
                     transition: "opacity 0.2s ease, transform 0.2s ease",
                   }}
-                >
+                  >
                   <span>
                     <strong>{mapping.request?.method || "METHOD"}</strong> |{" "}
                     {mapping.request?.url ||
