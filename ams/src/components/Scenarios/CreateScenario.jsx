@@ -17,6 +17,7 @@ const CreateScenario = () => {
   const [draggingMappingId, setDraggingMappingId] = useState(null);
   const [expandMappingIdLeft, setExpandMappingIdLeft] = useState(null)
   const [expandMappingIdRight, setExpandMappingIdRight] = useState(null)
+  const [scenarioName, setScenarioName] = useState("");
   const [highlighted, setHighlighted] = useState(false)
   
   // Load mappings and scenarios on component mount
@@ -96,7 +97,6 @@ const CreateScenario = () => {
     ReqId: droppedMapping.id,
     request: droppedMapping.request,
     response: droppedMappingResponse
-    
   }
 
   const cleanResponses = responses.filter(
@@ -118,16 +118,22 @@ const CreateScenario = () => {
       return
     }
 
+    if (!scenarioName.trim()) {
+      alert("Please enter a Title.")
+    }
+
     else {
-    const newScenarioData = {
-      name: `New Scenario ${scenarios.length + 1}`,
-      mappings: newScenarioMappings
-    };
+      const newScenarioData = {
+        name: scenarioName,
+        mappings: newScenarioMappings
+      };
+      
 
     const savedScenario = await saveScenario(newScenarioData);
     if (savedScenario) {
       setScenarios([...scenarios, savedScenario]);
       setNewScenarioMappings([])
+      setScenarioName("")
       alert("New Scenario Saved Succesfully!")
     }
     }
@@ -157,8 +163,14 @@ const CreateScenario = () => {
         setSearch={setSearch}
         sortCriterion={sortCriterion}
         />
+        <input placeholder="Enter Scenario Title Here"
+        value={scenarioName}
+        onChange={(e) => setScenarioName(e.target.value)}
+        >
+        </input>
         <h1>Create a New Scenario</h1>
         <p>Drag over which mappings you want to add to the right panel to create a new Scenario.</p>
+        
         {newScenarioMappings.length === 0 ? (
           <p>No Mappings added yet</p>
         ) : (
