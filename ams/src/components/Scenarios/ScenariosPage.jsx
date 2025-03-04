@@ -6,13 +6,13 @@ import styles from "./ScenarioPage.module.css";
 const ScenariosPage = () => {
   const navigate = useNavigate();
   const [scenarios, setScenarios] = useState([]);
-  const [expandedScenarios, setExpandedScenarios] = useState({});
+  const [expandedScenarioId, setExpandedScenarioId] = useState(null);
 
-  // Hämta sparade scenarier vid sidladdning
   useEffect(() => {
     const loadScenarios = async () => {
       try {
         const loadedScenarios = await fetchScenarios();
+        console.log("Loaded Scenarios:", loadedScenarios); // 🔍 Debug-logg
         setScenarios(loadedScenarios);
       } catch (error) {
         console.error("Error fetching scenarios:", error);
@@ -22,22 +22,21 @@ const ScenariosPage = () => {
     loadScenarios();
   }, []);
 
-  // Hantera borttagning av scenario
   const handleDeleteScenario = async (scenarioId) => {
     try {
       await deleteScenario(scenarioId);
-      setScenarios(scenarios.filter((scenario) => scenario.id !== scenarioId));
+      setScenarios((prev) =>
+        prev.filter((scenario) => scenario.id !== scenarioId)
+      );
     } catch (error) {
       console.error("Error deleting scenario:", error);
     }
   };
 
-  // Expandera/minimera scenarier
-  const toggleExpandScenario = (scenarioId) => {
-    setExpandedScenarios((prev) => ({
-      ...prev,
-      [scenarioId]: !prev[scenarioId],
-    }));
+  const toggleScenarioDropdown = (scenarioId) => {
+    setExpandedScenarioId(
+      expandedScenarioId === scenarioId ? null : scenarioId
+    );
   };
 
   return (
@@ -48,51 +47,54 @@ const ScenariosPage = () => {
         <p>No saved scenarios found.</p>
       ) : (
         <div className={styles.scenarioList}>
-          {scenarios.map((scenario, index) => (
+          {scenarios.map((scenario) => (
             <div
-              key={`scenario-${scenario.id}-${scenario.name}-${index}`}
+              key={`scenario-${scenario.id}`}
               className={styles.scenarioItem}
             >
+              {/* Scenario Header - Klickbar för att expandera/minimera */}
               <div
                 className={styles.scenarioHeader}
-                onClick={() => toggleExpandScenario(scenario.id)}
+                onClick={() => toggleScenarioDropdown(scenario.id)}
               >
-                <span>
-                  <strong>{scenario.name}</strong>
+                <span className={styles.scenarioTitle}>
+                  {scenario.name || "Untitled Scenario"}
                 </span>
                 <span className={styles.arrow}>
-                  {expandedScenarios[scenario.id] ? "▲" : "▼"}
+                  {expandedScenarioId === scenario.id ? "▲" : "▼"}
                 </span>
               </div>
 
-              {expandedScenarios[scenario.id] && (
+              {/* Dropdown-innehåll visas om scenariot är expanderat */}
+              {expandedScenarioId === scenario.id && (
                 <div className={styles.scenarioDetails}>
-                  <h3>Requests</h3>
-                  {scenario.mappings && scenario.mappings.length > 0 ? (
-                    scenario.mappings.map((m) => (
-                      <pre
-                        key={`mapping-${m.id}`}
-                        className={styles.preFormatted}
+                  {scenario.mappings.length > 0 ? (
+                    scenario.mappings.map((mapping, index) => (
+                      <div
+                        key={`mapping-${scenario.id}-${index}`}
+                        className={styles.mappingItem}
                       >
-                        {JSON.stringify(m.request, null, 2)}
-                      </pre>
-                    ))
-                  ) : (
-                    <p>No requests found.</p>
-                  )}
+                        {/* Titel visas i fetstil överst */}
+                        <p className={styles.scenarioMappingTitle}>
+                          <strong>Title:</strong>{" "}
+                          {mapping.request?.title || "No Title"}
+                        </p>
 
-                  <h3>Responses</h3>
-                  {scenario.responses && scenario.responses.length > 0 ? (
-                    scenario.responses.map((res) => (
-                      <pre
-                        key={`response-${res.id}`}
-                        className={styles.preFormatted}
-                      >
-                        {JSON.stringify(res.resJson, null, 2)}
-                      </pre>
+                        {/* Method och URL visas under varandra */}
+                        <div className={styles.mappingInfo}>
+                          <p>
+                            <strong>Method:</strong>{" "}
+                            {mapping.request?.method || "N/A"}
+                          </p>
+                          <p>
+                            <strong>URL:</strong>{" "}
+                            {mapping.request?.url || "N/A"}
+                          </p>
+                        </div>
+                      </div>
                     ))
                   ) : (
-                    <p>No responses found.</p>
+                    <p>No mappings found.</p>
                   )}
 
                   <button

@@ -158,3 +158,55 @@ p {
     max-width: 200px;
   }
 }
+/* Stil för hela scenariolistan */
+.scenarioList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Varje scenario får en tydlig box */
+.scenarioItem {
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Scenario-titeln (fetstil och stor) */
+.scenarioTitle {
+  font-size: 1.4rem;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 8px;
+}
+
+/* Mapping box */
+.mappingItem {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+/* Mapping-titel (fet och större text) */
+.scenarioMappingTitle {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+/* Info-text (method & URL) */
+.mappingInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 1rem;
+}
+
+.mappingInfo p {
+  margin: 0;
+  font-weight: normal;
+}

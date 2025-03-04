@@ -5,6 +5,26 @@
     "mappings": [
       {
         "request": {
+          "title": "/fetching",
+          "url": "/user",
+          "method": "GET",
+          "headers": {
+            "Content-Type": {
+              "equalTo": "application/json"
+            }
+          },
+          "bodyPatterns": [
+            {
+              "equalToJson": {
+                "body": "hello"
+              }
+            }
+          ]
+        },
+        "response": {}
+      },
+      {
+        "request": {
           "title": "title",
           "url": "/title",
           "method": "GET",
@@ -22,7 +42,13 @@
           ]
         },
         "response": {}
-      },
+      }
+    ]
+  },
+  {
+    "id": "2",
+    "name": "New Scenario 2",
+    "mappings": [
       {
         "request": {
           "title": "/fetching",
@@ -37,6 +63,32 @@
             {
               "equalToJson": {
                 "body": "hello"
+              }
+            }
+          ]
+        },
+        "response": {}
+      }
+    ]
+  },
+  {
+    "id": "3",
+    "name": "New Scenario 3",
+    "mappings": [
+      {
+        "request": {
+          "title": "title",
+          "url": "/title",
+          "method": "GET",
+          "headers": {
+            "Content-Type": {
+              "equalTo": "application/json"
+            }
+          },
+          "bodyPatterns": [
+            {
+              "equalToJson": {
+                "body": "req"
               }
             }
           ]
