@@ -76,7 +76,6 @@ const ScenariosPage = () => {
                       >
                         {/* Titel visas i fetstil överst */}
                         <p className={styles.scenarioMappingTitle}>
-                          <strong>Title:</strong>{" "}
                           {mapping.request?.title || "No Title"}
                         </p>
 
@@ -92,44 +91,20 @@ const ScenariosPage = () => {
                           </p>
                         </div>
                       </div>
-             
-              {expandedScenarios[scenario.id] && (
-                <div className={styles.scenarioDetails}>
-                  {scenario.mappings && scenario.mappings.length > 0 ? (
-                    scenario.mappings.map((mapping, mappingIndex) => (
-                      <div
-                        key={mapping.id || mappingIndex}
-                        className={styles.mappingItem}
-                      >   
-                          <span>
-                            <strong>
-                            {mapping.request?.method || "METHOD"}
-                            </strong>{" "}
-                            |{" "}
-                            {mapping.request?.url ||
-                              mapping.request?.urlPath ||
-                              mapping.request?.urlPathPattern ||
-                              mapping.request?.urlPathTemplate ||
-                              mapping.request?.urlPattern ||
-                              "No URL"}{" "}
-                            | {mapping.request?.title || "No Title"}
-                          </span>
-                        </div>
                     ))
                   ) : (
                     <p>No mappings found.</p>
                   )}
-                  
-                </div>
-              )}
-                 <button
+
+                  <button
                     className={`${styles.button} ${styles.deleteButton}`}
                     onClick={() => handleDeleteScenario(scenario.id)}
                   >
                     Delete Scenario
-            </button>
+                  </button>
+                </div>
+              )}
             </div>
-              
           ))}
         </div>
       )}
