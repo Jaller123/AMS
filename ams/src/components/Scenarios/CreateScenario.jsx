@@ -86,12 +86,17 @@ const CreateScenario = () => {
     const jsonData = e.dataTransfer.getData("application/json")
     if (!jsonData) return
     const droppedMapping = JSON.parse(jsonData)
+
+  const droppedMappingResponse = responses.find(
+    (res) => res.reqId === droppedMapping.id
+  ) || {}
   
 
   const cleanMapping = {
+    ReqId: droppedMapping.id,
     request: droppedMapping.request,
-    response: droppedMapping.response,
-    id: droppedMapping.id
+    response: droppedMappingResponse
+    
   }
 
   const cleanResponses = responses.filter(

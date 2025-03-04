@@ -64,46 +64,44 @@ const ScenariosPage = () => {
                   {expandedScenarios[scenario.id] ? "▲" : "▼"}
                 </span>
               </div>
-
+             
               {expandedScenarios[scenario.id] && (
                 <div className={styles.scenarioDetails}>
-                  <h3>Requests</h3>
                   {scenario.mappings && scenario.mappings.length > 0 ? (
-                    scenario.mappings.map((m) => (
-                      <pre
-                        key={`mapping-${m.id}`}
-                        className={styles.preFormatted}
-                      >
-                        {JSON.stringify(m.request, null, 2)}
-                      </pre>
-                    ))
-                  ) : (
-                    <p>No requests found.</p>
-                  )}
-
-                  <h3>Responses</h3>
-                  {scenario.responses && scenario.responses.length > 0 ? (
-                    scenario.responses.map((res) => (
-                      <pre
-                        key={`response-${res.id}`}
-                        className={styles.preFormatted}
-                      >
-                        {JSON.stringify(res.resJson, null, 2)}
-                      </pre>
+                    scenario.mappings.map((mapping, mappingIndex) => (
+                      <div
+                        key={mapping.id || mappingIndex}
+                        className={styles.mappingItem}
+                      >   
+                          <span>
+                            <strong>
+                            {mapping.request?.method || "METHOD"}
+                            </strong>{" "}
+                            |{" "}
+                            {mapping.request?.url ||
+                              mapping.request?.urlPath ||
+                              mapping.request?.urlPathPattern ||
+                              mapping.request?.urlPathTemplate ||
+                              mapping.request?.urlPattern ||
+                              "No URL"}{" "}
+                            | {mapping.request?.title || "No Title"}
+                          </span>
+                        </div>
                     ))
                   ) : (
                     <p>No responses found.</p>
                   )}
-
-                  <button
+                  
+                </div>
+              )}
+                 <button
                     className={`${styles.button} ${styles.deleteButton}`}
                     onClick={() => handleDeleteScenario(scenario.id)}
                   >
                     Delete Scenario
-                  </button>
-                </div>
-              )}
+            </button>
             </div>
+              
           ))}
         </div>
       )}
