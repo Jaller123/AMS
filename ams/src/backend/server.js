@@ -530,11 +530,29 @@ app.post("/scenarios", (req, res) => {
 
   // Ensure each mapping has both "request" and "response"
   const cleanMappings = (scenario.mappings && Array.isArray(scenario.mappings))
-    ? scenario.mappings.map(mapping => ({
-        request: mapping.request,
-        response: mapping.response || {} // ensure a response key is always present
-      }))
-    : [];
+  ? scenario.mappings.map(mapping => {
+      // Use mapping.id if available; otherwise, use mapping.ReqId from the front-end
+      const mappingId = mapping.id || mapping.ReqId;
+      
+      // Destructure the response to extract its id and the remaining properties
+      const { id: responseId, ...restResponse } = mapping.response || {};
+      return {
+        // Set the top-level reqId if needed
+        request: {
+          reqId: mappingId,  // Add reqId inside the request object
+          ...mapping.request  // Include all other request properties
+        },
+        response: Object.keys(mapping.response || {}).length > 0
+          ? {
+              resId: responseId,   // Rename the response id to resId   // Also include reqId in the response object
+              ...restResponse      // Spread the remaining response fields (like resJson, timestamp, etc.)
+            }
+          : {}
+      };
+    })
+  : [];
+
+
 
   // Build new scenario object with only the desired keys
   const newScenario = {
