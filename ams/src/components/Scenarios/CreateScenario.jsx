@@ -94,7 +94,7 @@ const CreateScenario = () => {
   
 
   const cleanMapping = {
-    ReqId: droppedMapping.id,
+    id: droppedMapping.id,
     request: droppedMapping.request,
     response: droppedMappingResponse
   }
@@ -154,25 +154,17 @@ const CreateScenario = () => {
       onDragLeave={handleDragLeaveDropZone}
       onDrop={handleDropOnDropZone}
       style={{ background: highlighted ? "#e6f7ff" : "" }}>
-        <SortControls 
-        setSortCriterion={setSortCriterion}
-        searchFilters={searchFilters}
-        setSearchFilters={setSearchFilters}
-        search={search}
-        filteredMappings={filteredMappings}
-        setSearch={setSearch}
-        sortCriterion={sortCriterion}
-        />
+       
+        <h1 style={{color: highlighted ? "#2c3e50" : "white"}}>Create a New Scenario</h1>
+        <p style={{color: highlighted ? "#666" : "white"}}>Drag and drop which mappings you want to add to the right panel and choose a title to create a new Scenario.</p>
         <input placeholder="Enter Scenario Title Here"
         value={scenarioName}
         onChange={(e) => setScenarioName(e.target.value)}
+        className={styles.inputTitle}
         >
         </input>
-        <h1>Create a New Scenario</h1>
-        <p>Drag over which mappings you want to add to the right panel to create a new Scenario.</p>
-        
         {newScenarioMappings.length === 0 ? (
-          <p>No Mappings added yet</p>
+          <p style={{color: "white"}}>No Mappings added yet</p>
         ) : (
           <ul className={styles.mappingList}>
             {newScenarioMappings.map((mapping, index) => (
@@ -240,6 +232,15 @@ const CreateScenario = () => {
       {/* Right Panel – Saved Mappings */}
       <div className={styles.rightPanel}>
         <h2>Saved Mappings</h2>
+        <SortControls 
+        setSortCriterion={setSortCriterion}
+        searchFilters={searchFilters}
+        setSearchFilters={setSearchFilters}
+        search={search}
+        filteredMappings={filteredMappings}
+        setSearch={setSearch}
+        sortCriterion={sortCriterion}
+        />
         {filteredMappings.length === 0 ? (
           <p>No Mappings Found.</p>
         ) : (

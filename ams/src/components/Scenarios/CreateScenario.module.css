@@ -177,3 +177,14 @@
   justify-content: center;
   font-size: 1.0rem;
 }
+
+.h1 {
+  color: white;
+}
+
+.inputTitle {
+  padding: 10px;
+  margin: 10px;
+  font-size: 15px;
+  text-align: center;
+}
