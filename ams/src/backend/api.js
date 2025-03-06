@@ -152,7 +152,6 @@ export const handleSendToWireMock = async (mappingId) => {
     const data = await response.json();
 
     if (data.success) {
-      alert("Mapping sent to WireMock successfully!");
       return data; // ✅ Return the response so MappingsPage can handle updates
     } else {
       alert("Failed to send mapping to WireMock.");

@@ -247,7 +247,7 @@ app.post("/mappings/:id/send", async (req, res) => {
     // Update the saved mapping with the WireMock UUID
     mappingEntry.wireMockId = data.id ?? data.uuid;
     fs.writeFileSync(requestsFile, JSON.stringify(requests, null, 2));
-    return res.json({ success: true, wireMockIdd: mappingEntry.wireMockId });
+    return res.json({ success: true, wireMockId: mappingEntry.wireMockId });
   } catch (error) {
     console.error("❌ Error sending mapping to WireMock:", error);
     return res.status(500).json({ success: false, message: error.message });
