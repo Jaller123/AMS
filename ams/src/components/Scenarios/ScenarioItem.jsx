@@ -6,7 +6,7 @@ const ScenarioItem = ({
   expanded,
   toggleScenarioDropdown,
   handleDeleteScenario,
-  handleSendScenarioToWireMock,
+  handleSendScenario,
 }) => {
   return (
     <li className={styles.scenarioItem}>
@@ -38,8 +38,8 @@ const ScenarioItem = ({
           ) : (
             <p>No mappings found.</p>
           )}
-           {handleSendScenarioToWireMock && (
-            <button onClick={() => handleSendScenarioToWireMock(scenario)} className={`${styles.button} ${styles.wireMockButton}`}>
+           {handleSendScenario && (
+            <button onClick={() => handleSendScenario(scenario.id)} className={`${styles.button} ${styles.wireMockButton}`}>
               Send to WireMock
             </button>
           )}

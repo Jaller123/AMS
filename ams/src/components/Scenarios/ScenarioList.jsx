@@ -19,7 +19,7 @@ const ScenarioList = ({
             expanded={expandedScenarioId === scenario.id}
             toggleScenarioDropdown={toggleScenarioDropdown}
             handleDeleteScenario={handleDeleteScenario}
-            handleSendScenarioToWireMock={handleSendScenarioToWireMock}
+            handleSendScenario={handleSendScenarioToWireMock}
           />
         ))
       ) : (

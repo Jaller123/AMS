@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchScenarios, deleteScenario, handleSendToWireMock } from "../../backend/api";
+import { fetchScenarios, deleteScenario, handleSendToWireMock, handleSendScenarioToWireMock } from "../../backend/api";
 import ScenarioList from "./ScenarioList"
 import styles from "./ScenarioPage.module.css";
 
@@ -24,30 +24,11 @@ const ScenariosPage = () => {
     loadScenarios();
   }, []);
 
- const handleSendScenarioToWireMock = async (scenario) => {
-    if (!scenario.mappings || scenario.mappings.length === 0) {
-      console.warn("No mappings to send for this scenario.");
-      return;
+  const handleSendScenario = async(scenarioId) => {
+    const result = await handleSendScenarioToWireMock(scenarioId);
+    if (result && result.success) {
+      alert("Scenario sent Succesfully")
     }
-
-   const results = await Promise.all(
-    scenario.mappings.map((mappings) => {
-      const mappingId = mappings.request.reqId
-      return handleSendToWireMock(mappingId)
-    })
-   )
-
-    if (results.every((result) => result && result.success)) {
-      alert("All mappings sent to WireMock successfully!");
-      return{ ...mapping, wireMockId: results.wireMockId}
-    } 
-    else {
-      alert("Some mappings failed to send to WireMock.");
-    }
-
-    setScenarios((prevScenarios) => 
-    prevScenarios.map((s) => 
-    s.id === scenario.id ? { ...s, mappings: updatedMappings } : s))
   }
 
   const handleDeleteScenario = async (scenarioId) => {
@@ -75,7 +56,7 @@ const ScenariosPage = () => {
         scenarios={scenarios}
         expandedScenarioId={expandedScenarioId}
         handleDeleteScenario={handleDeleteScenario}
-        handleSendScenarioToWireMock={handleSendScenarioToWireMock}
+        handleSendScenarioToWireMock={handleSendScenario}
         toggleScenarioDropdown={toggleScenarioDropdown}
       />
     )}
