@@ -1,5 +1,6 @@
 import React from "react";
 import styles from "./ScenarioPage.module.css";
+import { useNavigate } from "react-router-dom";
 
 const ScenarioItem = ({
   scenario,
@@ -12,6 +13,8 @@ const ScenarioItem = ({
   
   const getMappingDetails = (reqId) =>
     mappings.find(mapping => mapping.id === reqId) || {};
+
+  const navigate = useNavigate()
 
   console.log(mappings)
   return (
@@ -54,6 +57,11 @@ const ScenarioItem = ({
           ) : (
             <p>No mappings found.</p>
           )}
+          <button
+          onClick={() => navigate(`/edit-scenario/${scenario.id}`)}
+          className={`${styles.button} ${styles.wireMockButton}`}>
+            Edit Scenario
+          </button>
           {handleSendScenario && (
             <button
               onClick={() => handleSendScenario(scenario.id)}
