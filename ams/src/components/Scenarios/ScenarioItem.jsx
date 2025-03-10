@@ -3,50 +3,75 @@ import styles from "./ScenarioPage.module.css";
 
 const ScenarioItem = ({
   scenario,
-  expandedScenarios,
-  setExpandedScenarios,
+  mappings = [], 
+  expanded,
+  toggleScenarioDropdown,
   handleDeleteScenario,
-  handleSendScenarioToWireMock,
+  handleSendScenario,
 }) => {
-  const handleDelete = () => {
-    handleDeleteScenario(scenario.id);
-  };
+  
+  const getMappingDetails = (reqId) =>
+    mappings.find(mapping => mapping.id === reqId) || {};
 
+  console.log(mappings)
   return (
     <li className={styles.scenarioItem}>
-      <div>
-        <strong>{scenario.name}</strong>
-        {/* Om du vill ha en expanderbar vy */}
-        <button
-          onClick={() =>
-            setExpandedScenarios((prev) => ({
-              ...prev,
-              [scenario.id]: !prev[scenario.id],
-            }))
-          }
-        >
-          {expandedScenarios[scenario.id] ? "Collapse" : "Expand"}
-        </button>
+      <div
+        className={styles.scenarioHeader}
+        onClick={() => toggleScenarioDropdown(scenario.id)}
+      >
+        <span className={styles.scenarioTitle}>
+          {scenario.name || "Untitled Scenario"}
+        </span>
       </div>
 
-      {expandedScenarios[scenario.id] && (
-        <div>
-          <p>{scenario.description}</p>
-          {/* Lägg till mer detaljer här om du vill */}
+      {expanded && (
+        <div className={styles.scenarioDetails}>
+          {scenario.mappings && scenario.mappings.length > 0 ? (
+            scenario.mappings.map((mapping, index) => {
+              const fullMapping = getMappingDetails(mapping.request.reqId);
+              return (
+                <div
+                  key={`mapping-${scenario.id}-${index}`}
+                  className={styles.mappingItem}
+                >
+                  <p className={styles.scenarioMappingTitle}>
+                    {fullMapping.request?.title || "No Title"}
+                  </p>
+                  <div className={styles.mappingInfo}>
+                    <p>
+                      <strong>Method:</strong>{" "}
+                      {fullMapping.request?.method || "N/A"}
+                    </p>
+                    <p>
+                      <strong>URL:</strong>{" "}
+                      {fullMapping.request?.url || fullMapping.request?.urlPath || "N/A"}
+                    </p>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <p>No mappings found.</p>
+          )}
+          {handleSendScenario && (
+            <button
+              onClick={() => handleSendScenario(scenario.id)}
+              className={`${styles.button} ${styles.wireMockButton}`}
+            >
+              Send to WireMock
+            </button>
+          )}
+          <button
+            onClick={() => handleDeleteScenario(scenario.id)}
+            className={`${styles.button} ${styles.deleteButton}`}
+          >
+            Delete Scenario
+          </button>
         </div>
       )}
-
-      <div>
-        <button onClick={handleDelete}>Delete</button>
-        {handleSendScenarioToWireMock && (
-          <button onClick={() => handleSendScenarioToWireMock(scenario)}>
-            Send to WireMock
-          </button>
-        )}
-      </div>
     </li>
   );
 };
 
-// Se till att exportera som default
 export default ScenarioItem;

@@ -5,6 +5,7 @@ import cors from "cors";
 import path from "path";
 import fetch from "node-fetch";
 import { fileURLToPath } from "url";
+import { handleSendToWireMock } from "./api.js";
 
 const WIREMOCK_BASE_URL = "http://localhost:8081/__admin/mappings";
 const app = express();
@@ -247,7 +248,7 @@ app.post("/mappings/:id/send", async (req, res) => {
     // Update the saved mapping with the WireMock UUID
     mappingEntry.wireMockId = data.id ?? data.uuid;
     fs.writeFileSync(requestsFile, JSON.stringify(requests, null, 2));
-    return res.json({ success: true, wireMockIdd: mappingEntry.wireMockId });
+    return res.json({ success: true, wireMockId: mappingEntry.wireMockId });
   } catch (error) {
     console.error("❌ Error sending mapping to WireMock:", error);
     return res.status(500).json({ success: false, message: error.message });
@@ -540,19 +541,15 @@ app.post("/scenarios", (req, res) => {
         // Set the top-level reqId if needed
         request: {
           reqId: mappingId,  // Add reqId inside the request object
-          ...mapping.request  // Include all other request properties
         },
         response: Object.keys(mapping.response || {}).length > 0
           ? {
-              resId: responseId,   // Rename the response id to resId   // Also include reqId in the response object
-              ...restResponse      // Spread the remaining response fields (like resJson, timestamp, etc.)
+              resId: responseId,   // Rename the response id to resId   // Also include reqId in the response object         
             }
           : {}
       };
     })
   : [];
-
-
 
   // Build new scenario object with only the desired keys
   const newScenario = {
@@ -566,18 +563,72 @@ app.post("/scenarios", (req, res) => {
   res.json({ success: true, scenario: newScenario });
 });
 
+// Batch endpoint to send all mappings for a given scenario to WireMock
+app.post("/scenarios/:id/send", async (req, res) => {
+  const { id } = req.params;
+  let scenarios = readScenarios();
+  const scenarioIndex = scenarios.findIndex(s => s.id === id);
+  if (scenarioIndex === -1) {
+    return res.status(404).json({ success: false, message: "Scenario not found" });
+  }
+  const scenario = scenarios[scenarioIndex];
+  
+  if (!scenario.mappings || scenario.mappings.length === 0) {
+    return res.status(400).json({ success: false, message: "No mappings to send for this scenario" });
+  }
+  
+  // Send each mapping concurrently using Promise.all
+  const results = await Promise.all(
+    scenario.mappings.map(mapping => {
+      const mappingId = mapping.request.reqId;
+      return handleSendToWireMock(mappingId);
+    })
+  );
+  
+  // Update each mapping with its WireMock ID
+  const updatedMappings = scenario.mappings.map((mapping, index) => {
+    const result = results[index];
+    return result && result.success
+      ? { ...mapping, wireMockId: result.wireMockId }
+      : mapping;
+  });
+  scenario.mappings = updatedMappings;
+  
+  // Update the main requests file (by matching mapping IDs)
+  let requests = JSON.parse(fs.readFileSync(requestsFile, "utf-8"));
+  updatedMappings.forEach(updatedMapping => {
+    const reqId = updatedMapping.request.reqId;
+    const reqIndex = requests.findIndex(r => r.id === reqId);
+    if (reqIndex !== -1) {
+      requests[reqIndex].wireMockId = updatedMapping.wireMockId || requests[reqIndex].wireMockId;
+    }
+  });
+  fs.writeFileSync(requestsFile, JSON.stringify(requests, null, 2));
+  writeScenarios(scenarios);
+  
+  if (results.every(result => result && result.success)) {
+    return res.json({ success: true, scenario });
+  } else {
+    return res.json({ success: false, message: "Some mappings failed to send", scenario });
+  }
+});
+
+
 
 //Uppdaterar scenarios
 app.put("/scenarios/:id", (req, res) => {
   const { id } = req.params;
-  const { scenario } = req.body; // scenario = { name, mappings: [...], responses: [...] }
-
   let scenarios = readScenarios();
   const index = scenarios.findIndex((s) => s.id === id);
   if (index === -1) {
     return res.status(404).json({ success: false, message: "Scenario not found" });
   }
+  const scenario = scenarios[scenarioIndex];
 
+  if (!scenario.mappings || scenario.mappings.length === 0) {
+    return res.status(400).json({ success: false, message: "Scenario not Found"})     
+  }
+  
   // Merge new data into existing scenario
   const existingScenario = scenarios[index];
 

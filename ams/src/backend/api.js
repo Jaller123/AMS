@@ -152,7 +152,6 @@ export const handleSendToWireMock = async (mappingId) => {
     const data = await response.json();
 
     if (data.success) {
-      alert("Mapping sent to WireMock successfully!");
       return data; // ✅ Return the response so MappingsPage can handle updates
     } else {
       alert("Failed to send mapping to WireMock.");
@@ -164,6 +163,32 @@ export const handleSendToWireMock = async (mappingId) => {
     return null;
   }
 };
+
+export const handleSendScenarioToWireMock = async (scenarioId) => {
+  try {
+    const response = await fetch(
+      `http://localhost:8080/scenarios/${scenarioId}/send`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+    const data = await response.json();
+    if (data.success) {
+      return data; // The response now contains the updated scenario
+    } else {
+      alert("Failed to send scenario to WireMock.");
+      return null;
+    }
+  } catch (error) {
+    console.error("Error sending scenario to WireMock:", error);
+    alert("Error sending scenario. Check console for details.");
+    return null;
+  }
+};
+
+
+
 
 //Mappings--------------------------------------------------------------------------------------------------------------------------------
 

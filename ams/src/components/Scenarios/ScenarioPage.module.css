@@ -100,6 +100,23 @@ p {
   border: 1px solid #ddd;
 }
 
+.wireMockButton {
+  background-color: rgb(4, 84, 127);
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+  width: 100%;
+  font-size: 15px
+}
+
+.wireMockButton:hover {
+  background-color: rgb(3, 64, 97);
+  transform: scale(1.03);
+}
+
 /* Delete-knapp */
 .deleteButton {
   background-color: #e74c3c;
@@ -110,6 +127,7 @@ p {
   cursor: pointer;
   margin-top: 10px;
   width: 100%;
+  font-size: 15px
 }
 
 .deleteButton:hover {
