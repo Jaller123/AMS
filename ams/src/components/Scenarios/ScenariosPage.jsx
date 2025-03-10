@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchScenarios, deleteScenario, handleSendToWireMock, handleSendScenarioToWireMock } from "../../backend/api";
+import { fetchScenarios, deleteScenario, handleSendToWireMock, handleSendScenarioToWireMock, } from "../../backend/api";
 import ScenarioList from "./ScenarioList"
 import styles from "./ScenarioPage.module.css";
 
-const ScenariosPage = () => {
+const ScenariosPage = ({ mappings }) => {
   const navigate = useNavigate();
   const [scenarios, setScenarios] = useState([]);
   const [expandedScenarioId, setExpandedScenarioId] = useState(null);
-
 
   useEffect(() => {
     const loadScenarios = async () => {
@@ -53,6 +52,7 @@ const ScenariosPage = () => {
       <p>No saved scenarios found.</p>
     ) : (
       <ScenarioList
+        mappings={mappings}
         scenarios={scenarios}
         expandedScenarioId={expandedScenarioId}
         handleDeleteScenario={handleDeleteScenario}

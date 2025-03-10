@@ -8,6 +8,7 @@ const ScenarioList = ({
   toggleScenarioDropdown,
   handleDeleteScenario,
   handleSendScenarioToWireMock,
+  mappings,
 }) => {
   return (
     <ul className={styles.scenarioList}>
@@ -20,6 +21,7 @@ const ScenarioList = ({
             toggleScenarioDropdown={toggleScenarioDropdown}
             handleDeleteScenario={handleDeleteScenario}
             handleSendScenario={handleSendScenarioToWireMock}
+            mappings={mappings}
           />
         ))
       ) : (

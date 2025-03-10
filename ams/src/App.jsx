@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ToastContainer, toast, Bounce } from "react-toastify";
-
 import Navbar from "./components/Navbar";
 import ReqForm from "./components/ReqForm";
 import ResForm from "./components/ResForm";
@@ -11,7 +10,6 @@ import TrafficPage from "./components/TrafficPage";
 import ReqDetailPage from "./components/ReqDetailPage";
 import ScenariosPage from "./components/Scenarios/ScenariosPage.jsx";
 import CreateScenario from "./components/Scenarios/CreateScenario.jsx";
-
 import Button from "./components/Button.jsx";
 import {
   fetchMappings,
@@ -21,6 +19,7 @@ import {
   handleSendToWireMock,
 } from "./backend/api.js";
 import Home from "../src/components/Home.jsx"; // Import den nya komponenten
+import ScenarioList from "./components/Scenarios/ScenarioList.jsx";
 
 const App = () => {
   const [mappings, setMappings] = useState([]);
@@ -276,7 +275,7 @@ const App = () => {
           path="/traffic"
           element={<TrafficPage savedMappings={mappings} />}
         />
-        <Route path="/scenarios" element={<ScenariosPage />} />
+        <Route path="/scenarios" element={<ScenariosPage mappings={mappings} />} />
         <Route path="/create-scenario" element={<CreateScenario />} />/
       </Routes>
     </Router>

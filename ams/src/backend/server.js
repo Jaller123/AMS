@@ -541,12 +541,10 @@ app.post("/scenarios", (req, res) => {
         // Set the top-level reqId if needed
         request: {
           reqId: mappingId,  // Add reqId inside the request object
-    
         },
         response: Object.keys(mapping.response || {}).length > 0
           ? {
-              resId: responseId,   // Rename the response id to resId   // Also include reqId in the response object
-                   
+              resId: responseId,   // Rename the response id to resId   // Also include reqId in the response object         
             }
           : {}
       };
