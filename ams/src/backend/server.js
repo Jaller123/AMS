@@ -623,44 +623,32 @@ app.put("/scenarios/:id", (req, res) => {
   if (index === -1) {
     return res.status(404).json({ success: false, message: "Scenario not found" });
   }
-  const scenario = scenarios[scenarioIndex];
 
-  if (!scenario.mappings || scenario.mappings.length === 0) {
-    return res.status(400).json({ success: false, message: "Scenario not Found"})     
-  }
-  
-  // Merge new data into existing scenario
-  const existingScenario = scenarios[index];
-
-  // Merge scenario name if provided
-  if (scenario.name) {  
-    existingScenario.name = scenario.name;
+  // Get the new scenario data from the request body.
+  const updatedScenario = req.body.scenario;
+  if (!updatedScenario) {
+    return res.status(400).json({ success: false, message: "No scenario data provided" });
   }
 
-  // Merge new mappings
-  if (scenario.mappings && scenario.mappings.length) {
-    const cleanMapping = scenario.mappings.map(mapping => ({
-      request: mapping.request,
-      response: mapping.response 
-    }))
-    existingScenario.mappings = [
-      ...(existingScenario.mappings || []),
-      ...cleanMapping
-    ];
-  }
+  const cleanMappings = (updatedScenario.mappings && Array.isArray(updatedScenario.mappings))
+    ? updatedScenario.mappings.map(mapping => ({
+        request: { reqId: mapping.request.reqId },
+        response: mapping.response && mapping.response.resId 
+          ? { resId: mapping.response.resId } 
+          : {}
+      }))
+    : [];
 
-  if (scenario.responses && scenario.responses.length) {
-    existingScenario.responses = [
-      ...(existingScenario.responses || []),
-      ...scenario.responses,
-    ];
-  }
+  // Replace the existing scenario data with the new data.
+  scenarios[index] = {
+    id,
+    name: updatedScenario.name,      // Use the updated name
+    mappings: updatedScenario.mappings // Replace the mappings
+    // You can add responses if needed.
+  };
 
-  // Save updated scenario
-  scenarios[index] = existingScenario;
   writeScenarios(scenarios);
-
-  res.json({ success: true, scenario: existingScenario });
+  res.json({ success: true, scenario: scenarios[index] });
 });
 
 

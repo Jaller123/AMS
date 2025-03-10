@@ -10,6 +10,7 @@ import TrafficPage from "./components/TrafficPage";
 import ReqDetailPage from "./components/ReqDetailPage";
 import ScenariosPage from "./components/Scenarios/ScenariosPage.jsx";
 import CreateScenario from "./components/Scenarios/CreateScenario.jsx";
+import EditScenario from "./components/Scenarios/EditScenario.jsx";
 import Button from "./components/Button.jsx";
 import {
   fetchMappings,
@@ -277,6 +278,7 @@ const App = () => {
         />
         <Route path="/scenarios" element={<ScenariosPage mappings={mappings} />} />
         <Route path="/create-scenario" element={<CreateScenario />} />/
+        <Route path="/edit-scenario/:scenarioId" element={<EditScenario />} />
       </Routes>
     </Router>
   );
