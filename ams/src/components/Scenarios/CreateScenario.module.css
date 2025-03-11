@@ -169,13 +169,13 @@
   transition: background 0.3s ease, transform 0.2s ease;
 }
 
-.removeMapping{
+.removeMapping {
   color: red; /* Red text for inactive */
   font-weight: bold;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.0rem;
+  font-size: 1rem;
 }
 
 .h1 {
@@ -187,4 +187,38 @@
   margin: 10px;
   font-size: 15px;
   text-align: center;
+}
+.leftPanel {
+  padding: 20px;
+  border: 1px solid #ccc;
+  min-height: 300px; /* Justera storleken */
+  background: #f9f9f9;
+  border-radius: 8px;
+}
+
+.rightPanel {
+  padding: 20px;
+  border: 1px solid #ccc;
+  background: #fff;
+  margin-left: 20px;
+  min-height: 300px;
+  border-radius: 8px;
+}
+
+.scenarioMappingItem {
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #fff;
+  cursor: grab;
+  transition: opacity 0.3s ease;
+}
+
+.scenarioMappingItem.dragging {
+  opacity: 0.6;
+}
+
+.dropTarget {
+  border: 2px dashed #007bff;
 }

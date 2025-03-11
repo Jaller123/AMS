@@ -18,7 +18,7 @@
         }
       ]
     },
-    "wireMockId": null
+    "wireMockId": "6ed876ff-5479-4a62-9e36-2c0d63b6de89"
   },
   {
     "id": "2",
@@ -39,6 +39,6 @@
         }
       ]
     },
-    "wireMockId": null
+    "wireMockId": "a308c67e-c78f-4ee1-b2f5-56e8867e0c96"
   }
 ]

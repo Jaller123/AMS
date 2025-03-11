@@ -276,7 +276,10 @@ const App = () => {
           path="/traffic"
           element={<TrafficPage savedMappings={mappings} />}
         />
-        <Route path="/scenarios" element={<ScenariosPage mappings={mappings} />} />
+        <Route
+          path="/scenarios"
+          element={<ScenariosPage mappings={mappings} />}
+        />
         <Route path="/create-scenario" element={<CreateScenario />} />/
         <Route path="/edit-scenario/:scenarioId" element={<EditScenario />} />
       </Routes>

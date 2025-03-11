@@ -1,73 +1,15 @@
 [
   {
-    "id": "1",
-    "name": "New Scenario 1",
-    "mappings": [
-      {
-        "request": {
-          "title": "/fetching",
-          "url": "/user",
-          "method": "GET",
-          "headers": {
-            "Content-Type": {
-              "equalTo": "application/json"
-            }
-          },
-          "bodyPatterns": [
-            {
-              "equalToJson": {
-                "body": "hello"
-              }
-            }
-          ]
-        },
-        "response": {}
-      },
-      {
-        "request": {
-          "title": "title",
-          "url": "/title",
-          "method": "GET",
-          "headers": {
-            "Content-Type": {
-              "equalTo": "application/json"
-            }
-          },
-          "bodyPatterns": [
-            {
-              "equalToJson": {
-                "body": "req"
-              }
-            }
-          ]
-        },
-        "response": {}
-      }
-    ]
-  },
-  {
     "id": "2",
-    "name": "New Scenario 2",
+    "name": "New scenario",
     "mappings": [
       {
         "request": {
-          "title": "/fetching",
-          "url": "/user",
-          "method": "GET",
-          "headers": {
-            "Content-Type": {
-              "equalTo": "application/json"
-            }
-          },
-          "bodyPatterns": [
-            {
-              "equalToJson": {
-                "body": "hello"
-              }
-            }
-          ]
+          "reqId": "2"
         },
-        "response": {}
+        "response": {
+          "resId": "2.1"
+        }
       }
     ]
   },
@@ -139,7 +81,7 @@
   },
   {
     "id": "5",
-    "name": "hejsan",
+    "name": "regent",
     "mappings": [
       {
         "request": {
@@ -173,6 +115,38 @@
             }
           },
           "timestamp": "2025-02-27 10:36:23"
+        },
+        "wireMockId": "6ed876ff-5479-4a62-9e36-2c0d63b6de89"
+      },
+      {
+        "request": {
+          "reqId": "2"
+        },
+        "response": {
+          "resId": "2.1"
+        },
+        "wireMockId": "a308c67e-c78f-4ee1-b2f5-56e8867e0c96"
+      }
+    ]
+  },
+  {
+    "id": "6",
+    "name": "New ",
+    "mappings": [
+      {
+        "request": {
+          "reqId": "2"
+        },
+        "response": {
+          "resId": "2.1"
+        }
+      },
+      {
+        "request": {
+          "reqId": "1"
+        },
+        "response": {
+          "resId": "1.1"
         }
       }
     ]

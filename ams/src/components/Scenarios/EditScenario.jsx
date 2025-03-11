@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import {
   fetchMappings,
   fetchScenarios,
-  updateScenario
+  updateScenario,
 } from "../../backend/api";
 import styles from "./CreateScenario.module.css"; // You can reuse the same CSS as CreateScenario if desired
 import useMappingSearch from "./useMappingSearch";
@@ -54,9 +54,7 @@ const EditScenario = () => {
     }
   }, [scenarioId, scenarios]);
 
-  const getFullMapping = (reqId) =>
-    mappings.find((m) => m.id === reqId) || {};
-  
+  const getFullMapping = (reqId) => mappings.find((m) => m.id === reqId) || {};
 
   const {
     filteredMappings,
@@ -109,11 +107,14 @@ const EditScenario = () => {
     if (!jsonData) return;
     const droppedMapping = JSON.parse(jsonData);
 
-    const fullMapping = mappings.find((m) => m.id === droppedMapping.id) || {}
+    const fullMapping = mappings.find((m) => m.id === droppedMapping.id) || {};
 
     const cleanMapping = {
-      request: {reqId: droppedMapping.id },
-      response: fullMapping && fullMapping.id ? { resId: droppedMapping.id + ".1" } : {}
+      request: { reqId: droppedMapping.id },
+      response:
+        fullMapping && fullMapping.id
+          ? { resId: droppedMapping.id + ".1" }
+          : {},
     };
 
     // Check by mapping id to avoid duplicates
@@ -181,65 +182,63 @@ const EditScenario = () => {
           <p style={{ color: "white" }}>No Mappings added yet</p>
         ) : (
           <ul className={styles.mappingList}>
-                    {editScenarioMappings.map((mapping) => {
-        // Use mapping.request.reqId as the unique identifier
-        const mappingId = mapping.request.reqId;
-        const fullMapping = getFullMapping(mappingId);
-        return (
-            <div key={mapping.request.reqId} className={styles.mappingItem}>
-            <div
-                className={styles.mappingHeader}
-                onClick={() => toggleMappingDropdownLeft(mappingId)}
-                draggable
-                onDragStart={(e) => handleDragStartMapping(e, mapping)}
-                onDragEnd={handleDragEndMapping}
-                style={{
-                cursor: "grab",
-                opacity: draggingMappingId === mappingId ? 0.6 : 1,
-                transition: "opacity 0.2s ease, transform 0.2s ease",
-                }}
-            >
-                <span>
-                <strong>
-                    {fullMapping.request?.method || "METHOD"}
-                </strong>{" "}
-                |{" "}
-                {fullMapping.request?.url ||
-                    fullMapping.request?.urlPath ||
-                    "No URL"}{" "}
-                | {fullMapping.request?.title || "No Title"}
-                </span>
-                <button
-                className={styles.removeMapping}
-                onClick={() => handleRemoveMapping(mappingId)}
-                >
-                ❌
-                </button>
-            </div>
-            {expandMappingIdLeft === mappingId && (
-                <div className={styles.mappingDetails}>
-                <h3>Request</h3>
-                <pre className={styles.preFormatted}>
-                    {JSON.stringify(fullMapping.request, null, 2)}
-                </pre>
-                <h3>Responses</h3>
-                {responses.filter((res) => res.reqId === mappingId).length > 0 ? (
-                    responses
-                    .filter((res) => res.reqId === mappingId)
-                    .map((res) => (
-                        <pre key={res.id} className={styles.preFormatted}>
-                        {JSON.stringify(res.resJson, null, 2)}
-                        </pre>
-                    ))
-                ) : (
-                    <p>No response found for this mapping.</p>
-                )}
+            {editScenarioMappings.map((mapping) => {
+              // Use mapping.request.reqId as the unique identifier
+              const mappingId = mapping.request.reqId;
+              const fullMapping = getFullMapping(mappingId);
+              return (
+                <div key={mapping.request.reqId} className={styles.mappingItem}>
+                  <div
+                    className={styles.mappingHeader}
+                    onClick={() => toggleMappingDropdownLeft(mappingId)}
+                    draggable
+                    onDragStart={(e) => handleDragStartMapping(e, mapping)}
+                    onDragEnd={handleDragEndMapping}
+                    style={{
+                      cursor: "grab",
+                      opacity: draggingMappingId === mappingId ? 0.6 : 1,
+                      transition: "opacity 0.2s ease, transform 0.2s ease",
+                    }}
+                  >
+                    <span>
+                      <strong>{fullMapping.request?.method || "METHOD"}</strong>{" "}
+                      |{" "}
+                      {fullMapping.request?.url ||
+                        fullMapping.request?.urlPath ||
+                        "No URL"}{" "}
+                      | {fullMapping.request?.title || "No Title"}
+                    </span>
+                    <button
+                      className={styles.removeMapping}
+                      onClick={() => handleRemoveMapping(mappingId)}
+                    >
+                      ❌
+                    </button>
+                  </div>
+                  {expandMappingIdLeft === mappingId && (
+                    <div className={styles.mappingDetails}>
+                      <h3>Request</h3>
+                      <pre className={styles.preFormatted}>
+                        {JSON.stringify(fullMapping.request, null, 2)}
+                      </pre>
+                      <h3>Responses</h3>
+                      {responses.filter((res) => res.reqId === mappingId)
+                        .length > 0 ? (
+                        responses
+                          .filter((res) => res.reqId === mappingId)
+                          .map((res) => (
+                            <pre key={res.id} className={styles.preFormatted}>
+                              {JSON.stringify(res.resJson, null, 2)}
+                            </pre>
+                          ))
+                      ) : (
+                        <p>No response found for this mapping.</p>
+                      )}
+                    </div>
+                  )}
                 </div>
-            )}
-            </div>
-        );
-        })}
-
+              );
+            })}
           </ul>
         )}
         <button onClick={handleSaveScenario} className={styles.button}>
