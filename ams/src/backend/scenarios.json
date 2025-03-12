@@ -1,7 +1,7 @@
 [
   {
     "id": "2",
-    "name": "New scenario",
+    "name": "New regent",
     "mappings": [
       {
         "request": {
@@ -148,6 +148,60 @@
         "response": {
           "resId": "1.1"
         }
+      }
+    ]
+  },
+  {
+    "id": "7",
+    "name": "hej",
+    "mappings": [
+      {
+        "request": {
+          "reqId": "1"
+        },
+        "response": {}
+      },
+      {
+        "request": {
+          "reqId": "2"
+        },
+        "response": {}
+      }
+    ]
+  },
+  {
+    "id": "8",
+    "name": "tjabba",
+    "mappings": [
+      {
+        "request": {
+          "reqId": "1"
+        },
+        "response": {}
+      },
+      {
+        "request": {
+          "reqId": "2"
+        },
+        "response": {}
+      }
+    ]
+  },
+  {
+    "id": "9",
+    "name": "Regent",
+    "mappings": [
+      {
+        "request": {
+          "reqId": "1"
+        },
+        "response": {}
+      },
+      {
+        "request": {
+          "reqId": "2"
+        },
+        "response": {}
       }
     ]
   }

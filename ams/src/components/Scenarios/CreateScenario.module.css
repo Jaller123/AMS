@@ -222,3 +222,45 @@
 .dropTarget {
   border: 2px dashed #007bff;
 }
+.scenarioMappingItem {
+  background: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin: 8px 0;
+  padding: 10px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.scenarioMappingItem:hover {
+  background: #e9ecef;
+}
+
+.mappingHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.removeMapping {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: red;
+}
+
+.mappingDetails {
+  background: #ffffff;
+  padding: 10px;
+  margin-top: 8px;
+  border-top: 1px solid #ccc;
+}
+
+.preFormatted {
+  white-space: pre-wrap;
+  background: #eee;
+  padding: 8px;
+  border-radius: 5px;
+  font-size: 14px;
+}
