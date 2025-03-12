@@ -43,6 +43,12 @@ const CreateScenario = () => {
     setDraggingMappingId(mapping.id);
   };
 
+  const handleRemoveMapping = (mappingId) => {
+    setNewScenarioMappings((prevMappings) =>
+      prevMappings.filter((mapping) => mapping.id !== mappingId)
+    );
+  };
+
   // Handle drag end
   const handleDragEndMapping = () => {
     setDraggingMappingId(null);
@@ -119,6 +125,12 @@ const CreateScenario = () => {
                   {mapping.request?.url || "No URL"} |{" "}
                   {mapping.request?.title || "No Title"}
                 </span>
+                <button
+                  className={styles.removeMapping}
+                  onClick={() => handleRemoveMapping(mapping.id)}
+                >
+                  ❌
+                </button>
               </div>
               {expandedMappingId === mapping.id && (
                 <div className={styles.mappingDetails}>
