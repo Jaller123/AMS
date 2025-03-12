@@ -1,36 +1,75 @@
 import React from "react";
 import ScenarioMappingItem from "./ScenarioMappingItem";
 import styles from "./CreateScenario.module.css";
+import useMappingSearch from "./useMappingSearch";
+import SortControls from "../MappingPage/SortControls";
 
 const ScenarioMappingList = ({
-  mappings = [], // Ensure mappings is always an array
-  responses = [],
+  mappings,
+  responses,
+  scenarioName,
+  setScenarioName,
+  newScenarioMappings,
   expandedMappingId,
   toggleMappingDropdown,
   handleDragStartMapping,
   handleDragEndMapping,
+  handleDragOverDropZone,
+  handleDragLeaveDropZone,
+  handleDropOnDropZone,
+  highlighted,
   handleRemoveMapping,
   draggingMappingId,
+  expandMappingIdLeft,
+  expandMappingIdRight,
+  toggleMappingDropdownLeft,
+  toggleMappingDropdownRight,
+  handleSaveNewScenario
 }) => {
+
+  const {
+    filteredMappings,
+    search,
+    setSearch,
+    searchFilters,
+    setSearchFilters,
+    sortCriterion,
+    setSortCriterion,
+  } = useMappingSearch(mappings)
+
   return (
-    <ul className={styles.scenarioMappingList}>
-      {mappings.length > 0 ? (
-        mappings.map((mapping, index) => (
+    <ul>
+      <SortControls 
+      setSortCriterion={setSortCriterion}
+      searchFilters={searchFilters}
+      setSearchFilters={setSearchFilters}
+      search={search}
+      filteredMappings={filteredMappings}
+      setSearch={setSearch}
+      sortCriterion={sortCriterion}
+      />
           <ScenarioMappingItem
-            key={mapping.id || index}
-            mapping={mapping}
             responses={responses}
-            expanded={expandedMappingId === mapping.id}
+            scenarioName={scenarioName}
+            setScenarioName={setScenarioName}
+            filteredMappings={filteredMappings}
+            searchFilters={searchFilters}
+            newScenarioMappings={newScenarioMappings}
+            expandMappingIdLeft={expandMappingIdLeft}
+            expandMappingIdRight={expandMappingIdRight}
             toggleMappingDropdown={toggleMappingDropdown}
             handleDragStartMapping={handleDragStartMapping}
             handleDragEndMapping={handleDragEndMapping}
+            handleDragOverDropZone={handleDragOverDropZone}
+            handleDragLeaveDropZone={handleDragLeaveDropZone}
+            highlighted={highlighted}
+            handleDropOnDropZone={handleDropOnDropZone}
             handleRemoveMapping={handleRemoveMapping}
             draggingMappingId={draggingMappingId}
+            toggleMappingDropdownLeft={toggleMappingDropdownLeft}
+            toggleMappingDropdownRight={toggleMappingDropdownRight}
+            handleSaveNewScenario={handleSaveNewScenario}
           />
-        ))
-      ) : (
-        <p>No mappings available</p>
-      )}
     </ul>
   );
 };

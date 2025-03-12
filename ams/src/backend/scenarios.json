@@ -1,7 +1,7 @@
 [
   {
     "id": "2",
-    "name": "New regent",
+    "name": "dasdsa",
     "mappings": [
       {
         "request": {
@@ -202,6 +202,20 @@
           "reqId": "2"
         },
         "response": {}
+      }
+    ]
+  },
+  {
+    "id": "10",
+    "name": "prova",
+    "mappings": [
+      {
+        "request": {
+          "reqId": "1"
+        },
+        "response": {
+          "resId": "1.1"
+        }
       }
     ]
   }
