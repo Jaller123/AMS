@@ -218,5 +218,27 @@
         }
       }
     ]
+  },
+  {
+    "id": "11",
+    "name": "Reg",
+    "mappings": [
+      {
+        "request": {
+          "reqId": "1"
+        },
+        "response": {
+          "resId": "1.1"
+        }
+      },
+      {
+        "request": {
+          "reqId": "2"
+        },
+        "response": {
+          "resId": "2.1"
+        }
+      }
+    ]
   }
 ]
