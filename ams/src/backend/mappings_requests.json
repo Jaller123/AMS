@@ -40,5 +40,26 @@
       ]
     },
     "wireMockId": "a308c67e-c78f-4ee1-b2f5-56e8867e0c96"
+  },
+  {
+    "id": "3",
+    "resJson": {
+      "title": "hej",
+      "urlPathPattern": "user/name",
+      "method": "GET",
+      "headers": {
+        "Content-Type": {
+          "equalTo": "application/json"
+        }
+      },
+      "bodyPatterns": [
+        {
+          "equalToJson": {
+            "body": "text"
+          }
+        }
+      ]
+    },
+    "wireMockId": null
   }
 ]

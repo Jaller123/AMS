@@ -7,25 +7,18 @@ import SortControls from "../MappingPage/SortControls";
 const ScenarioMappingList = ({
   mappings,
   responses,
-  scenarioName,
-  setScenarioName,
-  newScenarioMappings,
-  expandedMappingId,
-  toggleMappingDropdown,
+  expanded,
+  expandId,
+  onToggleExpand,
+  draggingMappingId,
   handleDragStartMapping,
   handleDragEndMapping,
-  handleDragOverDropZone,
-  handleDragLeaveDropZone,
-  handleDropOnDropZone,
-  highlighted,
   handleRemoveMapping,
-  draggingMappingId,
-  expandMappingIdLeft,
-  expandMappingIdRight,
-  toggleMappingDropdownLeft,
-  toggleMappingDropdownRight,
-  handleSaveNewScenario
 }) => {
+  if (!mappings.length) {
+    return <p>No Mappings Found.</p>;
+  }
+
 
   const {
     filteredMappings,
@@ -38,7 +31,7 @@ const ScenarioMappingList = ({
   } = useMappingSearch(mappings)
 
   return (
-    <ul>
+    <ul className={styles.headerScenarioMappings}>
       <SortControls 
       setSortCriterion={setSortCriterion}
       searchFilters={searchFilters}
@@ -48,28 +41,19 @@ const ScenarioMappingList = ({
       setSearch={setSearch}
       sortCriterion={sortCriterion}
       />
-          <ScenarioMappingItem
-            responses={responses}
-            scenarioName={scenarioName}
-            setScenarioName={setScenarioName}
-            filteredMappings={filteredMappings}
-            searchFilters={searchFilters}
-            newScenarioMappings={newScenarioMappings}
-            expandMappingIdLeft={expandMappingIdLeft}
-            expandMappingIdRight={expandMappingIdRight}
-            toggleMappingDropdown={toggleMappingDropdown}
-            handleDragStartMapping={handleDragStartMapping}
-            handleDragEndMapping={handleDragEndMapping}
-            handleDragOverDropZone={handleDragOverDropZone}
-            handleDragLeaveDropZone={handleDragLeaveDropZone}
-            highlighted={highlighted}
-            handleDropOnDropZone={handleDropOnDropZone}
-            handleRemoveMapping={handleRemoveMapping}
-            draggingMappingId={draggingMappingId}
-            toggleMappingDropdownLeft={toggleMappingDropdownLeft}
-            toggleMappingDropdownRight={toggleMappingDropdownRight}
-            handleSaveNewScenario={handleSaveNewScenario}
-          />
+        {filteredMappings.map((mapping) => (
+        <ScenarioMappingItem
+          key={mapping.id}
+          mapping={mapping}
+          responses={responses}
+          expanded={expandId === mapping.id}
+          onToggleExpand={onToggleExpand}
+          draggingMappingId={draggingMappingId}
+          handleDragStartMapping={handleDragStartMapping}
+          handleDragEndMapping={handleDragEndMapping}
+          handleRemoveMapping={handleRemoveMapping}
+        />
+      ))}
     </ul>
   );
 };
