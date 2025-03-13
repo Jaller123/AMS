@@ -1,9 +1,7 @@
 .container {
   display: flex;
   gap: 20px;
-}
-
-.leftPanel {
+  align-items: flex-start;
   flex: 1;
   border-right: 1px solid #ccc;
   padding: 20px;
@@ -169,6 +167,10 @@
   transition: background 0.3s ease, transform 0.2s ease;
 }
 
+.button:hover {
+  color: white
+}
+
 .removeMapping {
   color: red; /* Red text for inactive */
   font-weight: bold;
@@ -189,6 +191,9 @@
   text-align: center;
 }
 .leftPanel {
+  flex: 1;
+  border-right: 1px solid #ccc;
+  padding: 20px;
   padding: 20px;
   border: 1px solid #ccc;
   min-height: 300px; /* Justera storleken */

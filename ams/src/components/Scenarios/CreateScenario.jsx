@@ -7,15 +7,15 @@ const CreateScenario = () => {
   const [mappings, setMappings] = useState([]);
   const [responses, setResponses] = useState([]);
   const [scenarios, setScenarios] = useState([]);
-  const [newScenarioMappings, setNewScenarioMappings] = useState([])
+  const [newScenarioMappings, setNewScenarioMappings] = useState([]);
   const [draggingMappingId, setDraggingMappingId] = useState(null);
-  const [expandMappingIdLeft, setExpandMappingIdLeft] = useState(null)
-  const [expandMappingIdRight, setExpandMappingIdRight] = useState(null)
+  const [expandMappingIdLeft, setExpandMappingIdLeft] = useState(null);
+  const [expandMappingIdRight, setExpandMappingIdRight] = useState(null);
   const [scenarioName, setScenarioName] = useState("");
-  const [highlighted, setHighlighted] = useState(false)
-
+  const [highlighted, setHighlighted] = useState(false);
 
   useEffect(() => {
+    // Load data
     const loadData = async () => {
       try {
         const { requests, responses } = await fetchMappings();
@@ -34,126 +34,134 @@ const CreateScenario = () => {
     loadData();
   }, []);
 
-
-  // Toggle expanded state for a mapping
-  const toggleMappingDropdownLeft = (mappingId) => {
-    setExpandMappingIdLeft(expandMappingIdLeft === mappingId ? null : mappingId);
+  // ---------------------
+  // Expand/collapse logic
+  // ---------------------
+  const toggleMappingDropdownLeft = (id) => {
+    console.log("Left toggled", id);
+    setExpandMappingIdLeft((prev) => (prev === id ? null : id));
+  };
+  const toggleMappingDropdownRight = (id) => {
+    console.log("Right toggled", id);
+    setExpandMappingIdRight((prev) => (prev === id ? null : id));
   };
 
-  const toggleMappingDropdownRight = (mappingId) => {
-    setExpandMappingIdRight(expandMappingIdRight === mappingId ? null : mappingId);
-  };
-  
-
-  // When a mapping is dragged, set its data and mark it as dragging.
+  // ---------------------
+  // Drag handlers
+  // ---------------------
   const handleDragStartMapping = (e, mapping) => {
     e.dataTransfer.setData("application/json", JSON.stringify(mapping));
     setDraggingMappingId(mapping.id);
   };
-
   const handleDragEndMapping = () => {
     setDraggingMappingId(null);
   };
-
   const handleDragOverDropZone = (e) => {
-    e.preventDefault()
-    setHighlighted(true)
-  }
-
+    e.preventDefault();
+    setHighlighted(true);
+  };
   const handleDragLeaveDropZone = (e) => {
-    e.preventDefault()
-    setHighlighted(false)
-  }
-
+    e.preventDefault();
+    setHighlighted(false);
+  };
   const handleDropOnDropZone = (e) => {
-    e.preventDefault()
-    setHighlighted(false)
-    const jsonData = e.dataTransfer.getData("application/json")
-    if (!jsonData) return
-    const droppedMapping = JSON.parse(jsonData)
+    e.preventDefault();
+    setHighlighted(false);
 
-  const droppedMappingResponse = responses.find(
-    (res) => res.reqId === droppedMapping.id
-  ) || {}
-  
+    const jsonData = e.dataTransfer.getData("application/json");
+    if (!jsonData) return;
+    const droppedMapping = JSON.parse(jsonData);
 
-  const cleanMapping = {
-    ReqId: droppedMapping.id,
-    request: droppedMapping.request,
-    response: droppedMappingResponse
-  }
+    // Possibly find responses, etc.
+    // Then push to newScenarioMappings.
+    setNewScenarioMappings((prev) => {
+      // Avoid duplicates
+      const alreadyExists = prev.some((m) => m.id === droppedMapping.id);
+      if (alreadyExists) return prev;
+      return [...prev, droppedMapping];
+    });
+  };
 
-  const cleanResponses = responses.filter(
-    (res) => res.reqId === droppedMapping.id
-  )
-  
-
-  const alreadyExists = newScenarioMappings.some(
-    (m) => m.request.title === cleanMapping.request.title
-  )
-  if (!alreadyExists) {
-    setNewScenarioMappings([...newScenarioMappings, cleanMapping]);
-  }
-}
-  // Create a new scenario with empty mappings/responses
+  // ---------------------
+  // Save logic
+  // ---------------------
   const handleSaveNewScenario = async () => {
-    if (newScenarioMappings.length === 0) {
-      alert("Please add atleast one mapping to create a new Scenario.")
-      return
-    }
-
     if (!scenarioName.trim()) {
-      alert("Please enter a Title.")
+      alert("Please enter a scenario name.");
+      return;
     }
-
-    else {
-      const newScenarioData = {
-        name: scenarioName,
-        mappings: newScenarioMappings
-      };
-      
-
+    if (newScenarioMappings.length === 0) {
+      alert("Add at least one mapping before saving.");
+      return;
+    }
+    const newScenarioData = {
+      name: scenarioName,
+      mappings: newScenarioMappings,
+    };
+    // Save scenario
     const savedScenario = await saveScenario(newScenarioData);
     if (savedScenario) {
-      setScenarios([...scenarios, savedScenario]);
-      setNewScenarioMappings([])
-      setScenarioName("")
-      alert("New Scenario Saved Succesfully!")
-    }
+      alert("Scenario saved successfully!");
+      setScenarios((prev) => [...prev, savedScenario]);
+      setScenarioName("");
+      setNewScenarioMappings([]);
     }
   };
-  
-  const handleRemoveMapping = (mappingId) => {
-    setNewScenarioMappings((prevMappings) => {
-     return  prevMappings.filter((mapping) => mapping.id !== mappingId)
-    })
-  }
+
+  // ---------------------
+  // Remove from left list
+  // ---------------------
+  const handleRemoveMapping = (id) => {
+    setNewScenarioMappings((prev) => prev.filter((m) => m.id !== id));
+  };
 
   return (
-
-      <div>
-        <h2>Saved Mappings</h2>
+    <div className={styles.container}>
+      {/* LEFT PANEL: New Scenario */}
+      <div
+        className={styles.leftPanel}
+        onDragOver={handleDragOverDropZone}
+        onDragLeave={handleDragLeaveDropZone}
+        onDrop={handleDropOnDropZone}
+        style={{ background: highlighted ? "#e6f7ff" : "" }}
+      >
+        <h1>Create a New Scenario</h1>
+        <h3>Drag and drop the mappings you want to add into a scenario and enter a title.</h3>
+        <input 
+          className={styles.inputTitle}
+          placeholder="Enter Scenario Title Here"
+          value={scenarioName}
+          onChange={(e) => setScenarioName(e.target.value)}
+        />
         <ScenarioMappingList
-          mappings={mappings}
+          // The list on the left is your "new scenario" list
+          mappings={newScenarioMappings}
           responses={responses}
-          scenarioName={scenarioName}
-          setScenarioName={setScenarioName}
-          newScenarioMappings={newScenarioMappings}
+          expandId={expandMappingIdRight}
+          onToggleExpand={toggleMappingDropdownRight}
+          draggingMappingId={draggingMappingId}
           handleDragStartMapping={handleDragStartMapping}
           handleDragEndMapping={handleDragEndMapping}
-          draggingMappingId={draggingMappingId}
-          handleDragOverDropZone={handleDragOverDropZone}
-          handleDragLeaveDropZone={handleDragLeaveDropZone}
-          expandMappingIdLeft={expandMappingIdLeft}
-          expandMappingIdRight={expandMappingIdRight}
-          handleDropOnDropZone={handleDropOnDropZone}
-          highlighted={highlighted}
-          toggleMappingDropdownLeft={toggleMappingDropdownLeft}
-          toggleMappingDropdownRight={toggleMappingDropdownRight}
           handleRemoveMapping={handleRemoveMapping}
-          handleSaveNewScenario={handleSaveNewScenario}
+        />
+        <button className={styles.button} onClick={handleSaveNewScenario}>Save Scenario</button>
+      </div>
+
+      {/* RIGHT PANEL: Saved Mappings */}
+      <div className={styles.rightPanel}>
+        <h2>Saved Mappings</h2>
+        <ScenarioMappingList
+          // The list on the right is your "existing mappings"
+          mappings={mappings}
+          responses={responses}
+          expandId={expandMappingIdLeft}
+          onToggleExpand={toggleMappingDropdownLeft}
+          draggingMappingId={draggingMappingId}
+          handleDragStartMapping={handleDragStartMapping}
+          handleDragEndMapping={handleDragEndMapping}
         />
       </div>
+    </div>
   );
 };
 
