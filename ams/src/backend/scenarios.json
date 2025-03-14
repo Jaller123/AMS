@@ -14,32 +14,6 @@
     ]
   },
   {
-    "id": "3",
-    "name": "New Scenario 3",
-    "mappings": [
-      {
-        "request": {
-          "title": "title",
-          "url": "/title",
-          "method": "GET",
-          "headers": {
-            "Content-Type": {
-              "equalTo": "application/json"
-            }
-          },
-          "bodyPatterns": [
-            {
-              "equalToJson": {
-                "body": "req"
-              }
-            }
-          ]
-        },
-        "response": {}
-      }
-    ]
-  },
-  {
     "id": "4",
     "name": "New Scenario 4",
     "mappings": [
@@ -75,7 +49,8 @@
             }
           },
           "timestamp": "2025-02-27 10:36:23"
-        }
+        },
+        "wireMockId": "c44e8a31-7e6a-43c8-ac75-fbce074129c4"
       }
     ]
   },
@@ -116,7 +91,7 @@
           },
           "timestamp": "2025-02-27 10:36:23"
         },
-        "wireMockId": "6ed876ff-5479-4a62-9e36-2c0d63b6de89"
+        "wireMockId": "579c8898-dd8b-4e42-a372-414ed12bc1e0"
       },
       {
         "request": {
@@ -125,7 +100,7 @@
         "response": {
           "resId": "2.1"
         },
-        "wireMockId": "a308c67e-c78f-4ee1-b2f5-56e8867e0c96"
+        "wireMockId": "5139af55-20d3-47af-bfbd-1d69db234b16"
       }
     ]
   },
@@ -223,6 +198,34 @@
     "id": "11",
     "name": "Reg",
     "mappings": [
+      {
+        "request": {
+          "reqId": "1"
+        },
+        "response": {
+          "resId": "1.1"
+        }
+      },
+      {
+        "request": {
+          "reqId": "2"
+        },
+        "response": {
+          "resId": "2.1"
+        }
+      }
+    ]
+  },
+  {
+    "id": "12",
+    "name": "HEjsan",
+    "mappings": [
+      {
+        "request": {
+          "reqId": "3"
+        },
+        "response": {}
+      },
       {
         "request": {
           "reqId": "1"

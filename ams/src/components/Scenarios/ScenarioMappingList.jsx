@@ -15,10 +15,9 @@ const ScenarioMappingList = ({
   handleDragEndMapping,
   handleRemoveMapping,
 }) => {
-  if (!mappings.length) {
+  if (!mappings || mappings.length === 0) {
     return <p>No Mappings Found.</p>;
   }
-
 
   const {
     filteredMappings,
@@ -28,20 +27,21 @@ const ScenarioMappingList = ({
     setSearchFilters,
     sortCriterion,
     setSortCriterion,
-  } = useMappingSearch(mappings)
+  } = useMappingSearch(mappings);
+  console.log("Filtered Mappings:", filteredMappings);
 
   return (
     <ul className={styles.headerScenarioMappings}>
-      <SortControls 
-      setSortCriterion={setSortCriterion}
-      searchFilters={searchFilters}
-      setSearchFilters={setSearchFilters}
-      search={search}
-      filteredMappings={filteredMappings}
-      setSearch={setSearch}
-      sortCriterion={sortCriterion}
+      <SortControls
+        setSortCriterion={setSortCriterion}
+        searchFilters={searchFilters}
+        setSearchFilters={setSearchFilters}
+        search={search}
+        filteredMappings={filteredMappings}
+        setSearch={setSearch}
+        sortCriterion={sortCriterion}
       />
-        {filteredMappings.map((mapping) => (
+      {filteredMappings.map((mapping) => (
         <ScenarioMappingItem
           key={mapping.id}
           mapping={mapping}

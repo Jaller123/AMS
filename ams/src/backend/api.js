@@ -159,7 +159,6 @@ export const handleSendToWireMock = async (mappingId) => {
     }
   } catch (error) {
     console.error("Error sending mapping to WireMock:", error);
-    alert("Error sending mapping. Check console for details.");
     return null;
   }
 };
@@ -186,9 +185,6 @@ export const handleSendScenarioToWireMock = async (scenarioId) => {
     return null;
   }
 };
-
-
-
 
 //Mappings--------------------------------------------------------------------------------------------------------------------------------
 
