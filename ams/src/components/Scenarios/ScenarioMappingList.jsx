@@ -14,11 +14,11 @@ const ScenarioMappingList = ({
   handleDragStartMapping,
   handleDragEndMapping,
   handleRemoveMapping,
+  handleAddToScenario,  // Passed here
 }) => {
   if (!mappings.length) {
     return <p>No Mappings Found.</p>;
   }
-
 
   const {
     filteredMappings,
@@ -28,20 +28,20 @@ const ScenarioMappingList = ({
     setSearchFilters,
     sortCriterion,
     setSortCriterion,
-  } = useMappingSearch(mappings)
+  } = useMappingSearch(mappings);
 
   return (
     <ul className={styles.headerScenarioMappings}>
-      <SortControls 
-      setSortCriterion={setSortCriterion}
-      searchFilters={searchFilters}
-      setSearchFilters={setSearchFilters}
-      search={search}
-      filteredMappings={filteredMappings}
-      setSearch={setSearch}
-      sortCriterion={sortCriterion}
+      <SortControls
+        setSortCriterion={setSortCriterion}
+        searchFilters={searchFilters}
+        setSearchFilters={setSearchFilters}
+        search={search}
+        filteredMappings={filteredMappings}
+        setSearch={setSearch}
+        sortCriterion={sortCriterion}
       />
-        {filteredMappings.map((mapping) => (
+      {filteredMappings.map((mapping) => (
         <ScenarioMappingItem
           key={mapping.id}
           mapping={mapping}
@@ -52,10 +52,11 @@ const ScenarioMappingList = ({
           handleDragStartMapping={handleDragStartMapping}
           handleDragEndMapping={handleDragEndMapping}
           handleRemoveMapping={handleRemoveMapping}
+          handleAddToScenario={handleAddToScenario} // Pass function here
         />
       ))}
     </ul>
   );
 };
 
-export default ScenarioMappingList;
+export default ScenarioMappingList;  

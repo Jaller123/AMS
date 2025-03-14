@@ -155,5 +155,59 @@
         "wireMockId": "18aa4653-81bd-4122-bba6-84f476ebd0a5"
       }
     ]
+  },
+  {
+    "id": "12",
+    "name": "My Test Scenario",
+    "mappings": [
+      {
+        "request": {
+          "reqId": "1",
+          "title": "title",
+          "url": "/title",
+          "method": "GET",
+          "headers": {
+            "Content-Type": {
+              "equalTo": "application/json"
+            }
+          },
+          "bodyPatterns": [
+            {
+              "equalToJson": {
+                "body": "req"
+              }
+            }
+          ]
+        },
+        "response": {}
+      }
+    ]
+  },
+  {
+    "id": "13",
+    "name": "My Test Scenario",
+    "mappings": [
+      {
+        "request": {
+          "reqId": "1",
+          "title": "title",
+          "url": "/title",
+          "method": "GET",
+          "headers": {
+            "Content-Type": {
+              "equalTo": "application/json"
+            }
+          },
+          "bodyPatterns": [
+            {
+              "equalToJson": {
+                "body": "req"
+              }
+            }
+          ]
+        },
+        "response": {}
+      }
+    ]
   }
 ]
