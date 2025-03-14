@@ -1,6 +1,6 @@
 it('should add mappings to the "Create a New Scenario" panel', () => {
     // 1️⃣ Besök scenarios-sidan
-    cy.visit('http://localhost:5178/scenarios');
+    cy.visit('http://localhost:5173/scenarios');
     
     // Vänta en sekund innan nästa åtgärd
    
@@ -31,7 +31,7 @@ it('should add mappings to the "Create a New Scenario" panel', () => {
     
     cy.contains('Save Scenario').click();
 
-    cy.visit('http://localhost:5178/scenarios');
+    cy.visit('http://localhost:5173/scenarios');
   
   
   });  

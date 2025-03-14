@@ -2,8 +2,8 @@
   {
     "id": "1",
     "resJson": {
-      "title": "title",
-      "url": "/title",
+      "title": "Mapping 1",
+      "url": "/ett",
       "method": "GET",
       "headers": {
         "Content-Type": {
@@ -13,18 +13,18 @@
       "bodyPatterns": [
         {
           "equalToJson": {
-            "body": "req"
+            "body": "text"
           }
         }
       ]
     },
-    "wireMockId": "6ed876ff-5479-4a62-9e36-2c0d63b6de89"
+    "wireMockId": null
   },
   {
     "id": "2",
     "resJson": {
-      "title": "/fetching",
-      "url": "/user",
+      "title": "Mapping 2",
+      "url": "/tva",
       "method": "GET",
       "headers": {
         "Content-Type": {
@@ -34,18 +34,18 @@
       "bodyPatterns": [
         {
           "equalToJson": {
-            "body": "hello"
+            "body": "text"
           }
         }
       ]
     },
-    "wireMockId": "a308c67e-c78f-4ee1-b2f5-56e8867e0c96"
+    "wireMockId": null
   },
   {
     "id": "3",
     "resJson": {
-      "title": "hej",
-      "urlPathPattern": "user/name",
+      "title": "Mapping 3",
+      "url": "/tre",
       "method": "GET",
       "headers": {
         "Content-Type": {
