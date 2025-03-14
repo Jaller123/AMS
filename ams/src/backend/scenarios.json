@@ -40,96 +40,6 @@
     ]
   },
   {
-    "id": "4",
-    "name": "New Scenario 4",
-    "mappings": [
-      {
-        "request": {
-          "reqId": "1",
-          "title": "title",
-          "url": "/title",
-          "method": "GET",
-          "headers": {
-            "Content-Type": {
-              "equalTo": "application/json"
-            }
-          },
-          "bodyPatterns": [
-            {
-              "equalToJson": {
-                "body": "req"
-              }
-            }
-          ]
-        },
-        "response": {
-          "resId": "1.1",
-          "reqId": "1",
-          "resJson": {
-            "status": "200",
-            "headers": {
-              "Content-Type": "application/json"
-            },
-            "body": {
-              "body": "res"
-            }
-          },
-          "timestamp": "2025-02-27 10:36:23"
-        }
-      }
-    ]
-  },
-  {
-    "id": "5",
-    "name": "regent",
-    "mappings": [
-      {
-        "request": {
-          "reqId": "1",
-          "title": "title",
-          "url": "/title",
-          "method": "GET",
-          "headers": {
-            "Content-Type": {
-              "equalTo": "application/json"
-            }
-          },
-          "bodyPatterns": [
-            {
-              "equalToJson": {
-                "body": "req"
-              }
-            }
-          ]
-        },
-        "response": {
-          "resId": "1.1",
-          "reqId": "1",
-          "resJson": {
-            "status": "200",
-            "headers": {
-              "Content-Type": "application/json"
-            },
-            "body": {
-              "body": "res"
-            }
-          },
-          "timestamp": "2025-02-27 10:36:23"
-        },
-        "wireMockId": "6ed876ff-5479-4a62-9e36-2c0d63b6de89"
-      },
-      {
-        "request": {
-          "reqId": "2"
-        },
-        "response": {
-          "resId": "2.1"
-        },
-        "wireMockId": "a308c67e-c78f-4ee1-b2f5-56e8867e0c96"
-      }
-    ]
-  },
-  {
     "id": "6",
     "name": "New ",
     "mappings": [
@@ -216,6 +126,33 @@
         "response": {
           "resId": "1.1"
         }
+      }
+    ]
+  },
+  {
+    "id": "11",
+    "name": "test",
+    "mappings": [
+      {
+        "request": {
+          "reqId": "3"
+        },
+        "response": {},
+        "wireMockId": "99e1e479-35a2-4dca-a0e0-28a3670b47ad"
+      },
+      {
+        "request": {
+          "reqId": "2"
+        },
+        "response": {},
+        "wireMockId": "0fda40ac-515b-4117-8c24-d7ecd15fe2fc"
+      },
+      {
+        "request": {
+          "reqId": "1"
+        },
+        "response": {},
+        "wireMockId": "18aa4653-81bd-4122-bba6-84f476ebd0a5"
       }
     ]
   }

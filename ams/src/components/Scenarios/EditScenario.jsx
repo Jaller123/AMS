@@ -126,6 +126,24 @@ const EditScenario = () => {
     }
   };
 
+  const handleAddtoScenario = (mappingId) => {
+
+
+    const fullMapping = mappings.find((m) => m.id === mappingId) || {};
+
+    const cleanMapping = {
+      request: { reqId: mappingId },
+      response: fullMapping && fullMapping.id ?  { resId: mappingId + ".1"} : {}, 
+    };
+
+    // Check by mapping id to avoid duplicates
+    const alreadyExists = editScenarioMappings.some(
+      (m) => m.request.reqId === mappingId
+    );
+    if (!alreadyExists) {
+      setEditScenarioMappings([...editScenarioMappings, cleanMapping]);
+    }
+  }
   // Save handler: always updates the existing scenario
   const handleSaveScenario = async () => {
     if (editScenarioMappings.length === 0) {
@@ -209,6 +227,7 @@ const EditScenario = () => {
                       | {fullMapping.request?.title || "No Title"}
                     </span>
                     <button
+                      placeholder="Delete button"
                       className={styles.removeMapping}
                       onClick={() => handleRemoveMapping(mappingId)}
                     >
@@ -263,7 +282,8 @@ const EditScenario = () => {
         ) : (
           <div className={styles.mappingList}>
             {filteredMappings.map((mapping) => (
-              <div key={mapping.id} className={styles.mappingItem}>
+              <div key={mapping.id} className={styles.mappingItem}
+              placeholder="mappingItem">
                 <div
                   className={styles.mappingHeader}
                   onClick={() => toggleMappingDropdownRight(mapping.id)}
@@ -286,6 +306,8 @@ const EditScenario = () => {
                       "No URL"}{" "}
                     | {mapping.request?.title || "No Title"}
                   </span>
+                  <button placeholder="Add button"
+                  onClick={() => handleAddtoScenario (mapping.id)}> +</button>
                 </div>
                 {expandMappingIdRight === mapping.id && (
                   <div className={styles.mappingDetails}>
