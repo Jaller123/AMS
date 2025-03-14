@@ -1,1 +1,66 @@
 []
+[
+  {
+    "id": "1",
+    "resJson": {
+      "title": "Mapping 1",
+      "url": "/ett",
+      "method": "GET",
+      "headers": {
+        "Content-Type": {
+          "equalTo": "application/json"
+        }
+      },
+      "bodyPatterns": [
+        {
+          "equalToJson": {
+            "body": "text"
+          }
+        }
+      ]
+    },
+    "wireMockId": null
+  },
+  {
+    "id": "2",
+    "resJson": {
+      "title": "Mapping 2",
+      "url": "/tva",
+      "method": "GET",
+      "headers": {
+        "Content-Type": {
+          "equalTo": "application/json"
+        }
+      },
+      "bodyPatterns": [
+        {
+          "equalToJson": {
+            "body": "text"
+          }
+        }
+      ]
+    },
+    "wireMockId": null
+  },
+  {
+    "id": "3",
+    "resJson": {
+      "title": "Mapping 3",
+      "url": "/tre",
+      "method": "GET",
+      "headers": {
+        "Content-Type": {
+          "equalTo": "application/json"
+        }
+      },
+      "bodyPatterns": [
+        {
+          "equalToJson": {
+            "body": "text"
+          }
+        }
+      ]
+    },
+    "wireMockId": null
+  }
+]
