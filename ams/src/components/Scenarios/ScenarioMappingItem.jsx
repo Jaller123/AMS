@@ -10,7 +10,7 @@ const ScenarioMappingItem = ({
   handleDragStartMapping,
   handleDragEndMapping,
   handleRemoveMapping,
-  filteredMappings,
+  handleAddToScenario, // Passed as prop
 }) => {
   const { id, request } = mapping;
 
@@ -25,7 +25,6 @@ const ScenarioMappingItem = ({
         opacity: draggingMappingId === id ? 0.6 : 1,
       }}
     >
-      {/* Header Row */}
       <div
         className={styles.mappingHeader}
         onClick={() => onToggleExpand?.(id)}
@@ -40,12 +39,22 @@ const ScenarioMappingItem = ({
             "No URL"}{" "}
           | {mapping.request?.title || "No Title"}
         </span>
-        {/* If handleRemoveMapping is passed in, show a remove button */}
+        {handleAddToScenario && (
+          <button
+            className={styles.addToScenarioButton}
+            onClick={(e) => {
+              e.stopPropagation(); // Prevent expand toggle
+              handleAddToScenario(id); // Adds mapping to scenario
+            }}
+          >
+            Add to Scenario
+          </button>
+        )}
         {handleRemoveMapping && (
           <button
             className={styles.removeMapping}
             onClick={(e) => {
-              e.stopPropagation(); // so it doesn’t toggle expand
+              e.stopPropagation();
               handleRemoveMapping(id);
             }}
           >
@@ -54,7 +63,6 @@ const ScenarioMappingItem = ({
         )}
       </div>
 
-      {/* Expanded details */}
       {expanded && (
         <div className={styles.mappingDetails}>
           <h3>Request</h3>
@@ -66,7 +74,7 @@ const ScenarioMappingItem = ({
             .filter((res) => res.reqId === id)
             .map((res) => (
               <pre key={res.id} className={styles.preFormatted}>
-                {JSON.stringify(res.resJson, null, 2)}
+                {JSON.stringify(res, null, 2)}
               </pre>
             ))}
         </div>

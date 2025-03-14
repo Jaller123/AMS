@@ -13,9 +13,9 @@ const CreateScenario = () => {
   const [expandMappingIdRight, setExpandMappingIdRight] = useState(null);
   const [scenarioName, setScenarioName] = useState("");
   const [highlighted, setHighlighted] = useState(false);
+  const [addedMappings, setAddedMappings] = useState(new Set()); // Track added mappings
 
   useEffect(() => {
-    // Load data
     const loadData = async () => {
       try {
         const { requests, responses } = await fetchMappings();
@@ -34,36 +34,33 @@ const CreateScenario = () => {
     loadData();
   }, []);
 
-  // ---------------------
-  // Expand/collapse logic
-  // ---------------------
   const toggleMappingDropdownLeft = (id) => {
-    console.log("Left toggled", id);
     setExpandMappingIdLeft((prev) => (prev === id ? null : id));
   };
+
   const toggleMappingDropdownRight = (id) => {
-    console.log("Right toggled", id);
     setExpandMappingIdRight((prev) => (prev === id ? null : id));
   };
 
-  // ---------------------
-  // Drag handlers
-  // ---------------------
   const handleDragStartMapping = (e, mapping) => {
     e.dataTransfer.setData("application/json", JSON.stringify(mapping));
     setDraggingMappingId(mapping.id);
   };
+
   const handleDragEndMapping = () => {
     setDraggingMappingId(null);
   };
+
   const handleDragOverDropZone = (e) => {
     e.preventDefault();
     setHighlighted(true);
   };
+
   const handleDragLeaveDropZone = (e) => {
     e.preventDefault();
     setHighlighted(false);
   };
+
   const handleDropOnDropZone = (e) => {
     e.preventDefault();
     setHighlighted(false);
@@ -72,19 +69,28 @@ const CreateScenario = () => {
     if (!jsonData) return;
     const droppedMapping = JSON.parse(jsonData);
 
-    // Possibly find responses, etc.
-    // Then push to newScenarioMappings.
     setNewScenarioMappings((prev) => {
-      // Avoid duplicates
       const alreadyExists = prev.some((m) => m.id === droppedMapping.id);
       if (alreadyExists) return prev;
       return [...prev, droppedMapping];
     });
   };
 
-  // ---------------------
-  // Save logic
-  // ---------------------
+  const handleAddToScenario = (mappingId) => {
+    const mappingToAdd = mappings.find((m) => m.id === mappingId);
+
+    if (!mappingToAdd) return;
+
+    setNewScenarioMappings((prevMappings) => {
+      const alreadyExists = prevMappings.some((m) => m.id === mappingToAdd.id);
+      if (alreadyExists) return prevMappings;
+      return [...prevMappings, mappingToAdd];
+    });
+
+    // Add to addedMappings state
+    setAddedMappings((prevAdded) => new Set(prevAdded).add(mappingId));
+  };
+
   const handleSaveNewScenario = async () => {
     if (!scenarioName.trim()) {
       alert("Please enter a scenario name.");
@@ -98,7 +104,6 @@ const CreateScenario = () => {
       name: scenarioName,
       mappings: newScenarioMappings,
     };
-    // Save scenario
     const savedScenario = await saveScenario(newScenarioData);
     if (savedScenario) {
       alert("Scenario saved successfully!");
@@ -108,9 +113,6 @@ const CreateScenario = () => {
     }
   };
 
-  // ---------------------
-  // Remove from left list
-  // ---------------------
   const handleRemoveMapping = (id) => {
     setNewScenarioMappings((prev) => prev.filter((m) => m.id !== id));
   };
@@ -126,15 +128,17 @@ const CreateScenario = () => {
         style={{ background: highlighted ? "#e6f7ff" : "" }}
       >
         <h1>Create a New Scenario</h1>
-        <h3>Drag and drop the mappings you want to add into a scenario and enter a title.</h3>
-        <input 
+        <h3>
+          Drag and drop the mappings you want to add into a scenario and enter a
+          title.
+        </h3>
+        <input
           className={styles.inputTitle}
           placeholder="Enter Scenario Title Here"
           value={scenarioName}
           onChange={(e) => setScenarioName(e.target.value)}
         />
         <ScenarioMappingList
-          // The list on the left is your "new scenario" list
           mappings={newScenarioMappings}
           responses={responses}
           expandId={expandMappingIdRight}
@@ -142,23 +146,28 @@ const CreateScenario = () => {
           draggingMappingId={draggingMappingId}
           handleDragStartMapping={handleDragStartMapping}
           handleDragEndMapping={handleDragEndMapping}
-          handleRemoveMapping={handleRemoveMapping}
+          handleRemoveMapping={handleRemoveMapping} // Don't pass handleAddToScenario here
         />
-        <button className={styles.button} onClick={handleSaveNewScenario}>Save Scenario</button>
+        <button className={styles.button} onClick={handleSaveNewScenario}>
+          Save Scenario
+        </button>
       </div>
 
       {/* RIGHT PANEL: Saved Mappings */}
       <div className={styles.rightPanel}>
         <h2>Saved Mappings</h2>
         <ScenarioMappingList
-          // The list on the right is your "existing mappings"
-          mappings={mappings}
+          mappings={mappings.filter(
+            (mapping) => !addedMappings.has(mapping.id)
+          )} // Exclude the ones already added
           responses={responses}
+          expanded={expandMappingIdLeft}
           expandId={expandMappingIdLeft}
           onToggleExpand={toggleMappingDropdownLeft}
           draggingMappingId={draggingMappingId}
           handleDragStartMapping={handleDragStartMapping}
           handleDragEndMapping={handleDragEndMapping}
+          handleAddToScenario={handleAddToScenario} // Pass handleAddToScenario here
         />
       </div>
     </div>
