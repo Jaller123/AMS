@@ -22,6 +22,7 @@ const EditScenario = () => {
   const [expandMappingIdRight, setExpandMappingIdRight] = useState(null);
   const [scenarioName, setScenarioName] = useState("");
   const [highlighted, setHighlighted] = useState(false);
+  const [addButton, setAddButton] = useState()
 
   // Load mappings and scenarios on component mount
   useEffect(() => {
@@ -168,6 +169,27 @@ const EditScenario = () => {
     }
   };
 
+  const handleAddToScenarios = (mappingId, e) => {
+
+    const fullMapping = mappings.find((m) => m.id === mappingId.id) || {};
+
+    const cleanMapping = {
+      request: { reqId: mappingId },
+      response:
+        fullMapping && fullMapping.id
+          ? { resId: mappingId + ".1" }
+          : {},
+    };
+
+    // Check by mapping id to avoid duplicates
+    const alreadyExists = editScenarioMappings.some(
+      (m) => m.request.reqId === cleanMapping.request.reqId
+    );
+    if (!alreadyExists) {
+      setEditScenarioMappings([...editScenarioMappings, cleanMapping]);
+    }
+  }
+
   const handleRemoveMapping = (mappingId) => {
     setEditScenarioMappings((prevMappings) =>
       prevMappings.filter((mapping) => mapping.request.reqId !== mappingId)
@@ -296,6 +318,7 @@ const EditScenario = () => {
                     transition: "opacity 0.2s ease, transform 0.2s ease",
                   }}
                 >
+                 
                   <span>
                     <strong>{mapping.request?.method || "METHOD"}</strong> |{" "}
                     {mapping.request?.url ||

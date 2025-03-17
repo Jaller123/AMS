@@ -1,0 +1,14 @@
+[
+  {
+    "id": "1",
+    "name": "Updated Scenario",
+    "mappings": [
+      {
+        "request": {
+          "reqId": "1"
+        },
+        "response": {}
+      }
+    ]
+  }
+]
