@@ -12,9 +12,10 @@ const ReqDetailPage = ({ mappings, handleSaveResponse }) => {
 
   // State for creating a new response
   const [newResponse, setNewResponse] = useState({
+    title:"",
     status: "",
-    headers: "{}",
-    body: "{}",
+    headers: '{"Content-Type": "application/json"}',
+    body: '{"body": "text"}',
   });
 
   const handleSaveNewResponse = () => {
@@ -29,6 +30,7 @@ const ReqDetailPage = ({ mappings, handleSaveResponse }) => {
       const parsedBody = JSON.parse(newResponse.body || "{}");
 
       handleSaveResponse(mapping?.id, {
+        title: newResponse.title,
         status: newResponse.status,
         headers: parsedHeaders,
         body: parsedBody,
@@ -57,6 +59,15 @@ const ReqDetailPage = ({ mappings, handleSaveResponse }) => {
           <div className={styles.formContainer}>
             <h3>Create a New Response</h3>
             <div className={styles.inputGroup}>
+            <label>Title</label>
+              <input
+                type="text"
+                value={newResponse.title}
+                onChange={(e) =>
+                  setNewResponse((prev) => ({ ...prev, title: e.target.value }))
+                }
+                placeholder="Title"
+              />
               <label>Status</label>
               <input
                 type="text"

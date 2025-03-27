@@ -33,8 +33,9 @@ const App = () => {
     const loadMappingsAndResponses = async () => {
       try {
         const data = await fetchMappings();
-        setMappings(data.requests || []); // Make sure 'requests' exists in your data
-        setResponses(data.responses || []); // Ensure 'responses' exists
+        setMappings(data.mappings || []); 
+        const allResponses = data.mappings.flatMap(m => m.responses);
+        setResponses(allResponses); 
       } catch (error) {
         console.error("Failed to load mappings and responses:", error);
         alert("Failed to load data from the server. Please check the console.");
@@ -47,13 +48,28 @@ const App = () => {
   const handleSaveResponse = async (reqId, newResponse) => {
     const responseToSave = {
       reqId,
-      resJson: newResponse,
+      resJson: {
+        ...newResponse,
+        title: newResponse.title
+      },
       timestamp: new Date().toISOString(),
     };
 
     try {
       const savedResponse = await saveResponse(responseToSave);
       setResponses((prevResponses) => [...prevResponses, savedResponse]);
+
+      setMappings((prevMappings) =>
+        prevMappings.map((mapping) => {
+          if (String(mapping.id) === String(reqId)) {
+            return {
+              ...mapping,
+              responses: [...(mapping.responses || []), savedResponse],
+            }
+        }
+        return mapping
+        })
+      )
     } catch (error) {
       console.error("Failed to save response:", error);
       alert("Failed to save response. Please try again.");
@@ -68,19 +84,20 @@ const App = () => {
           request: requestData,
           response: responseData,
         });
-
-        const { id, request, response, wireMockUuid } = newMapping;
-
-        // ✅ Update UI instantly
+        
+        const { id, request, wireMockUuid, responses } = newMapping;
+        
         setMappings((prevMappings) => [
           ...prevMappings,
           {
             id,
             request,
-            wireMockUuid,
-            isActive: true, // ✅ Show as active immediately
+            wireMockId: wireMockUuid,
+            isActive: true,
+            responses: responses || (response ? [response] : []),
           },
         ]);
+        
 
         setResponses((prevResponses) => [
           ...prevResponses,
@@ -89,7 +106,7 @@ const App = () => {
               prevResponses.filter((r) => r.reqId === id).length + 1
             }`,
             reqId: id,
-            resJson: response,
+            resJson: responses[0],
           },
         ]);
 
@@ -102,7 +119,7 @@ const App = () => {
         // ✅ Fetch mappings after a short delay
         setTimeout(async () => {
           const updatedData = await fetchMappings();
-          setMappings(updatedData.requests);
+          setMappings(updatedData.mappings || []);
         }, 500);
 
         toast.success("Mapping saved successfully!");
@@ -147,25 +164,24 @@ const App = () => {
   const handleUpdateRequest = async (requestId, updatedRequest) => {
     try {
       const response = await fetch(
-        `http://localhost:8080/requests/${requestId}`,
+        `http://localhost:8080/mappings/${requestId}`,  // ✅ Updated to match backend
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ resJson: updatedRequest }),
+          body: JSON.stringify({ request: updatedRequest }), // ✅ Use "request" key
         }
       );
-
+  
       if (!response.ok) {
         throw new Error("Failed to update request.");
       }
-
-      const { updatedRequest: updatedRequestFromServer } =
-        await response.json();
-
+  
+      const { updatedRequest: updatedRequestFromServer } = await response.json();
+  
       setMappings((prevMappings) =>
         prevMappings.map((mapping) =>
           mapping.id === requestId
-            ? { ...mapping, request: updatedRequestFromServer.resJson }
+            ? { ...mapping, request: updatedRequestFromServer }
             : mapping
         )
       );
@@ -174,24 +190,28 @@ const App = () => {
       alert("Failed to update request. Please try again.");
     }
   };
+  
 
   const handleUpdateResponse = async (responseId, updatedResponse) => {
     try {
-      const res = await fetch(`http://localhost:8080/responses/${responseId}`, {
+      console.log("Updating response with ID:", responseId);
+      console.log("Updated Response Data:", updatedResponse);
+      
+      const res = await fetch(`http://localhost:8080/responses/${responseId}`, {  // ✅ Ensure correct endpoint
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ resJson: updatedResponse }),
+        body: JSON.stringify({ response: updatedResponse }),  // ✅ Fix key
       });
-
+  
       if (!res.ok) {
         throw new Error("Failed to update response.");
       }
-
+  
       const { updatedResponse: updatedResponseFromServer } = await res.json();
-
+  
       setResponses((prevResponses) =>
         prevResponses.map((response) =>
-          response.id === responseId ? updatedResponseFromServer : response
+          response.resId === responseId ? { ...response, resJson: updatedResponseFromServer } : response
         )
       );
     } catch (error) {
@@ -199,6 +219,7 @@ const App = () => {
       alert("Failed to update response. Please try again.");
     }
   };
+  
 
   return (
     <Router>

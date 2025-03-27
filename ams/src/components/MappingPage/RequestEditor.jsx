@@ -3,12 +3,12 @@ import styles from "./MappingsPage.module.css";
 
 const RequestEditor = ({
   mappingId,
-  editedRequest,
+  editedRequest, // now the flattened request object
   setEditedRequest,
   handleUpdateRequest,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
-  // localRequest contains a urlMatchType field to choose which key to use.
+  // localRequest state for form editing
   const [localRequest, setLocalRequest] = useState({
     title: "",
     url: "",
@@ -18,7 +18,7 @@ const RequestEditor = ({
     body: "{}",
   });
 
-  // Helper: determine the current URL matching option from editedRequest.
+  // Determine which URL key to use
   const determineURLMatchType = (reqObj) => {
     if (!reqObj) return "url";
     if (reqObj.urlPath) return "urlPath";
@@ -29,6 +29,7 @@ const RequestEditor = ({
     return "url";
   };
 
+  // When the editedRequest changes, update the local state with prefilled values.
   useEffect(() => {
     if (editedRequest) {
       setLocalRequest({
@@ -43,6 +44,7 @@ const RequestEditor = ({
         urlMatchType: determineURLMatchType(editedRequest),
         method: editedRequest.method || "",
         headers: JSON.stringify(editedRequest.headers || {}, null, 2),
+        // If the request has a body stored in bodyPatterns, use that; otherwise, fallback to the body field.
         body: editedRequest.bodyPatterns
           ? JSON.stringify(editedRequest.bodyPatterns[0].equalToJson || {}, null, 2)
           : JSON.stringify(editedRequest.body || {}, null, 2),
@@ -52,7 +54,7 @@ const RequestEditor = ({
 
   const saveRequest = () => {
     try {
-      // Parse headers and body.
+      // Parse headers and body JSON strings.
       const parsedHeaders = JSON.parse(localRequest.headers || "{}");
       const parsedBody = JSON.parse(localRequest.body || "{}");
 
@@ -67,20 +69,18 @@ const RequestEditor = ({
       updatedRequest.method = localRequest.method.toUpperCase();
       updatedRequest.headers = Object.fromEntries(
         Object.entries(parsedHeaders).map(([key, value]) => {
-          if (typeof value === "object" && value !== null && "equalTo" in value) {
-            return [key, value];
-          } else {
-            return [key, { equalTo: value }];
-          }
+          return [key, typeof value === "object" ? value : { equalTo: value }];
         })
       );
       if (localRequest.body && Object.keys(parsedBody).length > 0) {
         updatedRequest.bodyPatterns = [{ equalToJson: parsedBody }];
       }
 
-      // Update using the handler.
+      // Call the update handler and then exit editing mode.
       handleUpdateRequest(mappingId, updatedRequest);
       setIsEditing(false);
+      // Optionally update local state too:
+      setEditedRequest(updatedRequest);
     } catch (error) {
       alert("Invalid JSON in headers or body.");
     }
@@ -95,7 +95,6 @@ const RequestEditor = ({
           <input
             placeholder="Title"
             type="text"
-            
             value={localRequest.title}
             onChange={(e) =>
               setLocalRequest({ ...localRequest, title: e.target.value })
@@ -104,7 +103,7 @@ const RequestEditor = ({
           <label htmlFor="urlMatchType">URL Matching Option</label>
           <select
             id="urlMatchType"
-            data-testid="url-match-type-select" 
+            data-testid="url-match-type-select"
             value={localRequest.urlMatchType}
             onChange={(e) =>
               setLocalRequest({ ...localRequest, urlMatchType: e.target.value })
@@ -155,24 +154,21 @@ const RequestEditor = ({
         <div>
           <pre>
             {JSON.stringify(
-              (() => {
-                // Reconstruct the saved request exactly.
-                let obj = {};
-                if (editedRequest?.title) obj.title = editedRequest.title;
-                const keys = ["url", "urlPath", "urlPathPattern", "urlPathTemplate", "urlPattern"];
-                for (let key of keys) {
-                  if (editedRequest && editedRequest[key]) {
-                    obj[key] = editedRequest[key];
-                    break;
-                  }
-                }
-                obj.method = editedRequest?.method || "";
-                obj.headers = editedRequest?.headers || "";
-                obj.body = editedRequest?.bodyPatterns
+              {
+                title: editedRequest?.title || "",
+                url:
+                  editedRequest?.url ||
+                  editedRequest?.urlPath ||
+                  editedRequest?.urlPathPattern ||
+                  editedRequest?.urlPathTemplate ||
+                  editedRequest?.urlPattern ||
+                  "",
+                method: editedRequest?.method || "",
+                headers: editedRequest?.headers || {},
+                body: editedRequest?.bodyPatterns
                   ? editedRequest.bodyPatterns[0].equalToJson
-                  : editedRequest?.body || "";
-                return obj;
-              })(),
+                  : editedRequest?.body || {},
+              },
               null,
               2
             )}

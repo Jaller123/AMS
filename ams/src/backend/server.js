@@ -1,23 +1,26 @@
 import express from "express";
 import fs from "fs";
+import sequelize from "./db.js";
 import bodyParser from "body-parser";
 import cors from "cors";
 import path from "path";
 import fetch from "node-fetch";
-import { fileURLToPath } from "url";
 import { handleSendToWireMock } from "./api.js";
+import {
+  getMappings,
+  createMapping,
+  updateMappingRequest,
+  updateMappingResponse,
+  deleteMapping,
+} from './mappings.js'
+
 
 const WIREMOCK_BASE_URL = "http://localhost:8081/__admin/mappings";
 const app = express();
 app.use(bodyParser.json());
 app.use(cors({ origin: "*" }));
+app.use(express.json());
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const requestsFile = path.join(__dirname, "./mappings_requests.json");
-const responseFile = path.join(__dirname, "./mappings_responses.json");
-const scenariosFile = path.join(__dirname, "./scenarios.json") 
 
 // Helper för nästa ID
 const getNextId = (mappings) => {
@@ -40,12 +43,15 @@ app.get("/health", async (req, res) => {
 });
 
 // Hämta alla mappings
-app.get("/mappings", (req, res) => {
-  const requests = JSON.parse(fs.readFileSync(requestsFile, "utf-8"));
-  const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"));
-  console.log("GET /mappings:", { requests, responses });
-  res.json({ requests, responses });
+app.get("/mappings", async (req, res) => {
+  try {
+    const mappings = await getMappings();
+    res.json({ mappings });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch mappings" });
+  }
 });
+
 
 const sendMappingToWireMock = async (request, response) => {
   const mapping = {
@@ -96,108 +102,22 @@ const sendMappingToWireMock = async (request, response) => {
 
 
 // Ny endpoint för att skicka en specifik mapping till WireMock
-app.post("/mappings", (req, res) => {
-  const { request, response } = req.body;
-  const requests = JSON.parse(fs.readFileSync(requestsFile, "utf-8"));
-  const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"));
-
-  // Check for an existing mapping based on request details.
-  const existingMapping = requests.find((r) => {
-    return JSON.stringify(r.resJson) === JSON.stringify(request);
-  });
-
-  let requestId;
-  let transformedRequest; // Declare variable outside if/else
-
-  if (existingMapping) {
-    // Use the existing mapping's values.
-    requestId = existingMapping.id;
-    transformedRequest = existingMapping.resJson;
-  } else {
-    requestId = getNextId(requests);
-
-    // Determine which URL key to use
-    let urlKey = "url"; // default
-    if (request.urlMatchType) {
-      if (request.urlMatchType === "urlPath") {
-        urlKey = "urlPath";
-      } else if (request.urlMatchType === "urlPathPattern") {
-        urlKey = "urlPathPattern";
-      } else if (request.urlMatchType === "urlPathTemplate") {
-        urlKey = "urlPathTemplate";
-      } else if (request.urlMatchType === "urlPattern") {
-        urlKey = "urlPattern";
-      }
-    }
-
-    // Build the transformed request object in the desired order.
-    transformedRequest = {};
-    // 1. Title (if provided)
-    if (request.title) {
-      transformedRequest.title = request.title;
-    }
-    // 2. URL using the chosen key
-    if (request.url) {
-      transformedRequest[urlKey] = request.url;
-    }
-    // 3. Method
-    transformedRequest.method = request.method.toUpperCase();
-    // 4. Headers (wrap each value with "equalTo")
-    transformedRequest.headers = Object.fromEntries(
-      Object.entries(request.headers || {}).map(([key, value]) => [
-        key,
-        { equalTo: value },
-      ])
-    );
-    // 5. Body as bodyPatterns (if provided)
-    if (request.body) {
-      transformedRequest.bodyPatterns = [{ equalToJson: request.body }];
-    }
-
-    // Save the new mapping (do not include urlMatchType)
-    requests.push({
-      id: requestId,
-      resJson: transformedRequest,
-      wireMockId: null,
-    });
-    fs.writeFileSync(requestsFile, JSON.stringify(requests, null, 2));
+app.post('/mappings', async (req, res) => {
+  try {
+    // Expecting request.body to include "request" and optionally "response"
+    const mapping = req.body;
+    const newMapping = await createMapping(mapping);
+    res.json({ success: true, mapping: newMapping });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error creating mapping' });
   }
-
-  // Create a new response entry.
-  const matchingResponses = responses.filter((r) => r.reqId === requestId);
-  const responseId = `${requestId}.${matchingResponses.length + 1}`;
-  const timestamp = new Date().toLocaleString("sv-SE", {
-    timeZone: "Europe/Stockholm",
-  });
-  const newResponse = {
-    id: responseId,
-    reqId: requestId,
-    resJson: {
-      status: response.status,
-      headers: response.headers,
-      body: response.body, // Will be stringified when sending
-    },
-    timestamp,
-  };
-
-  responses.push(newResponse);
-  fs.writeFileSync(responseFile, JSON.stringify(responses, null, 2));
-
-  res.json({
-    success: true,
-    newRequest: { id: requestId, resJson: transformedRequest },
-    newResponse,
-  });
 });
-
-
 
 
 // POST /mappings/:id/send: Send a mapping to WireMock
 app.post("/mappings/:id/send", async (req, res) => {
   const { id } = req.params;
-  const requests = JSON.parse(fs.readFileSync(requestsFile, "utf-8"));
-  const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"));
+
 
   const mappingEntry = requests.find((r) => r.id === id);
   const mappingResponse = responses.find((r) => r.reqId === id);
@@ -258,187 +178,99 @@ app.post("/mappings/:id/send", async (req, res) => {
 
 
 // Uppdatera en request
-app.put("/requests/:id", (req, res) => {
-  const { id } = req.params;
-  const { resJson } = req.body;
-
-  if (!id || !resJson) {
-    return res
-      .status(400)
-      .json({ success: false, message: "ID and request data are required." });
+app.put('/mappings/:reqId', async (req, res) => {
+  try {
+    const { reqId } = req.params;
+    const updatedRequest = req.body.request;
+    const result = await updateMappingRequest(reqId, updatedRequest);
+    res.json({ success: true, updatedRequest: result });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error updating mapping' });
   }
-
-  const requests = JSON.parse(fs.readFileSync(requestsFile, "utf-8"));
-  const requestIndex = requests.findIndex(
-    (req) => String(req.id) === String(id)
-  );
-
-  if (requestIndex === -1) {
-    return res
-      .status(404)
-      .json({ success: false, message: "Request not found." });
-  }
-
-  // Uppdatera requesten
-  requests[requestIndex].resJson = resJson;
-  fs.writeFileSync(requestsFile, JSON.stringify(requests, null, 2));
-
-  res.json({ success: true, updatedRequest: requests[requestIndex] });
 });
+
 
 // Uppdatera en respons
-app.put("/requests/:id", (req, res) => {
-  const { id } = req.params;
-  const { resJson } = req.body; // Incoming data containing title, url, method, headers, (and optionally body or urlMatchType)
-
-  if (!id || !resJson) {
-    return res
-      .status(400)
-      .json({ success: false, message: "ID and request data are required." });
+app.put('/responses/:resId', async (req, res) => {
+  try {
+    const { resId } = req.params;
+    console.log(`Received update request for response ID: ${resId}`);
+    console.log("Request body:", req.body);
+    const updatedResponse = req.body.response;
+    const result = await updateMappingResponse(resId, updatedResponse);
+    res.json({ success: true, updatedResponse: result });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error updating response' });
   }
-
-  const requests = JSON.parse(fs.readFileSync(requestsFile, "utf-8"));
-  const requestIndex = requests.findIndex((r) => String(r.id) === String(id));
-
-  if (requestIndex === -1) {
-    return res
-      .status(404)
-      .json({ success: false, message: "Request not found." });
-  }
-
-  // Determine which URL key to use based on an optional urlMatchType field.
-  // (If not provided, default to "url")
-  let urlKey = "url";
-  if (resJson.urlMatchType) {
-    if (resJson.urlMatchType === "urlPath") {
-      urlKey = "urlPath";
-    } else if (resJson.urlMatchType === "urlPathPattern") {
-      urlKey = "urlPathPattern";
-    } else if (resJson.urlMatchType === "urlPathTemplate") {
-      urlKey = "urlPathTemplate";
-    } else if (resJson.urlMatchType === "urlPattern") {
-      urlKey = "urlPattern";
-    }
-  }
-
-  // Build the transformed request object in the desired order:
-  // 1. Title (if provided)
-  // 2. URL (using the chosen key)
-  // 3. Method (uppercased)
-  // 4. Headers (each value wrapped with "equalTo")
-  // 5. Body as bodyPatterns (if provided)
-  let transformedRequest = {};
-  if (resJson.title) {
-    transformedRequest.title = resJson.title;
-  }
-  if (resJson.url) {
-    transformedRequest[urlKey] = resJson.url;
-  }
-  transformedRequest.method = resJson.method.toUpperCase();
-  transformedRequest.headers = Object.fromEntries(
-    Object.entries(resJson.headers || {}).map(([key, value]) => [
-      key,
-      { equalTo: value },
-    ])
-  );
-  if (resJson.body) {
-    transformedRequest.bodyPatterns = [{ equalToJson: resJson.body }];
-  }
-
-  // Update the saved mapping with the transformed object.
-  requests[requestIndex].resJson = transformedRequest;
-  fs.writeFileSync(requestsFile, JSON.stringify(requests, null, 2));
-
-  res.json({ success: true, updatedRequest: requests[requestIndex] });
 });
 
+app.get('/responses/:resId', async (req, res) => {
+  try {
+    const { resId } = req.params;
+    const responses = await getMappings(); // Fetch all mappings (which contain responses)
+    const response = responses
+      .flatMap(m => m.responses)  // Extract responses from mappings
+      .find(r => r.dbId == resId);  // Match by resId
+
+    if (!response) {
+      return res.status(404).json({ success: false, message: "Response not found" });
+    }
+
+    res.json({ success: true, response });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Error fetching response" });
+  }
+});
 
 
 // Ta bort mapping
-app.delete("/mappings/:id", async (req, res) => {
-  const { id } = req.params;
-  if (!id) {
-    return res.status(400).json({ success: false, message: "Invalid ID" });
+app.delete('/mappings/:reqId', async (req, res) => {
+  try {
+    const { reqId } = req.params;
+    await deleteMapping(reqId);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error deleting mapping' });
   }
-
-  // Read existing mappings from file
-  const requests = JSON.parse(fs.readFileSync(requestsFile, "utf-8"));
-  const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"));
-
-  // Find the mapping to delete
-  const mappingToDelete = requests.find((req) => String(req.id) === String(id));
-
-  // If the mapping exists and has a WireMock ID, delete it from WireMock
-  if (mappingToDelete && mappingToDelete.wireMockId) {
-    try {
-      const wireMockDeleteResponse = await fetch(
-        `${WIREMOCK_BASE_URL}/${mappingToDelete.wireMockId}`,
-        { method: "DELETE" }
-      );
-      if (!wireMockDeleteResponse.ok) {
-        console.error(
-          "Failed to delete mapping from WireMock:",
-          await wireMockDeleteResponse.text()
-        );
-      } else {
-        console.log("Mapping deleted from WireMock successfully");
-      }
-    } catch (error) {
-      console.error("Error deleting mapping from WireMock:", error);
-    }
-  }
-
-  // Filter out the deleted mapping locally
-  const updatedRequests = requests.filter(
-    (req) => String(req.id) !== String(id)
-  );
-  const updatedResponses = responses.filter(
-    (res) => String(res.reqId) !== String(id)
-  );
-
-  // Write the updated data back to files
-  fs.writeFileSync(requestsFile, JSON.stringify(updatedRequests, null, 2));
-  fs.writeFileSync(responseFile, JSON.stringify(updatedResponses, null, 2));
-
-  res.json({ success: true });
 });
 
 
-app.post("/responses", (req, res) => {
-  const { reqId, resJson, timestamp } = req.body;
-  if (
-    !reqId ||
-    !resJson ||
-    !resJson.status ||
-    !resJson.headers ||
-    !resJson.body
-  ) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid data. Ensure reqId and resJson fields are valid.",
-    });
+app.post("/responses", async (req, res) => {
+  try {
+    const { reqId, resJson, } = req.body;
+
+    if (!reqId || !resJson?.status || !resJson?.headers || !resJson?.body) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid data. Ensure reqId and resJson fields are valid.",
+      });
+    }
+
+    const mysql = await import("./db.js");
+    const connection = mysql.default;
+    const [result] = await connection.execute(
+      "INSERT INTO restab (resJson, reqId, title, timestamp) VALUES (?, ?, ?)",
+      [JSON.stringify(resJson), reqId, resJson.title || "Untitled" || new Date().toISOString()]
+    );
+
+    const newResponse = {
+      resId: result.insertId,
+      reqId,
+      resJson,
+    };
+
+    res.json({ success: true, newResponse });
+  } catch (error) {
+    console.error("Error creating response:", error);
+    res.status(500).json({ success: false, message: "Failed to save response." });
   }
-  const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"));
-  const matchingResponses = responses.filter(
-    (response) => response.reqId === reqId
-  );
-  const responseId = `${reqId}.${matchingResponses.length + 1}`;
-  const newResponse = {
-    id: responseId,
-    reqId,
-    resJson,
-    timestamp: timestamp || new Date().toISOString(),
-  };
-  responses.push(newResponse);
-  fs.writeFileSync(responseFile, JSON.stringify(responses, null, 2));
-  res.json({ success: true, newResponse });
 });
 
 app.get("/traffic", async (req, res) => {
   try {
     // Read AMS mappings
     const storeRequests = JSON.parse(fs.readFileSync(requestsFile, "utf-8"));
-    const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"));
+    c
 
     const mappingLookup = storeRequests.reduce((lookup, mapping) => {
       lookup[mapping.wireMockId] = mapping;

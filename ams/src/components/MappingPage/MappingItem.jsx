@@ -37,13 +37,14 @@ const MappingItem = ({
   const mappingItemRef = useRef(null);
   const toggleButtonRef = useRef(null);
   const [hasAutoExpanded, setHasAutoExpanded] = useState(false);
+  
 
   // Initialize local states if not already done.
   useEffect(() => {
     if (!editedRequests[mapping.id]) {
       setEditedRequests((prev) => ({
         ...prev,
-        [mapping.id]: mapping.request || {},
+        [mapping.id]: mapping.request.reqJson || {},
       }));
     }
     if (!editedResponses[mapping.id]) {
@@ -107,7 +108,8 @@ const MappingItem = ({
     }
   }, [expandedMappings, autoExpandMappingId, mapping.id]);
 
-  const currentRequest = editedRequests[mapping.id] || {};
+  const currentRequest = editedRequests[mapping.id] || mapping.request.reqJson || {};
+  console.log(mapping)
   const displayURL = extractURLValue(currentRequest);
 
   return (
@@ -119,7 +121,7 @@ const MappingItem = ({
       <div className={styles.titleRow} onClick={toggleExpanded}>
         <h3>{currentRequest.method || "Unidentified Method"}</h3>
         <h3>{displayURL || "No URL"}</h3>
-        <h3>{currentRequest.title || "Untitled Mapping"}</h3>
+        <h3>{mapping.title || "Untitled Mapping"}</h3>
         <span
           className={
             mapping.status === "Active" ? styles.active : styles.unmapped
@@ -142,7 +144,7 @@ const MappingItem = ({
         <>
           <RequestEditor
             mappingId={mapping.id}
-            editedRequest={editedRequests[mapping.id]}
+            editedRequest={editedRequests[mapping.id] || mapping.request}
             setEditedRequest={(data) =>
               setEditedRequests((prev) => ({ ...prev, [mapping.id]: data }))
             }
