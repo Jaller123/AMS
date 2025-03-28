@@ -23,7 +23,7 @@ const ResponseEditor = ({
   // Initialize `localResponse` when `editedResponse` or `selectedResponse` changes
   useEffect(() => {
     const selectedRes =
-      relevantResponses.find((res) => res.id === selectedResponse) || {};
+      relevantResponses.find((res) => res.resId === selectedResponse) || {};
     setLocalResponse({
       ...selectedRes.resJson,
       headers: selectedRes.resJson?.headers || {},
@@ -98,17 +98,19 @@ const ResponseEditor = ({
           <select
             value={selectedResponse || ""}
             onChange={(e) => {
-              const response = relevantResponses.find((res) => res.id === e.target.value);
+              const selectedId = Number(e.target.value); 
+              const response = relevantResponses.find((res) => res.resId === selectedId);
               // Now, set selectedResponse as the actual dbId, not the composite id
               setSelectedResponse(response?.resId || "");
               setEditedResponse(response?.resJson || {});
             }}
           >
-            {relevantResponses.map((response) => (
-              <option key={response.id} value={response.resId}>
-                {response.id} - {response.title || response.resJson?.status || "No Status"}
-              </option>
-            ))}
+          {relevantResponses.map((response) => (
+          <option key={response.resId} value={response.resId}>
+          {response.id} - {response.title || response.resJson?.status || "No Status"}
+          </option>
+          ))}
+
           </select>
 
           <pre className={styles.preresponse}>{JSON.stringify(localResponse, null, 2)}</pre>

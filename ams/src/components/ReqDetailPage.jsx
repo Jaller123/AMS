@@ -8,7 +8,7 @@ const ReqDetailPage = ({ mappings, handleSaveResponse }) => {
 
   // Find the specific request using the mapping ID
   const mapping =
-    mappings.find((m) => String(m.id) === String(mappingId)) || null;
+    mappings.find((m) => String(m.request.id) === String(mappingId)) || null;
 
   // State for creating a new response
   const [newResponse, setNewResponse] = useState({
@@ -29,7 +29,7 @@ const ReqDetailPage = ({ mappings, handleSaveResponse }) => {
       const parsedHeaders = JSON.parse(newResponse.headers || "{}");
       const parsedBody = JSON.parse(newResponse.body || "{}");
 
-      handleSaveResponse(mapping?.id, {
+      handleSaveResponse(mapping?.request?.id, {
         title: newResponse.title,
         status: newResponse.status,
         headers: parsedHeaders,

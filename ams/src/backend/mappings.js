@@ -34,9 +34,10 @@ export async function getMappings() {
           }));
         const parsedReqJson = typeof req.reqJson === "string" ? JSON.parse(req.reqJson) : req.reqJson;
         return {
-          id: req.reqId,
-          title: req.title,
-          request: { reqJson: parsedReqJson },
+          request: { 
+            id: req.reqId,
+            title: req.title,
+            reqJson: parsedReqJson },
           wireMockId: req.wireMockId,
           responses,
         };
@@ -51,7 +52,9 @@ export async function getMappings() {
 }
   
   
-
+function formatMySQLDate(date) {
+  return date.toISOString().slice(0, 19).replace('T', ' ')
+}
 
 export async function createMapping(mapping) {
   try {
@@ -90,8 +93,13 @@ export async function createMapping(mapping) {
       const resJson = JSON.stringify(mapping.response);
       const resTitle = mapping.response.title || "Untitled Response";
       const [resResult] = await connection.execute(
-        'INSERT INTO restab (resJson, reqId, title) VALUES (?, ?, ?)',
-        [resJson, reqId, resTitle]
+        'INSERT INTO restab (resJson, reqId, title, timestamp) VALUES (?, ?, ?, ?)',
+        [
+          JSON.stringify(resJson),
+          reqId,
+          resTitle,
+          formatMySQLDate(new Date()),
+        ]
       );
       newResponse = {
         dbId: resResult.insertId,
@@ -108,6 +116,36 @@ export async function createMapping(mapping) {
   }
 }
 
+
+export async function createResponse(reqId, resJson) {
+  try {
+    const resTitle = resJson.title || "Untitled";
+    const timestamp = formatMySQLDate(new Date());
+
+    const [existingRows] = await connection.execute(
+      'SELECT COUNT(*) as count FROM restab WHERE reqId = ?',
+      [reqId]
+    );
+    const index = existingRows[0].count;
+
+    const [result] = await connection.execute(
+      'INSERT INTO restab (resJson, reqId, title, timestamp) VALUES (?, ?, ?, ?)',
+      [JSON.stringify(resJson), reqId, resTitle, timestamp]
+    );
+
+    return {
+      id: `${reqId}.${index + 1}`,
+      resId: result.insertId,
+      reqId,
+      resJson,
+      title: resTitle,
+      timestamp,
+    };
+  } catch (error) {
+    console.error("Error creating response:", error);
+    throw error;
+  }
+}
   
 
 // Update a mapping's request (in the reqtab table)
