@@ -43,7 +43,9 @@ export const fetchMappings = async () => {
     // Ensure each mapping has a responses array:
     const mappings = (data.mappings || []).map(mapping => ({
       ...mapping,
-      responses: mapping.responses || []  // default to empty array if undefined
+      isActive: wiremockRunning && !!mapping.wireMockId,
+      wireMockId: wiremockRunning ? mapping.wireMockId : null,
+      responses: mapping.responses || []
     }));
 
     return { mappings, responses: [] };
@@ -109,6 +111,7 @@ export const handleSendToWireMock = async (mappingId) => {
     const data = await response.json();
 
     if (data.success) {
+      alert(data.message || "Mapping sent successfully!");
       return data; // ✅ Return the response so MappingsPage can handle updates
     } else {
       alert("Failed to send mapping to WireMock.");

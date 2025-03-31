@@ -13,6 +13,8 @@ import {
   updateMappingResponse,
   deleteMapping,
   createResponse,
+  saveWireMockToMapping,
+  clearWireMockIds,
 } from './mappings.js'
 
 
@@ -33,15 +35,21 @@ const getNextId = (mappings) => {
 // ✅ Add WireMock Health Check Route
 app.get("/health", async (req, res) => {
   try {
-    const response = await fetch("http://localhost:8081/__admin/mappings");
-    if (!response.ok) throw new Error("WireMock is unavailable");
+    const wireMockResponse = await fetch("http://localhost:8081/__admin/mappings");
+    if (!wireMockResponse.ok) throw new Error("WireMock is unavailable");
 
-    res.json({ wiremockRunning: true });
+    const mappings = await wireMockResponse.json();
+    const activeStubIds = mappings.mappings.map((m) => m.id);
+
+    res.json({ wiremockRunning: true, activeStubIds });
   } catch (error) {
     console.error("❌ WireMock is DOWN:", error.message);
-    res.json({ wiremockRunning: false }); // ✅ Send false if WireMock is down
+    await clearWireMockIds(); // ✅ Clear them on failure
+    res.json({ wiremockRunning: false, activeStubIds: [] });
   }
 });
+
+
 
 // Hämta alla mappings
 app.get("/mappings", async (req, res) => {
@@ -117,64 +125,55 @@ app.post('/mappings', async (req, res) => {
 
 // POST /mappings/:id/send: Send a mapping to WireMock
 app.post("/mappings/:id/send", async (req, res) => {
-  const { id } = req.params;
-
-
-  const mappingEntry = requests.find((r) => r.id === id);
-  const mappingResponse = responses.find((r) => r.reqId === id);
-
-  if (!mappingEntry || !mappingResponse) {
-    return res.status(404).json({ success: false, message: "Mapping not found" });
-  }
-
-  // Start with the saved request (transformed)...
-  let requestMapping = { ...mappingEntry.resJson };
-
-  // Remove custom fields that WireMock does not expect (e.g. "title")
-  if (requestMapping.title) {
-    delete requestMapping.title;
-  }
-
-  // If the saved object contains a plain "body" (instead of bodyPatterns),
-  // wrap it into a bodyPatterns array (and remove the plain "body" key).
-  if (requestMapping.body) {
-    requestMapping.bodyPatterns = [{ equalToJson: requestMapping.body }];
-    delete requestMapping.body;
-  }
-
-  // Build the mapping object to send to WireMock.
-  const mappingToSend = {
-    request: requestMapping,
-    response: {
-      status: mappingResponse.resJson.status,
-      headers: mappingResponse.resJson.headers,
-      // Ensure the response body is a string (WireMock expects a JSON string)
-      body: JSON.stringify(mappingResponse.resJson.body),
-    },
-  };
-
-  console.log("Mapping to send to WireMock:", mappingToSend);
-
   try {
+    const { id } = req.params;
+    const allMappings = await getMappings();
+    const mapping = allMappings.find((m) => String(m.request.id) === String(id));
+
+    if (!mapping) {
+      return res.status(404).json({ success: false, message: "Mapping not found" });
+    }
+
+    const requestData = mapping.request.reqJson;
+    const responseData = mapping.responses[0]?.resJson;
+
+    const mappingToSend = {
+      request: {
+        ...requestData,
+        ...(requestData.method !== 'GET' && requestData.body && {
+          bodyPatterns: [{ equalToJson: requestData.body }]
+        })
+      },
+      response: {
+        status: responseData?.status || 200,
+        headers: responseData?.headers || {},
+        body: JSON.stringify(responseData?.body || {})
+      }
+    };
+    
+    console.log("🔍 Sending to WireMock:\n", JSON.stringify(mappingToSend, null, 2));
+
     const wireMockResponse = await fetch(WIREMOCK_BASE_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(mappingToSend),
     });
+
     const data = await wireMockResponse.json();
     if (!wireMockResponse.ok) {
       console.error("WireMock response not OK:", data);
       return res.status(500).json({ success: false, message: "Failed to send to WireMock" });
     }
-    // Update the saved mapping with the WireMock UUID
-    mappingEntry.wireMockId = data.id ?? data.uuid;
-    fs.writeFileSync(requestsFile, JSON.stringify(requests, null, 2));
-    return res.json({ success: true, wireMockId: mappingEntry.wireMockId });
+    
+    await saveWireMockToMapping(id, data.id || data.wireMockId); // Save the WireMock ID to the mapping in the database
+    return res.json({ success: true, wireMockId: data.id || data.uuid, message: "Mapping sent to WireMock successfully!", });
+    
   } catch (error) {
-    console.error("❌ Error sending mapping to WireMock:", error);
-    return res.status(500).json({ success: false, message: error.message });
+    console.error("❌ Error sending to WireMock:", error);
+    res.status(500).json({ success: false, message: error.message });
   }
 });
+
 
 
 

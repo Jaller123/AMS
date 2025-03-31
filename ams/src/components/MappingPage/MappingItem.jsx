@@ -18,7 +18,7 @@ const extractURLValue = (reqObj) => {
 
 const MappingItem = ({
   mapping,
-  handleSendToWireMock,
+  sendToWireMockAndUpdateUI,
   responses,
   expandedMappings,
   setExpandedMappings,
@@ -37,8 +37,13 @@ const MappingItem = ({
   const mappingItemRef = useRef(null);
   const toggleButtonRef = useRef(null);
   const [hasAutoExpanded, setHasAutoExpanded] = useState(false);
-  const mappingId = mapping.request.id;
+  const mappingId = mapping.id || mapping.request.id;
+  const [isActive, setIsActive] = useState(!!mapping.wireMockId);
 
+
+  useEffect(() => {
+    setIsActive(!!mapping.wireMockId);
+  }, [mapping.wireMockId]);
 
   // Initialize local states if not already done.
   useEffect(() => {
@@ -122,6 +127,8 @@ const MappingItem = ({
     }
   }, [expandedMappings, autoExpandMappingId, mappingId]);
 
+  
+
   const currentRequest = editedRequests[mappingId] || mapping.request.reqJson || {};
   console.log(mapping)
   const displayURL = extractURLValue(currentRequest);
@@ -143,9 +150,10 @@ const MappingItem = ({
         >
           {mapping.status}
         </span>
-        <h3 className={mapping.isActive ? styles.active : styles.inactive}>
-          {mapping.isActive ? "✅ " : "❌"}
-        </h3>
+       <h3 className={isActive ? styles.active : styles.inactive}>
+          {isActive ? "✅ " : "❌"}
+      </h3>
+
         <button
           ref={toggleButtonRef}
           className={styles.toggleButton}
@@ -184,8 +192,7 @@ const MappingItem = ({
   }
   handleUpdateResponse={handleUpdateResponse}
 />
-
-          {mapping.isActive && (
+          {isActive && (
             <button
               className={styles.sendButton}
               onClick={() => {
@@ -198,12 +205,19 @@ const MappingItem = ({
               Traffic
             </button>
           )}
+
           <button
-            onClick={() => handleSendToWireMock(mappingId)}
+            onClick={async () => {
+              const result = await sendToWireMockAndUpdateUI(mappingId);
+              if (result?.success) {
+                setIsActive(true); // ✅ THIS is the key to reflect the new state locally
+              }
+            }}
             className={styles.sendButton}
           >
             Send to WireMock
           </button>
+
           <button
             onClick={() => handleDelete(mappingId)}
             className={styles.deleteButton}
