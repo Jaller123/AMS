@@ -26,10 +26,9 @@ const ResponseEditor = ({
       relevantResponses.find((res) => res.id === selectedResponse) || {};
     setLocalResponse({
       ...selectedRes.resJson,
-      headers: selectedRes.resJson?.headers || {}, // Keep as an object
-      body: selectedRes.resJson?.body || {}, // Keep as an object
+      headers: selectedRes.resJson?.headers || {},
+      body: selectedRes.resJson?.body || {},
     });
-    console.log("Updated Responses:", relevantResponses);
   }, [editedResponse, selectedResponse, relevantResponses]);
 
   const saveResponse = () => {
@@ -47,6 +46,7 @@ const ResponseEditor = ({
       };
       handleUpdateResponse(selectedResponse, updatedResponse);
       setIsEditing(false);
+      console.log("Updated Response;", updatedResponse);
     } catch (error) {
       alert("Invalid JSON in headers or body.");
     }
@@ -89,15 +89,21 @@ const ResponseEditor = ({
               setLocalResponse({ ...localResponse, body: e.target.value })
             }
           />
-          <button className={styles.saveResponseButton} onClick={saveResponse}>Save Response</button>
+          <button className={styles.saveResponseButton} onClick={saveResponse}>
+            Save Response
+          </button>
         </div>
       ) : (
         <div>
-          <select placeholder="Select Response"
+          // When setting the selected response:
+          <select
             value={selectedResponse || ""}
             onChange={(e) => {
-              const response = relevantResponses.find((res) => res.id === e.target.value);
-              setSelectedResponse(response?.id || "");
+              const response = relevantResponses.find(
+                (res) => res.id === e.target.value
+              );
+              // Now, set selectedResponse as the actual dbId, not the composite id
+              setSelectedResponse(response?.dbId || "");
               setEditedResponse(response?.resJson || {});
             }}
           >
@@ -107,15 +113,22 @@ const ResponseEditor = ({
               </option>
             ))}
           </select>
-          <pre className={styles.preresponse}>{JSON.stringify(localResponse, null, 2)}</pre>
+          <pre className={styles.preresponse}>
+            {JSON.stringify(localResponse, null, 2)}
+          </pre>
           <div className={styles.buttonContainer}>
-           <button onClick={() => setIsEditing(true)} className={styles.ButtonEdit}>Edit Response</button>
-          <button
-            onClick={() => navigate(`/request/${mappingId}`)}
-            className={styles.detailsButton}
-          >
-            Add New Response
-          </button>
+            <button
+              onClick={() => setIsEditing(true)}
+              className={styles.ButtonEdit}
+            >
+              Edit Response
+            </button>
+            <button
+              onClick={() => navigate(`/request/${mappingId}`)}
+              className={styles.detailsButton}
+            >
+              Add New Response
+            </button>
           </div>
         </div>
       )}

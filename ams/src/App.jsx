@@ -33,8 +33,9 @@ const App = () => {
     const loadMappingsAndResponses = async () => {
       try {
         const data = await fetchMappings();
-        setMappings(data.requests || []); // Make sure 'requests' exists in your data
-        setResponses(data.responses || []); // Ensure 'responses' exists
+        setMappings(data.mappings || []);
+        const allResponses = data.mappings.flatMap((m) => m.responses);
+        setResponses(allResponses);
       } catch (error) {
         console.error("Failed to load mappings and responses:", error);
         alert("Failed to load data from the server. Please check the console.");
@@ -69,16 +70,16 @@ const App = () => {
           response: responseData,
         });
 
-        const { id, request, response, wireMockUuid } = newMapping;
+        const { id, request, wireMockUuid, responses } = newMapping;
 
-        // ✅ Update UI instantly
         setMappings((prevMappings) => [
           ...prevMappings,
           {
             id,
             request,
-            wireMockUuid,
-            isActive: true, // ✅ Show as active immediately
+            wireMockId: wireMockUuid,
+            isActive: true,
+            responses: responses || (response ? [response] : []),
           },
         ]);
 
@@ -89,7 +90,7 @@ const App = () => {
               prevResponses.filter((r) => r.reqId === id).length + 1
             }`,
             reqId: id,
-            resJson: response,
+            resJson: responses[0],
           },
         ]);
 
@@ -102,7 +103,7 @@ const App = () => {
         // ✅ Fetch mappings after a short delay
         setTimeout(async () => {
           const updatedData = await fetchMappings();
-          setMappings(updatedData.requests);
+          setMappings(updatedData.mappings || []);
         }, 500);
 
         toast.success("Mapping saved successfully!");

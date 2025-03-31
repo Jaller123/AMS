@@ -1,5 +1,4 @@
 import React from "react";
-import styles from "./CreateScenario.module.css";
 
 const ScenarioMappingItem = ({
   mapping,
@@ -10,73 +9,37 @@ const ScenarioMappingItem = ({
   handleDragStartMapping,
   handleDragEndMapping,
   handleRemoveMapping,
-  handleAddToScenario, // Passed as prop
+  handleAddToScenario, // Function passed as prop
 }) => {
-  const { id, request } = mapping;
-
   return (
-    <li
-      className={styles.mappingItem}
-      draggable
-      onDragStart={(e) => handleDragStartMapping(e, mapping)}
-      onDragEnd={handleDragEndMapping}
-      style={{
-        cursor: "grab",
-        opacity: draggingMappingId === id ? 0.6 : 1,
-      }}
-    >
+    <li className={styles.mappingItem}>
       <div
         className={styles.mappingHeader}
-        onClick={() => onToggleExpand?.(id)}
+        onClick={() => onToggleExpand(mapping.id)} // Expandera eller kollapsa mappning
+        draggable
+        onDragStart={(e) => handleDragStartMapping(e, mapping)}
+        onDragEnd={handleDragEndMapping}
       >
-        <span>
-          <strong>{mapping.request?.method || "METHOD"}</strong> |{" "}
-          {mapping.request?.url ||
-            mapping.request?.urlPath ||
-            mapping.request?.urlPathPattern ||
-            mapping.request?.urlPathTemplate ||
-            mapping.request?.urlPattern ||
-            "No URL"}{" "}
-          | {mapping.request?.title || "No Title"}
-        </span>
-        {handleAddToScenario && (
-          <button
-            className={styles.addToScenarioButton}
-            onClick={(e) => {
-              e.stopPropagation(); // Prevent expand toggle
-              handleAddToScenario(id); // Adds mapping to scenario
-            }}
-          >
-            Add to Scenario
-          </button>
-        )}
-        {handleRemoveMapping && (
-          <button
-            className={styles.removeMapping}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleRemoveMapping(id);
-            }}
-          >
-            ❌
-          </button>
-        )}
+        <span>{mapping.name}</span>
+        <button
+          className={styles.addButton}
+          onClick={() => handleAddToScenario(mapping.id)} // Lägg till mappning i scenario
+        >
+          + Add to Scenario
+        </button>
+        <button
+          className={styles.removeButton}
+          onClick={() => handleRemoveMapping(mapping.id)} // Ta bort mappning från scenario
+        >
+          ❌ Remove
+        </button>
       </div>
 
       {expanded && (
         <div className={styles.mappingDetails}>
-          <h3>Request</h3>
-          <pre className={styles.preFormatted}>
-            {JSON.stringify(request, null, 2)}
-          </pre>
-          <h3>Responses</h3>
-          {responses
-            .filter((res) => res.reqId === id)
-            .map((res) => (
-              <pre key={res.id} className={styles.preFormatted}>
-                {JSON.stringify(res, null, 2)}
-              </pre>
-            ))}
+          <h3>Details for {mapping.name}</h3>
+          {/* Här kan du lägga till mer information om mappningen */}
+          <pre>{JSON.stringify(mapping, null, 2)}</pre>
         </div>
       )}
     </li>

@@ -43,7 +43,7 @@ const MappingItem = ({
     if (!editedRequests[mapping.id]) {
       setEditedRequests((prev) => ({
         ...prev,
-        [mapping.id]: mapping.request || {},
+        [mapping.id]: mapping.request.reqJson || {},
       }));
     }
     if (!editedResponses[mapping.id]) {
@@ -107,7 +107,8 @@ const MappingItem = ({
     }
   }, [expandedMappings, autoExpandMappingId, mapping.id]);
 
-  const currentRequest = editedRequests[mapping.id] || {};
+  const currentRequest =
+    editedRequests[mapping.id] || mapping.request.reqJson || {};
   const displayURL = extractURLValue(currentRequest);
 
   return (
@@ -142,7 +143,7 @@ const MappingItem = ({
         <>
           <RequestEditor
             mappingId={mapping.id}
-            editedRequest={editedRequests[mapping.id]}
+            editedRequest={editedRequests[mapping.id] || mapping.request}
             setEditedRequest={(data) =>
               setEditedRequests((prev) => ({ ...prev, [mapping.id]: data }))
             }

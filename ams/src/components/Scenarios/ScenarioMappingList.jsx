@@ -1,5 +1,5 @@
 import React from "react";
-import ScenarioMappingItem from "./ScenarioMappingItem";
+import ScenarioMappingItem from "./ScenarioMappingItem"; // Jag antar att du har en komponent för varje mappning
 import styles from "./CreateScenario.module.css";
 import useMappingSearch from "./useMappingSearch";
 import SortControls from "../MappingPage/SortControls";
@@ -14,9 +14,9 @@ const ScenarioMappingList = ({
   handleDragStartMapping,
   handleDragEndMapping,
   handleRemoveMapping,
-  handleAddToScenario, // Passed here
+  handleAddToScenario,
 }) => {
-  if (!mappings.length) {
+  if (!mappings || mappings.length === 0) {
     return <p>No Mappings Found.</p>;
   }
 

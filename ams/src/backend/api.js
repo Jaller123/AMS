@@ -24,7 +24,7 @@ const retryFetch = async (url, retries = 3, delay = 1000) => {
 
 export const fetchMappings = async () => {
   try {
-    // ✅ Step 1: Check if WireMock is running
+    // Check if WireMock is running (optional)
     let wiremockRunning = false;
     try {
       const healthResponse = await retryFetch(
@@ -41,58 +41,22 @@ export const fetchMappings = async () => {
       );
     }
 
-    // ✅ Step 2: Fetch mappings from backend (Always available)
+    // Fetch mappings from the backend
     const response = await fetch(`${API_BASE_URL}/mappings`);
     if (!response.ok) throw new Error("Failed to fetch mappings");
-    const { requests, responses } = await response.json();
+    const data = await response.json();
+    console.log("Fetched mappings:", data.mappings);
 
-    let wireMockMappings = new Set();
+    // Ensure each mapping has a responses array:
+    const mappings = (data.mappings || []).map((mapping) => ({
+      ...mapping,
+      responses: mapping.responses || [], // default to empty array if undefined
+    }));
 
-    // ✅ Step 3: Fetch WireMock mappings only if it's running
-    if (wiremockRunning) {
-      try {
-        const wireMockData = await retryFetch(
-          `${API_WIREMOCK_URL}/mappings`,
-          3,
-          1000
-        );
-        wireMockMappings = new Set(
-          wireMockData.mappings.map((mapping) => mapping.id)
-        );
-
-        console.log("✅ WireMock Mappings:", wireMockMappings);
-      } catch (error) {
-        console.error("⚠️ Failed to fetch WireMock mappings:", error.message);
-      }
-    }
-
-    console.log(
-      "🔄 Backend Mappings:",
-      requests.map((req) => ({
-        id: req.id,
-        request: req.resJson,
-        uuid: req.wireMockId,
-        isActive: wiremockRunning && wireMockMappings.has(req.wireMockId), // ✅ Inactive if WireMock is Down
-      }))
-    );
-
-    return {
-      requests: requests.map((req) => ({
-        id: req.id,
-        request: req.resJson,
-        uuid: req.wireMockId,
-        isActive: wiremockRunning && wireMockMappings.has(req.wireMockId), // ✅ Automatically Inactive if WireMock is Down
-      })),
-      responses: responses.map((res) => ({
-        id: res.id,
-        reqId: res.reqId,
-        resJson: res.resJson,
-        timestamp: res.timestamp,
-      })),
-    };
+    return { mappings, responses: [] };
   } catch (error) {
     console.error("❌ Error fetching mappings:", error);
-    return { requests: [], responses: [] };
+    return { mappings: [], responses: [] };
   }
 };
 
@@ -195,13 +159,20 @@ export const saveMapping = async (mapping) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(mapping),
     });
-    const { newRequest, newResponse } = await response.json();
+    const data = await response.json();
+    console.log("SaveMapping response data:", data);
 
+    // Ensure the mapping was returned
+    if (!data.mapping) {
+      throw new Error("Mapping was not returned from the server");
+    }
+
+    const newMapping = data.mapping;
     return {
-      id: newRequest.id,
-      request: newRequest.resJson,
-      wireMockId: newRequest.wireMockId,
-      response: newResponse.resJson,
+      id: newMapping.reqId, // using reqId from the backend object
+      request: newMapping.request,
+      wireMockId: newMapping.wireMockId,
+      responses: newMapping.response ? [newMapping.response] : [], // Always return an array!
     };
   } catch (error) {
     console.error("Error saving mapping:", error);
@@ -266,19 +237,17 @@ export const updateRequest = async (requestId, updatedRequest) => {
   }
 };
 
-export const updateResponse = async (responseId, updatedResponse) => {
+export const updateResponse = async (dbId, updatedResponse) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/responses/${responseId}`, {
+    const response = await fetch(`${API_BASE_URL}/responses/${dbId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ resJson: updatedResponse }),
     });
-
     if (!response.ok) {
       throw new Error("Failed to update response.");
     }
-
-    return await response.json(); // Return updated response
+    return await response.json(); // Expect updatedResponse as an object
   } catch (error) {
     console.error("Error updating response:", error);
     throw error;

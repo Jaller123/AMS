@@ -168,7 +168,7 @@
 }
 
 .button:hover {
-  color: white
+  color: white;
 }
 
 .removeMapping {
@@ -268,4 +268,33 @@
   padding: 8px;
   border-radius: 5px;
   font-size: 14px;
+}
+
+.container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.leftPanel {
+  width: 45%;
+}
+
+.rightPanel {
+  width: 45%;
+}
+
+.mappingList {
+  list-style-type: none;
+  padding: 0;
+}
+
+.mappingItem {
+  margin-bottom: 10px;
+}
+
+.addMappingButton {
+  background-color: green;
+  color: white;
+  padding: 5px 10px;
+  cursor: pointer;
 }

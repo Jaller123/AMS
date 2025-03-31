@@ -1,4 +1,3 @@
-[]
 [
   {
     "id": "1",
@@ -20,6 +19,30 @@
         "request": {
           "reqId": "3"
         },
+        "response": {}
+      }
+    ]
+  },
+  {
+    "id": "2",
+    "name": "Test Scenario",
+    "mappings": [
+      {
+        "request": {},
+        "response": {}
+      },
+      {
+        "request": {},
+        "response": {}
+      }
+    ]
+  },
+  {
+    "id": "3",
+    "name": "hej",
+    "mappings": [
+      {
+        "request": {},
         "response": {}
       }
     ]
