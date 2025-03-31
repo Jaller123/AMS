@@ -90,7 +90,7 @@ export async function createMapping(mapping) {
 
     let newResponse = null;
     if (mapping.response) {
-      const resJson = JSON.stringify(mapping.response);
+      const resJson = mapping.response;
       const resTitle = mapping.response.title || "Untitled Response";
       const [resResult] = await connection.execute(
         'INSERT INTO restab (resJson, reqId, title, timestamp) VALUES (?, ?, ?, ?)',
