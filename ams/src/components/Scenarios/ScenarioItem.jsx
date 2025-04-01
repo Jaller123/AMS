@@ -10,13 +10,8 @@ const ScenarioItem = ({
   handleDeleteScenario,
   handleSendScenario,
 }) => {
-  
-  const getMappingDetails = (reqId) =>
-    mappings.find(mapping => mapping.id === reqId) || {};
+  const navigate = useNavigate();
 
-  const navigate = useNavigate()
-
-  console.log(mappings)
   return (
     <li className={styles.scenarioItem}>
       <div
@@ -32,23 +27,26 @@ const ScenarioItem = ({
         <div className={styles.scenarioDetails}>
           {scenario.mappings && scenario.mappings.length > 0 ? (
             scenario.mappings.map((mapping, index) => {
-              const fullMapping = getMappingDetails(mapping.request.reqId);
+              const request = mapping.request?.reqJson || mapping.request || {};
               return (
                 <div
                   key={`mapping-${scenario.id}-${index}`}
                   className={styles.mappingItem}
                 >
                   <p className={styles.scenarioMappingTitle}>
-                    {fullMapping.request?.title || "No Title"}
+                    {request?.title || "No Title"}
                   </p>
                   <div className={styles.mappingInfo}>
                     <p>
-                      <strong>Method:</strong>{" "}
-                      {fullMapping.request?.method || "N/A"}
+                      <strong>Method:</strong> {request?.method || "N/A"}
                     </p>
                     <p>
                       <strong>URL:</strong>{" "}
-                      {fullMapping.request?.url || fullMapping.request?.urlPath || "N/A"}
+                      {request?.url ||
+                        request?.urlPath ||
+                        request?.urlPattern ||
+                        request?.urlPathTemplate ||
+                        "N/A"}
                     </p>
                   </div>
                 </div>
@@ -58,8 +56,9 @@ const ScenarioItem = ({
             <p>No mappings found.</p>
           )}
           <button
-          onClick={() => navigate(`/edit-scenario/${scenario.id}`)}
-          className={`${styles.button} ${styles.wireMockButton}`}>
+            onClick={() => navigate(`/edit-scenario/${scenario.id}`)}
+            className={`${styles.button} ${styles.wireMockButton}`}
+          >
             Edit Scenario
           </button>
           {handleSendScenario && (

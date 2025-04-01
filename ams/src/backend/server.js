@@ -1,6 +1,6 @@
 import express from "express";
 import fs from "fs";
-import sequelize from "./db.js";
+import connection from "./db.js";
 import bodyParser from "body-parser";
 import cors from "cors";
 import path from "path";
@@ -335,8 +335,78 @@ app.get("/traffic", async (req, res) => {
 
 //Hämtar nästa scenarios Id
 //Skapar en ny scenario
+app.get("/scenarios", async (req, res) => {
+  const [scenarios] = await connection.execute("SELECT * FROM scentab");
+  const [links] = await connection.execute("SELECT * FROM scenrestab");
+  const [responses] = await connection.execute("SELECT * FROM restab");
+  const [requests] = await connection.execute("SELECT * FROM reqtab");
+
+  const result = scenarios.map((s) => {
+    const linkedRes = links.filter((l) => l.scenId === s.id);
+    const scenarioMappings = linkedRes
+    .map((link) => {
+      const response = responses.find((r) => r.resId === link.resId);
+      if (!response) return null;
+  
+      const request = requests.find((req) => req.reqId === response.reqId);
+      if (!request) return null;
+  
+      return {
+        resId: response.resId,
+        reqId: response.reqId,
+        request: {
+          id: request.reqId,
+          title: request.title,
+          ...JSON.parse(request.reqJson),
+        },
+        response: {
+          id: response.resId,
+          title: response.title,
+          ...JSON.parse(response.resJson),
+        },
+      };
+    })
+    .filter(Boolean); // Remove nulls
+  
+
+    return {
+      id: s.id,
+      name: s.title,
+      mappings: scenarioMappings
+    };
+  });
+
+  res.json({ scenarios: result });
+});
 
   
+// POST new scenario
+app.post("/scenarios", async (req, res) => {
+  const { scenario } = req.body;
+  const { name, mappings } = scenario;
+
+  if (!name || !mappings || !Array.isArray(mappings)) {
+    return res.status(400).json({ success: false, message: "Invalid scenario format" });
+  }
+
+  const [insertResult] = await connection.execute(
+    "INSERT INTO scentab (title) VALUES (?)",
+    [name]
+  );
+  const scenId = insertResult.insertId;
+
+  for (const mapping of mappings) {
+    const { resId } = mapping;
+    if (resId) {
+      await connection.execute(
+        "INSERT INTO scenrestab (scenId, resId) VALUES (?, ?)",
+        [scenId, resId]
+      );
+    }    
+  }
+
+  res.json({ success: true, scenario: { id: scenId, name, mappings } });
+});
 
 
 

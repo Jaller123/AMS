@@ -18,8 +18,9 @@ const CreateScenario = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const { requests, responses } = await fetchMappings();
-        setMappings(requests);
+        const { mappings: loadedMappings, responses } = await fetchMappings();
+        setMappings(loadedMappings);
+
         setResponses(responses);
       } catch (error) {
         console.error("Error fetching mappings:", error);
@@ -102,8 +103,16 @@ const CreateScenario = () => {
     }
     const newScenarioData = {
       name: scenarioName,
-      mappings: newScenarioMappings,
+      mappings: newScenarioMappings.map((mapping) => {
+        const firstResponse = responses.find((res) => res.reqId === mapping.id);
+        return {
+          reqId: mapping.id,
+          resId: firstResponse?.resId || null, // 👈 this is what scenrestab expects
+        };
+      }),
     };
+    
+    
     const savedScenario = await saveScenario(newScenarioData);
     if (savedScenario) {
       alert("Scenario saved successfully!");

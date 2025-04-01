@@ -30,12 +30,12 @@ const ScenarioMappingItem = ({
         onClick={() => onToggleExpand?.(id)}
       >
         <span>
-          <strong>{mapping.request?.method || "METHOD"}</strong> |{" "}
-          {mapping.request?.url ||
-            mapping.request?.urlPath ||
-            mapping.request?.urlPathPattern ||
-            mapping.request?.urlPathTemplate ||
-            mapping.request?.urlPattern ||
+          <strong>{mapping.request?.reqJson?.method|| "METHOD"}</strong> |{" "}
+            {mapping.request?.reqJson?.url ||
+            mapping.request?.reqJson?.urlPath ||
+            mapping.request?.reqJson?.urlPathPattern ||
+            mapping.request?.reqJson?.urlPathTemplate ||
+            mapping.request?.reqJson?.urlPattern ||
             "No URL"}{" "}
           | {mapping.request?.title || "No Title"}
         </span>
