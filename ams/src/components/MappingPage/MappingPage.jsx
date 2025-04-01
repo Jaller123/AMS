@@ -163,7 +163,7 @@ const MappingsPage = ({
           handleDelete={handleDelete}
           handleUpdateRequest={handleUpdateRequest}
           handleUpdateResponse={handleUpdateResponse}
-          handleSendToWireMock={sendToWireMockAndUpdateUI}
+          sendToWireMockAndUpdateUI={sendToWireMockAndUpdateUI}
           autoExpandMappingId={autoExpandMappingId} // Pass the auto-expand id down
         />
 

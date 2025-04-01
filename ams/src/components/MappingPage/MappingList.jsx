@@ -4,7 +4,7 @@ import MappingItem from "./MappingItem";
 const MappingList = ({
 const MappingList = ({ 
   mappings = [],
-  handleSendToWireMock,
+  sendToWireMockAndUpdateUI,
   responses,
   expandedMappings,
   setExpandedMappings,
@@ -37,7 +37,7 @@ const MappingList = ({
           handleDelete={handleDelete}
           handleUpdateRequest={handleUpdateRequest}
           handleUpdateResponse={handleUpdateResponse}
-          handleSendToWireMock={handleSendToWireMock}
+          sendToWireMockAndUpdateUI={sendToWireMockAndUpdateUI}
           autoExpandMappingId={autoExpandMappingId} // pass it down
         />
       ))}

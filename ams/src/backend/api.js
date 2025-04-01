@@ -33,11 +33,8 @@ export const fetchMappings = async () => {
     } catch (error) {
       console.log("🩺 WireMock Health Status:", wiremockRunning ? "Running ✅" : "Down ❌");
     }
-<<<<<<< HEAD
 
-=======
     
->>>>>>> fe0ebfebe8c420cb662f8eef43024379f577469d
     // Fetch mappings from the backend
     const response = await fetch(`${API_BASE_URL}/mappings`);
     if (!response.ok) throw new Error("Failed to fetch mappings");
@@ -45,15 +42,15 @@ export const fetchMappings = async () => {
     console.log("Fetched mappings:", data.mappings);
 
     // Ensure each mapping has a responses array:
-<<<<<<< HEAD
     const mappings = (data.mappings || []).map((mapping) => ({
       ...mapping,
       responses: mapping.responses || [], // default to empty array if undefined
-=======
     const mappings = (data.mappings || []).map(mapping => ({
       ...mapping,
       responses: mapping.responses || []  // default to empty array if undefined
->>>>>>> fe0ebfebe8c420cb662f8eef43024379f577469d
+      isActive: wiremockRunning && !!mapping.wireMockId,
+      wireMockId: wiremockRunning ? mapping.wireMockId : null,
+      responses: mapping.responses || []
     }));
 
     return { mappings, responses: [] };
@@ -119,6 +116,7 @@ export const handleSendToWireMock = async (mappingId) => {
     const data = await response.json();
 
     if (data.success) {
+      alert(data.message || "Mapping sent successfully!");
       return data; // ✅ Return the response so MappingsPage can handle updates
     } else {
       alert("Failed to send mapping to WireMock.");
@@ -164,30 +162,21 @@ export const saveMapping = async (mapping) => {
     });
     const data = await response.json();
     console.log("SaveMapping response data:", data);
-<<<<<<< HEAD
 
-=======
     
->>>>>>> fe0ebfebe8c420cb662f8eef43024379f577469d
     // Ensure the mapping was returned
     if (!data.mapping) {
       throw new Error("Mapping was not returned from the server");
     }
-<<<<<<< HEAD
 
-=======
     
->>>>>>> fe0ebfebe8c420cb662f8eef43024379f577469d
     const newMapping = data.mapping;
     return {
       id: newMapping.reqId, // using reqId from the backend object
       request: newMapping.request,
       wireMockId: newMapping.wireMockId,
-<<<<<<< HEAD
       responses: newMapping.response ? [newMapping.response] : [], // Always return an array!
-=======
       responses: newMapping.response ? [newMapping.response] : [] // Always return an array!
->>>>>>> fe0ebfebe8c420cb662f8eef43024379f577469d
     };
   } catch (error) {
     console.error("Error saving mapping:", error);

@@ -12,23 +12,19 @@ import {
   updateMappingRequest,
   updateMappingResponse,
   deleteMapping,
-<<<<<<< HEAD
 } from "./mappings.js";
-=======
   createResponse,
+  saveWireMockToMapping,
+  clearWireMockIds,
 } from './mappings.js'
 
->>>>>>> fe0ebfebe8c420cb662f8eef43024379f577469d
 
 const WIREMOCK_BASE_URL = "http://localhost:8081/__admin/mappings";
 const app = express();
 app.use(bodyParser.json());
 app.use(cors({ origin: "*" }));
 app.use(express.json());
-<<<<<<< HEAD
-=======
 
->>>>>>> fe0ebfebe8c420cb662f8eef43024379f577469d
 
 // Helper för nästa ID
 const getNextId = (mappings) => {
@@ -40,15 +36,21 @@ const getNextId = (mappings) => {
 // ✅ Add WireMock Health Check Route
 app.get("/health", async (req, res) => {
   try {
-    const response = await fetch("http://localhost:8081/__admin/mappings");
-    if (!response.ok) throw new Error("WireMock is unavailable");
+    const wireMockResponse = await fetch("http://localhost:8081/__admin/mappings");
+    if (!wireMockResponse.ok) throw new Error("WireMock is unavailable");
 
-    res.json({ wiremockRunning: true });
+    const mappings = await wireMockResponse.json();
+    const activeStubIds = mappings.mappings.map((m) => m.id);
+
+    res.json({ wiremockRunning: true, activeStubIds });
   } catch (error) {
     console.error("❌ WireMock is DOWN:", error.message);
-    res.json({ wiremockRunning: false }); // ✅ Send false if WireMock is down
+    await clearWireMockIds(); // ✅ Clear them on failure
+    res.json({ wiremockRunning: false, activeStubIds: [] });
   }
 });
+
+
 
 // Hämta alla mappings
 app.get("/mappings", async (req, res) => {
@@ -109,29 +111,23 @@ const sendMappingToWireMock = async (request, response) => {
 };
 
 // Ny endpoint för att skicka en specifik mapping till WireMock
-<<<<<<< HEAD
 app.post("/mappings", async (req, res) => {
-=======
 app.post('/mappings', async (req, res) => {
->>>>>>> fe0ebfebe8c420cb662f8eef43024379f577469d
   try {
     // Expecting request.body to include "request" and optionally "response"
     const mapping = req.body;
     const newMapping = await createMapping(mapping);
     res.json({ success: true, mapping: newMapping });
   } catch (error) {
-<<<<<<< HEAD
     res.status(500).json({ success: false, message: "Error creating mapping" });
   }
 });
 
-=======
     res.status(500).json({ success: false, message: 'Error creating mapping' });
   }
 });
 
 
->>>>>>> fe0ebfebe8c420cb662f8eef43024379f577469d
 // POST /mappings/:id/send: Send a mapping to WireMock
 app.post("/mappings/:id/send", async (req, res) => {
   const { id } = req.params;
@@ -175,11 +171,39 @@ app.post("/mappings/:id/send", async (req, res) => {
   console.log("Mapping to send to WireMock:", mappingToSend);
 
   try {
+    const { id } = req.params;
+    const allMappings = await getMappings();
+    const mapping = allMappings.find((m) => String(m.request.id) === String(id));
+
+    if (!mapping) {
+      return res.status(404).json({ success: false, message: "Mapping not found" });
+    }
+
+    const requestData = mapping.request.reqJson;
+    const responseData = mapping.responses[0]?.resJson;
+
+    const mappingToSend = {
+      request: {
+        ...requestData,
+        ...(requestData.method !== 'GET' && requestData.body && {
+          bodyPatterns: [{ equalToJson: requestData.body }]
+        })
+      },
+      response: {
+        status: responseData?.status || 200,
+        headers: responseData?.headers || {},
+        body: JSON.stringify(responseData?.body || {})
+      }
+    };
+    
+    console.log("🔍 Sending to WireMock:\n", JSON.stringify(mappingToSend, null, 2));
+
     const wireMockResponse = await fetch(WIREMOCK_BASE_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(mappingToSend),
     });
+
     const data = await wireMockResponse.json();
     if (!wireMockResponse.ok) {
       console.error("WireMock response not OK:", data);
@@ -187,54 +211,45 @@ app.post("/mappings/:id/send", async (req, res) => {
         .status(500)
         .json({ success: false, message: "Failed to send to WireMock" });
     }
-    // Update the saved mapping with the WireMock UUID
-    mappingEntry.wireMockId = data.id ?? data.uuid;
-    fs.writeFileSync(requestsFile, JSON.stringify(requests, null, 2));
-    return res.json({ success: true, wireMockId: mappingEntry.wireMockId });
+    
+    await saveWireMockToMapping(id, data.id || data.wireMockId); // Save the WireMock ID to the mapping in the database
+    return res.json({ success: true, wireMockId: data.id || data.uuid, message: "Mapping sent to WireMock successfully!", });
+    
   } catch (error) {
-    console.error("❌ Error sending mapping to WireMock:", error);
-    return res.status(500).json({ success: false, message: error.message });
+    console.error("❌ Error sending to WireMock:", error);
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
+
 // Uppdatera en request
-<<<<<<< HEAD
 app.put("/mappings/:reqId", async (req, res) => {
-=======
 app.put('/mappings/:reqId', async (req, res) => {
->>>>>>> fe0ebfebe8c420cb662f8eef43024379f577469d
   try {
     const { reqId } = req.params;
     const updatedRequest = req.body.request;
     const result = await updateMappingRequest(reqId, updatedRequest);
     res.json({ success: true, updatedRequest: result });
   } catch (error) {
-<<<<<<< HEAD
     res.status(500).json({ success: false, message: "Error updating mapping" });
-=======
     res.status(500).json({ success: false, message: 'Error updating mapping' });
->>>>>>> fe0ebfebe8c420cb662f8eef43024379f577469d
   }
 });
 
 
 // Uppdatera en respons
-<<<<<<< HEAD
 app.put("/responses/:resId", async (req, res) => {
   try {
     const { resId } = req.params;
-=======
 app.put('/responses/:resId', async (req, res) => {
   try {
     const { resId } = req.params;
     console.log(`Received update request for response ID: ${resId}`);
     console.log("Request body:", req.body);
->>>>>>> fe0ebfebe8c420cb662f8eef43024379f577469d
     const updatedResponse = req.body.response;
     const result = await updateMappingResponse(resId, updatedResponse);
     res.json({ success: true, updatedResponse: result });
   } catch (error) {
-<<<<<<< HEAD
     res
       .status(500)
       .json({ success: false, message: "Error updating response" });
@@ -243,8 +258,6 @@ app.put('/responses/:resId', async (req, res) => {
 
 // Ta bort mapping
 app.delete("/mappings/:reqId", async (req, res) => {
-=======
-    res.status(500).json({ success: false, message: 'Error updating response' });
   }
 });
 
@@ -269,13 +282,11 @@ app.get('/responses/:resId', async (req, res) => {
 
 // Ta bort mapping
 app.delete('/mappings/:reqId', async (req, res) => {
->>>>>>> fe0ebfebe8c420cb662f8eef43024379f577469d
   try {
     const { reqId } = req.params;
     await deleteMapping(reqId);
     res.json({ success: true });
   } catch (error) {
-<<<<<<< HEAD
     res.status(500).json({ success: false, message: "Error deleting mapping" });
   }
 });
@@ -293,7 +304,6 @@ app.post("/responses", (req, res) => {
       success: false,
       message: "Invalid data. Ensure reqId and resJson fields are valid.",
     });
-=======
     res.status(500).json({ success: false, message: 'Error deleting mapping' });
   }
 });
@@ -315,7 +325,6 @@ app.post("/responses", async (req, res) => {
   } catch (error) {
     console.error("Error creating response:", error);
     res.status(500).json({ success: false, message: "Failed to save response." });
->>>>>>> fe0ebfebe8c420cb662f8eef43024379f577469d
   }
 });
 
@@ -383,7 +392,6 @@ app.get("/traffic", async (req, res) => {
   }
 });
 
-<<<<<<< HEAD
 //Detta läser Scenarion från filen
 const readScenarios = () => {
   if (!fs.existsSync(scenariosFile)) return [];
@@ -408,14 +416,11 @@ app.get("/scenarios", (req, res) => {
   res.json({ scenarios });
 });
 
-=======
 //Detta läser Scenarion från file
 
 //Hämtar nästa scenarios Id
->>>>>>> fe0ebfebe8c420cb662f8eef43024379f577469d
 //Skapar en ny scenario
 
-<<<<<<< HEAD
   // Ensure each mapping has both "request" and "response"
   const cleanMappings =
     scenario.mappings && Array.isArray(scenario.mappings)
@@ -513,12 +518,9 @@ app.post("/scenarios/:id/send", async (req, res) => {
     });
   }
 });
-=======
   
->>>>>>> fe0ebfebe8c420cb662f8eef43024379f577469d
 
 //Uppdaterar scenarios
-<<<<<<< HEAD
 app.put("/scenarios/:id", (req, res) => {
   const { id } = req.params;
   let scenarios = readScenarios();
@@ -559,11 +561,8 @@ app.put("/scenarios/:id", (req, res) => {
   writeScenarios(scenarios);
   res.json({ success: true, scenario: scenarios[index] });
 });
-=======
->>>>>>> fe0ebfebe8c420cb662f8eef43024379f577469d
 
 //Tar bort scenarios
-<<<<<<< HEAD
 app.delete("/scenarios/:id", (req, res) => {
   const { id } = req.params;
   let scenarios = readScenarios();
@@ -571,8 +570,6 @@ app.delete("/scenarios/:id", (req, res) => {
   writeScenarios(scenarios);
   res.json({ success: true });
 });
-=======
->>>>>>> fe0ebfebe8c420cb662f8eef43024379f577469d
 
 app.listen(8080, () => {
   console.log("Server running on http://localhost:8080");

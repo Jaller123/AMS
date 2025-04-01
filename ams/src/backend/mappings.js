@@ -90,7 +90,7 @@ export async function createMapping(mapping) {
 
     let newResponse = null;
     if (mapping.response) {
-      const resJson = JSON.stringify(mapping.response);
+      const resJson = mapping.response;
       const resTitle = mapping.response.title || "Untitled Response";
       const [resResult] = await connection.execute(
         'INSERT INTO restab (resJson, reqId, title, timestamp) VALUES (?, ?, ?, ?)',
@@ -147,6 +147,31 @@ export async function createResponse(reqId, resJson) {
   }
 }
   
+export async function saveWireMockToMapping(reqId, wireMockId) {
+  try {
+    const [result] = await connection.execute(
+      'UPDATE reqtab SET wireMockId = ? WHERE reqId = ?',
+      [wireMockId, reqId]
+    )
+    return result.affectedRows > 0
+  } catch (error) {
+    console.error("Error saving WireMock ID to mapping:", error);
+    throw error;
+  }
+}
+
+export async function clearWireMockIds() {
+  try {
+    const [result] = await connection.execute(
+      'UPDATE reqtab SET wireMockId = NULL WHERE wireMockId IS NOT NULL'
+    );
+    console.log(`✅ Cleared ${result.affectedRows} wireMockIds from reqtab`);
+  } catch (error) {
+    console.error("❌ Failed to clear wireMockIds:", error);
+  }
+}
+
+
 
 // Update a mapping's request (in the reqtab table)
 export async function updateMappingRequest(reqId, updatedRequest) {
