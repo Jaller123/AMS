@@ -5,7 +5,6 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import path from "path";
 import fetch from "node-fetch";
-import { fileURLToPath } from "url";
 import { handleSendToWireMock } from "./api.js";
 import {
   getMappings,
@@ -13,13 +12,23 @@ import {
   updateMappingRequest,
   updateMappingResponse,
   deleteMapping,
+<<<<<<< HEAD
 } from "./mappings.js";
+=======
+  createResponse,
+} from './mappings.js'
+
+>>>>>>> fe0ebfebe8c420cb662f8eef43024379f577469d
 
 const WIREMOCK_BASE_URL = "http://localhost:8081/__admin/mappings";
 const app = express();
 app.use(bodyParser.json());
 app.use(cors({ origin: "*" }));
 app.use(express.json());
+<<<<<<< HEAD
+=======
+
+>>>>>>> fe0ebfebe8c420cb662f8eef43024379f577469d
 
 // Helper för nästa ID
 const getNextId = (mappings) => {
@@ -50,6 +59,7 @@ app.get("/mappings", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch mappings" });
   }
 });
+
 
 const sendMappingToWireMock = async (request, response) => {
   const mapping = {
@@ -99,22 +109,33 @@ const sendMappingToWireMock = async (request, response) => {
 };
 
 // Ny endpoint för att skicka en specifik mapping till WireMock
+<<<<<<< HEAD
 app.post("/mappings", async (req, res) => {
+=======
+app.post('/mappings', async (req, res) => {
+>>>>>>> fe0ebfebe8c420cb662f8eef43024379f577469d
   try {
     // Expecting request.body to include "request" and optionally "response"
     const mapping = req.body;
     const newMapping = await createMapping(mapping);
     res.json({ success: true, mapping: newMapping });
   } catch (error) {
+<<<<<<< HEAD
     res.status(500).json({ success: false, message: "Error creating mapping" });
   }
 });
 
+=======
+    res.status(500).json({ success: false, message: 'Error creating mapping' });
+  }
+});
+
+
+>>>>>>> fe0ebfebe8c420cb662f8eef43024379f577469d
 // POST /mappings/:id/send: Send a mapping to WireMock
 app.post("/mappings/:id/send", async (req, res) => {
   const { id } = req.params;
-  const requests = JSON.parse(fs.readFileSync(requestsFile, "utf-8"));
-  const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"));
+
 
   const mappingEntry = requests.find((r) => r.id === id);
   const mappingResponse = responses.find((r) => r.reqId === id);
@@ -177,25 +198,43 @@ app.post("/mappings/:id/send", async (req, res) => {
 });
 
 // Uppdatera en request
+<<<<<<< HEAD
 app.put("/mappings/:reqId", async (req, res) => {
+=======
+app.put('/mappings/:reqId', async (req, res) => {
+>>>>>>> fe0ebfebe8c420cb662f8eef43024379f577469d
   try {
     const { reqId } = req.params;
     const updatedRequest = req.body.request;
     const result = await updateMappingRequest(reqId, updatedRequest);
     res.json({ success: true, updatedRequest: result });
   } catch (error) {
+<<<<<<< HEAD
     res.status(500).json({ success: false, message: "Error updating mapping" });
+=======
+    res.status(500).json({ success: false, message: 'Error updating mapping' });
+>>>>>>> fe0ebfebe8c420cb662f8eef43024379f577469d
   }
 });
 
+
 // Uppdatera en respons
+<<<<<<< HEAD
 app.put("/responses/:resId", async (req, res) => {
   try {
     const { resId } = req.params;
+=======
+app.put('/responses/:resId', async (req, res) => {
+  try {
+    const { resId } = req.params;
+    console.log(`Received update request for response ID: ${resId}`);
+    console.log("Request body:", req.body);
+>>>>>>> fe0ebfebe8c420cb662f8eef43024379f577469d
     const updatedResponse = req.body.response;
     const result = await updateMappingResponse(resId, updatedResponse);
     res.json({ success: true, updatedResponse: result });
   } catch (error) {
+<<<<<<< HEAD
     res
       .status(500)
       .json({ success: false, message: "Error updating response" });
@@ -204,11 +243,39 @@ app.put("/responses/:resId", async (req, res) => {
 
 // Ta bort mapping
 app.delete("/mappings/:reqId", async (req, res) => {
+=======
+    res.status(500).json({ success: false, message: 'Error updating response' });
+  }
+});
+
+app.get('/responses/:resId', async (req, res) => {
+  try {
+    const { resId } = req.params;
+    const responses = await getMappings(); // Fetch all mappings (which contain responses)
+    const response = responses
+      .flatMap(m => m.responses)  // Extract responses from mappings
+      .find(r => r.dbId == resId);  // Match by resId
+
+    if (!response) {
+      return res.status(404).json({ success: false, message: "Response not found" });
+    }
+
+    res.json({ success: true, response });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Error fetching response" });
+  }
+});
+
+
+// Ta bort mapping
+app.delete('/mappings/:reqId', async (req, res) => {
+>>>>>>> fe0ebfebe8c420cb662f8eef43024379f577469d
   try {
     const { reqId } = req.params;
     await deleteMapping(reqId);
     res.json({ success: true });
   } catch (error) {
+<<<<<<< HEAD
     res.status(500).json({ success: false, message: "Error deleting mapping" });
   }
 });
@@ -226,28 +293,37 @@ app.post("/responses", (req, res) => {
       success: false,
       message: "Invalid data. Ensure reqId and resJson fields are valid.",
     });
+=======
+    res.status(500).json({ success: false, message: 'Error deleting mapping' });
   }
-  const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"));
-  const matchingResponses = responses.filter(
-    (response) => response.reqId === reqId
-  );
-  const responseId = `${reqId}.${matchingResponses.length + 1}`;
-  const newResponse = {
-    id: responseId,
-    reqId,
-    resJson,
-    timestamp: timestamp || new Date().toISOString(),
-  };
-  responses.push(newResponse);
-  fs.writeFileSync(responseFile, JSON.stringify(responses, null, 2));
-  res.json({ success: true, newResponse });
+});
+
+
+app.post("/responses", async (req, res) => {
+  try {
+    const { reqId, resJson } = req.body;
+
+    if (!reqId || !resJson?.status || !resJson?.headers || !resJson?.body) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid data. Ensure reqId and resJson fields are valid.",
+      });
+    }
+
+    const newResponse = await createResponse(reqId, resJson);
+    res.json({ success: true, newResponse });
+  } catch (error) {
+    console.error("Error creating response:", error);
+    res.status(500).json({ success: false, message: "Failed to save response." });
+>>>>>>> fe0ebfebe8c420cb662f8eef43024379f577469d
+  }
 });
 
 app.get("/traffic", async (req, res) => {
   try {
     // Read AMS mappings
     const storeRequests = JSON.parse(fs.readFileSync(requestsFile, "utf-8"));
-    const responses = JSON.parse(fs.readFileSync(responseFile, "utf-8"));
+    c
 
     const mappingLookup = storeRequests.reduce((lookup, mapping) => {
       lookup[mapping.wireMockId] = mapping;
@@ -307,6 +383,7 @@ app.get("/traffic", async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 //Detta läser Scenarion från filen
 const readScenarios = () => {
   if (!fs.existsSync(scenariosFile)) return [];
@@ -331,12 +408,14 @@ app.get("/scenarios", (req, res) => {
   res.json({ scenarios });
 });
 
-//Skapar en ny scenario
-app.post("/scenarios", (req, res) => {
-  const { scenario } = req.body;
-  let scenarios = readScenarios();
-  const id = getNextScenarioId(scenarios);
+=======
+//Detta läser Scenarion från file
 
+//Hämtar nästa scenarios Id
+>>>>>>> fe0ebfebe8c420cb662f8eef43024379f577469d
+//Skapar en ny scenario
+
+<<<<<<< HEAD
   // Ensure each mapping has both "request" and "response"
   const cleanMappings =
     scenario.mappings && Array.isArray(scenario.mappings)
@@ -434,8 +513,12 @@ app.post("/scenarios/:id/send", async (req, res) => {
     });
   }
 });
+=======
+  
+>>>>>>> fe0ebfebe8c420cb662f8eef43024379f577469d
 
 //Uppdaterar scenarios
+<<<<<<< HEAD
 app.put("/scenarios/:id", (req, res) => {
   const { id } = req.params;
   let scenarios = readScenarios();
@@ -476,8 +559,11 @@ app.put("/scenarios/:id", (req, res) => {
   writeScenarios(scenarios);
   res.json({ success: true, scenario: scenarios[index] });
 });
+=======
+>>>>>>> fe0ebfebe8c420cb662f8eef43024379f577469d
 
 //Tar bort scenarios
+<<<<<<< HEAD
 app.delete("/scenarios/:id", (req, res) => {
   const { id } = req.params;
   let scenarios = readScenarios();
@@ -485,6 +571,8 @@ app.delete("/scenarios/:id", (req, res) => {
   writeScenarios(scenarios);
   res.json({ success: true });
 });
+=======
+>>>>>>> fe0ebfebe8c420cb662f8eef43024379f577469d
 
 app.listen(8080, () => {
   console.log("Server running on http://localhost:8080");

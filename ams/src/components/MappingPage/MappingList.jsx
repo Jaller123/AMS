@@ -2,6 +2,7 @@ import React from "react";
 import MappingItem from "./MappingItem";
 
 const MappingList = ({
+const MappingList = ({ 
   mappings = [],
   handleSendToWireMock,
   responses,

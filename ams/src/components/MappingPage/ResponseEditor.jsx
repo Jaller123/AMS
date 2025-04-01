@@ -23,7 +23,7 @@ const ResponseEditor = ({
   // Initialize `localResponse` when `editedResponse` or `selectedResponse` changes
   useEffect(() => {
     const selectedRes =
-      relevantResponses.find((res) => res.id === selectedResponse) || {};
+      relevantResponses.find((res) => res.resId === selectedResponse) || {};
     setLocalResponse({
       ...selectedRes.resJson,
       headers: selectedRes.resJson?.headers || {},
@@ -44,9 +44,11 @@ const ResponseEditor = ({
             ? JSON.parse(localResponse.body)
             : localResponse.body,
       };
-      handleUpdateResponse(selectedResponse, updatedResponse);
+      const dbId = relevantResponses.find(r => r.id === selectedResponse)?.resId || selectedResponse;
+      handleUpdateResponse(dbId, updatedResponse);
       setIsEditing(false);
       console.log("Updated Response;", updatedResponse);
+      console.log("Updated Response;", updatedResponse)
     } catch (error) {
       alert("Invalid JSON in headers or body.");
     }
@@ -104,18 +106,29 @@ const ResponseEditor = ({
               );
               // Now, set selectedResponse as the actual dbId, not the composite id
               setSelectedResponse(response?.dbId || "");
+         // When setting the selected response:
+          <select
+            value={selectedResponse || ""}
+            onChange={(e) => {
+              const selectedId = Number(e.target.value); 
+              const response = relevantResponses.find((res) => res.resId === selectedId);
+              // Now, set selectedResponse as the actual dbId, not the composite id
+              setSelectedResponse(response?.resId || "");
               setEditedResponse(response?.resJson || {});
             }}
           >
-            {relevantResponses.map((response) => (
-              <option key={response.id} value={response.id}>
-                {response.id} - {response.resJson?.status || "No Status"}
-              </option>
-            ))}
+          {relevantResponses.map((response) => (
+          <option key={response.resId} value={response.resId}>
+          {response.id} - {response.title || response.resJson?.status || "No Status"}
+          </option>
+          ))}
+
           </select>
           <pre className={styles.preresponse}>
             {JSON.stringify(localResponse, null, 2)}
           </pre>
+
+          <pre className={styles.preresponse}>{JSON.stringify(localResponse, null, 2)}</pre>
           <div className={styles.buttonContainer}>
             <button
               onClick={() => setIsEditing(true)}

@@ -13,6 +13,7 @@ const isValidJson = (jsonString) => {
 };
 
 const ResForm = ({ setResponseData, resetForm ,onSave}) => {
+  const [title, setTitle] = useState("")
   const [status, setStatus] = useState("");
   const [headers, setHeaders] = useState("");
   const [body, setBody] = useState("");
@@ -29,6 +30,7 @@ const ResForm = ({ setResponseData, resetForm ,onSave}) => {
 
     if (headersValid && bodyValid) {
       setResponseData({
+        title,
         status,
         headers: headers ? JSON.parse(headers) : {},
         body: body ? JSON.parse(body) : {},
@@ -50,6 +52,15 @@ const ResForm = ({ setResponseData, resetForm ,onSave}) => {
     <section className={styles.ResSection}>
       <h2>Response</h2>
       <div className={styles.formGroup}>
+      <label htmlFor="title">Title</label>
+      <input
+        id="title"
+        type="text"
+        data-testid="title-input"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        placeholder="Enter response title"
+        />
         <label htmlFor="status">Status Code</label>
         <input
           id="status"

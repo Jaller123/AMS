@@ -18,7 +18,7 @@ const extractURLValue = (reqObj) => {
 
 const MappingItem = ({
   mapping,
-  handleSendToWireMock,
+  sendToWireMockAndUpdateUI,
   responses,
   expandedMappings,
   setExpandedMappings,
@@ -37,34 +37,47 @@ const MappingItem = ({
   const mappingItemRef = useRef(null);
   const toggleButtonRef = useRef(null);
   const [hasAutoExpanded, setHasAutoExpanded] = useState(false);
+  const mappingId = mapping.id || mapping.request.id;
+  const [isActive, setIsActive] = useState(!!mapping.wireMockId);
+
+
+  useEffect(() => {
+    setIsActive(!!mapping.wireMockId);
+  }, [mapping.wireMockId]);
 
   // Initialize local states if not already done.
   useEffect(() => {
-    if (!editedRequests[mapping.id]) {
+    if (!editedRequests[mappingId]) {
       setEditedRequests((prev) => ({
         ...prev,
-        [mapping.id]: mapping.request.reqJson || {},
+        [mappingId]: {
+          ...mapping.request.reqJson,
+          title: mapping.request.title || "",
+        },
       }));
     }
-    if (!editedResponses[mapping.id]) {
-      const firstResponse =
-        responses.filter((res) => res.reqId === mapping.id)[0] || {};
+    
+  
+    if (!editedResponses[mappingId]) {
+      const firstResponse = responses.find((res) => res.reqId === mappingId);
       setEditedResponses((prev) => ({
         ...prev,
-        [mapping.id]: firstResponse.resJson || {},
+        [mappingId]: firstResponse?.resJson || {},
       }));
     }
+  
     if (
-      !selectedResponses[mapping.id] &&
-      responses.filter((res) => res.reqId === mapping.id).length > 0
+      !selectedResponses[mappingId] &&
+      responses.filter((res) => res.reqId === mappingId).length > 0
     ) {
+      const first = responses.find((res) => res.reqId === mappingId);
       setSelectedResponses((prev) => ({
         ...prev,
-        [mapping.id]: responses.filter((res) => res.reqId === mapping.id)[0].id,
+        [mappingId]: first?.resId,
       }));
     }
   }, [
-    mapping.id,
+    mappingId,
     responses,
     editedRequests,
     editedResponses,
@@ -73,31 +86,38 @@ const MappingItem = ({
     setEditedResponses,
     setSelectedResponses,
   ]);
-
+  
   const toggleExpanded = () => {
     setExpandedMappings((prev) => ({
       ...prev,
-      [mapping.id]: !prev[mapping.id],
+      [mappingId]: !prev[mappingId],
     }));
-  };
+  };  
 
   // Auto-expand the mapping if its ID matches autoExpandMappingId.
   useEffect(() => {
-    if (
-      !hasAutoExpanded &&
-      autoExpandMappingId &&
-      mapping.id === autoExpandMappingId
-    ) {
-      setExpandedMappings((prev) => ({ ...prev, [mapping.id]: true }));
+    if (!hasAutoExpanded && autoExpandMappingId && mappingId === autoExpandMappingId) {
+      setExpandedMappings((prev) => ({ ...prev, [mappingId]: true }));
       setHasAutoExpanded(true);
     }
-  }, [autoExpandMappingId, mapping.id, hasAutoExpanded, setExpandedMappings]);
+  }, [autoExpandMappingId, mappingId, hasAutoExpanded, setExpandedMappings]);
+  
+  useEffect(() => {
+    if (
+      expandedMappings[mappingId] &&
+      mappingId === autoExpandMappingId &&
+      mappingItemRef.current
+    ) {
+      mappingItemRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [expandedMappings, autoExpandMappingId, mappingId]);
+  
 
   // After expansion, scroll the mapping item into view.
   useEffect(() => {
     if (
-      expandedMappings[mapping.id] &&
-      mapping.id === autoExpandMappingId &&
+      expandedMappings[mappingId] &&
+      mappingId === autoExpandMappingId &&
       mappingItemRef.current
     ) {
       mappingItemRef.current.scrollIntoView({
@@ -105,10 +125,12 @@ const MappingItem = ({
         block: "start",
       });
     }
-  }, [expandedMappings, autoExpandMappingId, mapping.id]);
+  }, [expandedMappings, autoExpandMappingId, mappingId]);
 
-  const currentRequest =
-    editedRequests[mapping.id] || mapping.request.reqJson || {};
+  
+
+  const currentRequest = editedRequests[mappingId] || mapping.request.reqJson || {};
+  console.log(mapping)
   const displayURL = extractURLValue(currentRequest);
 
   return (
@@ -120,7 +142,7 @@ const MappingItem = ({
       <div className={styles.titleRow} onClick={toggleExpanded}>
         <h3>{currentRequest.method || "Unidentified Method"}</h3>
         <h3>{displayURL || "No URL"}</h3>
-        <h3>{currentRequest.title || "Untitled Mapping"}</h3>
+        <h3>{mapping.request.title || "Untitled Mapping"}</h3>
         <span
           className={
             mapping.status === "Active" ? styles.active : styles.unmapped
@@ -128,49 +150,49 @@ const MappingItem = ({
         >
           {mapping.status}
         </span>
-        <h3 className={mapping.isActive ? styles.active : styles.inactive}>
-          {mapping.isActive ? "✅ " : "❌"}
-        </h3>
+       <h3 className={isActive ? styles.active : styles.inactive}>
+          {isActive ? "✅ " : "❌"}
+      </h3>
+
         <button
           ref={toggleButtonRef}
           className={styles.toggleButton}
           data-testid="toggle-button"
         >
-          {expandedMappings[mapping.id] ? "Hide Details" : "Show Details"}
+          {expandedMappings[mappingId] ? "Hide Details" : "Show Details"}
         </button>
       </div>
-      {expandedMappings[mapping.id] && (
+      {expandedMappings[mappingId] && (
         <>
           <RequestEditor
-            mappingId={mapping.id}
-            editedRequest={editedRequests[mapping.id] || mapping.request}
-            setEditedRequest={(data) =>
-              setEditedRequests((prev) => ({ ...prev, [mapping.id]: data }))
-            }
-            handleUpdateRequest={(id, updatedRequest) => {
-              setEditedRequests((prev) => ({ ...prev, [id]: updatedRequest }));
-              handleUpdateRequest(id, updatedRequest);
-            }}
-          />
-          <ResponseEditor
-            mappingId={mapping.id}
-            relevantResponses={responses.filter(
-              (res) => res.reqId === mapping.id
-            )}
-            editedResponse={editedResponses[mapping.id]}
-            setEditedResponse={(data) =>
-              setEditedResponses((prev) => ({ ...prev, [mapping.id]: data }))
-            }
-            selectedResponse={selectedResponses[mapping.id]}
-            setSelectedResponse={(responseId) =>
-              setSelectedResponses((prev) => ({
-                ...prev,
-                [mapping.id]: responseId,
-              }))
-            }
-            handleUpdateResponse={handleUpdateResponse}
-          />
-          {mapping.isActive && (
+  mappingId={mappingId}
+  editedRequest={editedRequests[mappingId] || mapping.request.reqJson}
+  setEditedRequest={(data) =>
+    setEditedRequests((prev) => ({ ...prev, [mappingId]: data }))
+  }
+  handleUpdateRequest={(id, updatedRequest) => {
+    setEditedRequests((prev) => ({ ...prev, [id]: updatedRequest }));
+    handleUpdateRequest(id, updatedRequest);
+  }}
+/>
+
+<ResponseEditor
+  mappingId={mappingId}
+  relevantResponses={responses.filter((res) => res.reqId === mappingId)}
+  editedResponse={editedResponses[mappingId]}
+  setEditedResponse={(data) =>
+    setEditedResponses((prev) => ({ ...prev, [mappingId]: data }))
+  }
+  selectedResponse={selectedResponses[mappingId]}
+  setSelectedResponse={(responseId) =>
+    setSelectedResponses((prev) => ({
+      ...prev,
+      [mappingId]: responseId,
+    }))
+  }
+  handleUpdateResponse={handleUpdateResponse}
+/>
+          {isActive && (
             <button
               className={styles.sendButton}
               onClick={() => {
@@ -183,14 +205,21 @@ const MappingItem = ({
               Traffic
             </button>
           )}
+
           <button
-            onClick={() => handleSendToWireMock(mapping.id)}
+            onClick={async () => {
+              const result = await sendToWireMockAndUpdateUI(mappingId);
+              if (result?.success) {
+                setIsActive(true); // ✅ THIS is the key to reflect the new state locally
+              }
+            }}
             className={styles.sendButton}
           >
             Send to WireMock
           </button>
+
           <button
-            onClick={() => handleDelete(mapping.id)}
+            onClick={() => handleDelete(mappingId)}
             className={styles.deleteButton}
           >
             Delete Mapping

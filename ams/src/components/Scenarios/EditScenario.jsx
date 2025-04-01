@@ -17,6 +17,7 @@ const EditScenario = () => {
   const [editScenarioMappings, setEditScenarioMappings] = useState([]);
   const [scenarioName, setScenarioName] = useState("");
   const [highlighted, setHighlighted] = useState(false);
+  const [addButton, setAddButton] = useState()
 
   // Load mappings and scenarios on component mount
   useEffect(() => {
@@ -75,7 +76,6 @@ const EditScenario = () => {
       name: scenarioName,
       mappings: editScenarioMappings,
     };
-
     const result = await updateScenario(scenarioId, updatedScenarioData);
 
     if (result) {
@@ -85,6 +85,32 @@ const EditScenario = () => {
   };
 
   // Lägg till här andra funktioner som du har i din kod för att hantera drag and drop och lägga till mappings
+  const handleAddToScenarios = (mappingId, e) => {
+
+    const fullMapping = mappings.find((m) => m.id === mappingId.id) || {};
+
+    const cleanMapping = {
+      request: { reqId: mappingId },
+      response:
+        fullMapping && fullMapping.id
+          ? { resId: mappingId + ".1" }
+          : {},
+    };
+
+    // Check by mapping id to avoid duplicates
+    const alreadyExists = editScenarioMappings.some(
+      (m) => m.request.reqId === cleanMapping.request.reqId
+    );
+    if (!alreadyExists) {
+      setEditScenarioMappings([...editScenarioMappings, cleanMapping]);
+    }
+  }
+
+  const handleRemoveMapping = (mappingId) => {
+    setEditScenarioMappings((prevMappings) =>
+      prevMappings.filter((mapping) => mapping.request.reqId !== mappingId)
+    );
+  };
 
   return (
     <div className={styles.container}>
@@ -111,6 +137,74 @@ const EditScenario = () => {
       {/* Right Panel – Saved Mappings */}
       <div className={styles.rightPanel}>
         {/* Render saved mappings and sorting controls */}
+        <h2>Saved Mappings</h2>
+        <SortControls
+          setSortCriterion={setSortCriterion}
+          searchFilters={searchFilters}
+          setSearchFilters={setSearchFilters}
+          search={search}
+          filteredMappings={filteredMappings}
+          setSearch={setSearch}
+          sortCriterion={sortCriterion}
+        />
+        {filteredMappings.length === 0 ? (
+          <p>No Mappings Found.</p>
+        ) : (
+          <div className={styles.mappingList}>
+            {filteredMappings.map((mapping) => (
+              <div key={mapping.id} className={styles.mappingItem}
+              placeholder="mappingItem">
+                <div
+                  className={styles.mappingHeader}
+                  onClick={() => toggleMappingDropdownRight(mapping.id)}
+                  draggable
+                  onDragStart={(e) => handleDragStartMapping(e, mapping)}
+                  onDragEnd={handleDragEndMapping}
+                  style={{
+                    cursor: "grab",
+                    opacity: draggingMappingId === mapping.id ? 0.6 : 1,
+                    transition: "opacity 0.2s ease, transform 0.2s ease",
+                  }}
+                >
+                 
+                  <span>
+                    <strong>{mapping.request?.method || "METHOD"}</strong> |{" "}
+                    {mapping.request?.url ||
+                      mapping.request?.urlPath ||
+                      mapping.request?.urlPathPattern ||
+                      mapping.request?.urlPathTemplate ||
+                      mapping.request?.urlPattern ||
+                      "No URL"}{" "}
+                    | {mapping.request?.title || "No Title"}
+                  </span>
+                  <button placeholder="Add button"
+                  onClick={() => handleAddtoScenario (mapping.id)}> +</button>
+                </div>
+                {expandMappingIdRight === mapping.id && (
+                  <div className={styles.mappingDetails}>
+                    <h3>Request</h3>
+                    <pre className={styles.preFormatted}>
+                      {JSON.stringify(mapping.request, null, 2)}
+                    </pre>
+                    <h3>Responses</h3>
+                    {responses.filter((res) => res.reqId === mapping.id)
+                      .length > 0 ? (
+                      responses
+                        .filter((res) => res.reqId === mapping.id)
+                        .map((res) => (
+                          <pre key={res.id} className={styles.preFormatted}>
+                            {JSON.stringify(res.resJson, null, 2)}
+                          </pre>
+                        ))
+                    ) : (
+                      <p>No response found for this mapping.</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

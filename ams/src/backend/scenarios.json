@@ -1,23 +1,11 @@
 [
   {
     "id": "1",
-    "name": "ScenarioTest",
+    "name": "Updated Scenario",
     "mappings": [
       {
         "request": {
           "reqId": "1"
-        },
-        "response": {}
-      },
-      {
-        "request": {
-          "reqId": "2"
-        },
-        "response": {}
-      },
-      {
-        "request": {
-          "reqId": "3"
         },
         "response": {}
       }
