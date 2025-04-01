@@ -14,6 +14,10 @@ const ResponseEditor = ({
   const [isEditing, setIsEditing] = useState(false);
   const [localResponse, setLocalResponse] = useState({});
 
+  console.log("👀 mappingId:", mappingId);
+  console.log("📦 relevantResponses:", relevantResponses);
+  console.log("✅ selectedResponse:", selectedResponse);
+  
   const navigate = useNavigate();
 
   const goToDetails = (mappingId) => {
@@ -22,14 +26,17 @@ const ResponseEditor = ({
 
   // Initialize `localResponse` when `editedResponse` or `selectedResponse` changes
   useEffect(() => {
+    console.log("🔍 relevantResponses:", relevantResponses);
     const selectedRes =
-      relevantResponses.find((res) => res.resId === selectedResponse) || {};
+      relevantResponses.find((res) => String(res.resId) === String(selectedResponse)) || {};
+    console.log("🎯 selectedRes:", selectedRes);
     setLocalResponse({
       ...selectedRes.resJson,
       headers: selectedRes.resJson?.headers || {},
       body: selectedRes.resJson?.body || {},
     });
   }, [editedResponse, selectedResponse, relevantResponses]);
+  
 
   const saveResponse = () => {
     try {
@@ -95,23 +102,23 @@ const ResponseEditor = ({
       ) : (
         <div>
          // When setting the selected response:
-          <select
-            value={selectedResponse || ""}
-            onChange={(e) => {
-              const selectedId = Number(e.target.value); 
-              const response = relevantResponses.find((res) => res.resId === selectedId);
-              // Now, set selectedResponse as the actual dbId, not the composite id
-              setSelectedResponse(response?.resId || "");
-              setEditedResponse(response?.resJson || {});
-            }}
-          >
-          {relevantResponses.map((response) => (
-          <option key={response.resId} value={response.resId}>
-          {response.id} - {response.title || response.resJson?.status || "No Status"}
-          </option>
-          ))}
+         <select
+  value={selectedResponse || ""}
+  onChange={(e) => {
+    const selectedId = Number(e.target.value);
+    const response = relevantResponses.find((res) => res.resId === selectedId);
+    setSelectedResponse(response?.resId || "");
+    setEditedResponse(response?.resJson || {});
+  }}
+>
+  {relevantResponses.map((response) => (
+    <option key={response.resId} value={response.resId}>
+  {response.id} - {response.title || response.resJson?.status || "No Status"}
+    </option>
 
-          </select>
+  ))}
+</select>
+
 
           <pre className={styles.preresponse}>{JSON.stringify(localResponse, null, 2)}</pre>
           <div className={styles.buttonContainer}>

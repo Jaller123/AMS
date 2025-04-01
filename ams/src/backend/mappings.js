@@ -33,7 +33,9 @@ export async function getMappings() {
             timestamp: res.timestamp,
           }));
         const parsedReqJson = typeof req.reqJson === "string" ? JSON.parse(req.reqJson) : req.reqJson;
+      
         return {
+          id: req.reqId,
           request: { 
             id: req.reqId,
             title: req.title,

@@ -33,6 +33,7 @@ const App = () => {
     const loadMappingsAndResponses = async () => {
       try {
         const data = await fetchMappings();
+        console.log("🧩 Final mappings structure:", data.mappings);
         setMappings(data.mappings || []); 
         const allResponses = data.mappings.flatMap(m => m.responses);
         setResponses(allResponses); 

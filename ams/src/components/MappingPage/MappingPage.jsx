@@ -67,7 +67,7 @@ const MappingsPage = ({
         (res) => res.reqId === mapping.id
       );
       if (relevantResponses.length > 0) {
-        initialSelections[mapping.id] = relevantResponses[0].id;
+        initialSelections[mapping.id] = relevantResponses[0].resId; // ✅ use resId, not response.id
       }
     });
     setSelectedResponses(initialSelections);

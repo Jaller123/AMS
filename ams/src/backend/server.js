@@ -55,7 +55,19 @@ app.get("/health", async (req, res) => {
 app.get("/mappings", async (req, res) => {
   try {
     const mappings = await getMappings();
-    res.json({ mappings });
+
+    // Fetch actual WireMock mappings
+    const wireMockResponse = await fetch("http://localhost:8081/__admin/mappings");
+    const wireMockData = await wireMockResponse.json();
+    const wireMockIds = wireMockData.mappings.map((m) => m.id);
+
+    // Mark mappings as matched or not
+    const enrichedMappings = mappings.map((mapping) => ({
+      ...mapping,
+      isMatched: mapping.wireMockId ? wireMockIds.includes(mapping.wireMockId) : false
+    }));
+
+    res.json({ mappings: enrichedMappings });
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch mappings" });
   }
