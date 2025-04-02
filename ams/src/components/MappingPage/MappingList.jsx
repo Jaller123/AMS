@@ -1,7 +1,7 @@
 import React from "react";
 import MappingItem from "./MappingItem";
+import MappingDetailPage from "../MappingDetailPage";
 
-const MappingList = ({
 const MappingList = ({ 
   mappings = [],
   sendToWireMockAndUpdateUI,
@@ -44,5 +44,4 @@ const MappingList = ({
     </ul>
   );
 };
-
-export default MappingList;
+export default MappingList

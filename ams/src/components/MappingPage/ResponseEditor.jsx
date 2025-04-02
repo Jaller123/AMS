@@ -47,7 +47,6 @@ const ResponseEditor = ({
       const dbId = relevantResponses.find(r => r.id === selectedResponse)?.resId || selectedResponse;
       handleUpdateResponse(dbId, updatedResponse);
       setIsEditing(false);
-      console.log("Updated Response;", updatedResponse);
       console.log("Updated Response;", updatedResponse)
     } catch (error) {
       alert("Invalid JSON in headers or body.");
@@ -91,21 +90,10 @@ const ResponseEditor = ({
               setLocalResponse({ ...localResponse, body: e.target.value })
             }
           />
-          <button className={styles.saveResponseButton} onClick={saveResponse}>
-            Save Response
-          </button>
+          <button className={styles.saveResponseButton} onClick={saveResponse}>Save Response</button>
         </div>
       ) : (
         <div>
-          // When setting the selected response:
-          <select
-            value={selectedResponse || ""}
-            onChange={(e) => {
-              const response = relevantResponses.find(
-                (res) => res.id === e.target.value
-              );
-              // Now, set selectedResponse as the actual dbId, not the composite id
-              setSelectedResponse(response?.dbId || "");
          // When setting the selected response:
           <select
             value={selectedResponse || ""}
@@ -124,24 +112,16 @@ const ResponseEditor = ({
           ))}
 
           </select>
-          <pre className={styles.preresponse}>
-            {JSON.stringify(localResponse, null, 2)}
-          </pre>
 
           <pre className={styles.preresponse}>{JSON.stringify(localResponse, null, 2)}</pre>
           <div className={styles.buttonContainer}>
-            <button
-              onClick={() => setIsEditing(true)}
-              className={styles.ButtonEdit}
-            >
-              Edit Response
-            </button>
-            <button
-              onClick={() => navigate(`/request/${mappingId}`)}
-              className={styles.detailsButton}
-            >
-              Add New Response
-            </button>
+           <button onClick={() => setIsEditing(true)} className={styles.ButtonEdit}>Edit Response</button>
+          <button
+            onClick={() => navigate(`/request/${mappingId}`)}
+            className={styles.detailsButton}
+          >
+            Add New Response
+          </button>
           </div>
         </div>
       )}

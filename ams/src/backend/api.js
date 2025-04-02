@@ -33,7 +33,6 @@ export const fetchMappings = async () => {
     } catch (error) {
       console.log("🩺 WireMock Health Status:", wiremockRunning ? "Running ✅" : "Down ❌");
     }
-
     
     // Fetch mappings from the backend
     const response = await fetch(`${API_BASE_URL}/mappings`);
@@ -42,12 +41,8 @@ export const fetchMappings = async () => {
     console.log("Fetched mappings:", data.mappings);
 
     // Ensure each mapping has a responses array:
-    const mappings = (data.mappings || []).map((mapping) => ({
-      ...mapping,
-      responses: mapping.responses || [], // default to empty array if undefined
     const mappings = (data.mappings || []).map(mapping => ({
       ...mapping,
-      responses: mapping.responses || []  // default to empty array if undefined
       isActive: wiremockRunning && !!mapping.wireMockId,
       wireMockId: wiremockRunning ? mapping.wireMockId : null,
       responses: mapping.responses || []
@@ -151,6 +146,9 @@ export const handleSendScenarioToWireMock = async (scenarioId) => {
   }
 };
 
+
+
+
 //Mappings--------------------------------------------------------------------------------------------------------------------------------
 
 export const saveMapping = async (mapping) => {
@@ -162,20 +160,17 @@ export const saveMapping = async (mapping) => {
     });
     const data = await response.json();
     console.log("SaveMapping response data:", data);
-
     
     // Ensure the mapping was returned
     if (!data.mapping) {
       throw new Error("Mapping was not returned from the server");
     }
-
     
     const newMapping = data.mapping;
     return {
       id: newMapping.reqId, // using reqId from the backend object
       request: newMapping.request,
       wireMockId: newMapping.wireMockId,
-      responses: newMapping.response ? [newMapping.response] : [], // Always return an array!
       responses: newMapping.response ? [newMapping.response] : [] // Always return an array!
     };
   } catch (error) {

@@ -15,11 +15,9 @@
     "express": "^4.21.2",
     "font-awesome": "^4.7.0",
     "framer-motion": "^12.1.0",
-<<<<<<< HEAD
-    "mysql2": "^3.13.0",
-=======
+
     "mysql2": "^3.14.0",
->>>>>>> fe0ebfebe8c420cb662f8eef43024379f577469d
+
     "node-fetch": "^3.3.2",
     "nodemon": "^3.1.9",
     "react": "^18.3.1",

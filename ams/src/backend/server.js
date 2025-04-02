@@ -12,19 +12,16 @@ import {
   updateMappingRequest,
   updateMappingResponse,
   deleteMapping,
-} from "./mappings.js";
   createResponse,
   saveWireMockToMapping,
   clearWireMockIds,
-} from './mappings.js'
-
+} from "./mappings.js";
 
 const WIREMOCK_BASE_URL = "http://localhost:8081/__admin/mappings";
 const app = express();
 app.use(bodyParser.json());
 app.use(cors({ origin: "*" }));
 app.use(express.json());
-
 
 // Helper för nästa ID
 const getNextId = (mappings) => {
@@ -36,7 +33,9 @@ const getNextId = (mappings) => {
 // ✅ Add WireMock Health Check Route
 app.get("/health", async (req, res) => {
   try {
-    const wireMockResponse = await fetch("http://localhost:8081/__admin/mappings");
+    const wireMockResponse = await fetch(
+      "http://localhost:8081/__admin/mappings"
+    );
     if (!wireMockResponse.ok) throw new Error("WireMock is unavailable");
 
     const mappings = await wireMockResponse.json();
@@ -50,8 +49,6 @@ app.get("/health", async (req, res) => {
   }
 });
 
-
-
 // Hämta alla mappings
 app.get("/mappings", async (req, res) => {
   try {
@@ -61,7 +58,6 @@ app.get("/mappings", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch mappings" });
   }
 });
-
 
 const sendMappingToWireMock = async (request, response) => {
   const mapping = {
@@ -112,7 +108,6 @@ const sendMappingToWireMock = async (request, response) => {
 
 // Ny endpoint för att skicka en specifik mapping till WireMock
 app.post("/mappings", async (req, res) => {
-app.post('/mappings', async (req, res) => {
   try {
     // Expecting request.body to include "request" and optionally "response"
     const mapping = req.body;
@@ -123,60 +118,19 @@ app.post('/mappings', async (req, res) => {
   }
 });
 
-    res.status(500).json({ success: false, message: 'Error creating mapping' });
-  }
-});
-
-
 // POST /mappings/:id/send: Send a mapping to WireMock
 app.post("/mappings/:id/send", async (req, res) => {
-  const { id } = req.params;
-
-
-  const mappingEntry = requests.find((r) => r.id === id);
-  const mappingResponse = responses.find((r) => r.reqId === id);
-
-  if (!mappingEntry || !mappingResponse) {
-    return res
-      .status(404)
-      .json({ success: false, message: "Mapping not found" });
-  }
-
-  // Start with the saved request (transformed)...
-  let requestMapping = { ...mappingEntry.resJson };
-
-  // Remove custom fields that WireMock does not expect (e.g. "title")
-  if (requestMapping.title) {
-    delete requestMapping.title;
-  }
-
-  // If the saved object contains a plain "body" (instead of bodyPatterns),
-  // wrap it into a bodyPatterns array (and remove the plain "body" key).
-  if (requestMapping.body) {
-    requestMapping.bodyPatterns = [{ equalToJson: requestMapping.body }];
-    delete requestMapping.body;
-  }
-
-  // Build the mapping object to send to WireMock.
-  const mappingToSend = {
-    request: requestMapping,
-    response: {
-      status: mappingResponse.resJson.status,
-      headers: mappingResponse.resJson.headers,
-      // Ensure the response body is a string (WireMock expects a JSON string)
-      body: JSON.stringify(mappingResponse.resJson.body),
-    },
-  };
-
-  console.log("Mapping to send to WireMock:", mappingToSend);
-
   try {
     const { id } = req.params;
     const allMappings = await getMappings();
-    const mapping = allMappings.find((m) => String(m.request.id) === String(id));
+    const mapping = allMappings.find(
+      (m) => String(m.request.id) === String(id)
+    );
 
     if (!mapping) {
-      return res.status(404).json({ success: false, message: "Mapping not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Mapping not found" });
     }
 
     const requestData = mapping.request.reqJson;
@@ -185,18 +139,22 @@ app.post("/mappings/:id/send", async (req, res) => {
     const mappingToSend = {
       request: {
         ...requestData,
-        ...(requestData.method !== 'GET' && requestData.body && {
-          bodyPatterns: [{ equalToJson: requestData.body }]
-        })
+        ...(requestData.method !== "GET" &&
+          requestData.body && {
+            bodyPatterns: [{ equalToJson: requestData.body }],
+          }),
       },
       response: {
         status: responseData?.status || 200,
         headers: responseData?.headers || {},
-        body: JSON.stringify(responseData?.body || {})
-      }
+        body: JSON.stringify(responseData?.body || {}),
+      },
     };
-    
-    console.log("🔍 Sending to WireMock:\n", JSON.stringify(mappingToSend, null, 2));
+
+    console.log(
+      "🔍 Sending to WireMock:\n",
+      JSON.stringify(mappingToSend, null, 2)
+    );
 
     const wireMockResponse = await fetch(WIREMOCK_BASE_URL, {
       method: "POST",
@@ -211,20 +169,21 @@ app.post("/mappings/:id/send", async (req, res) => {
         .status(500)
         .json({ success: false, message: "Failed to send to WireMock" });
     }
-    
+
     await saveWireMockToMapping(id, data.id || data.wireMockId); // Save the WireMock ID to the mapping in the database
-    return res.json({ success: true, wireMockId: data.id || data.uuid, message: "Mapping sent to WireMock successfully!", });
-    
+    return res.json({
+      success: true,
+      wireMockId: data.id || data.uuid,
+      message: "Mapping sent to WireMock successfully!",
+    });
   } catch (error) {
     console.error("❌ Error sending to WireMock:", error);
     res.status(500).json({ success: false, message: error.message });
   }
 });
 
-
 // Uppdatera en request
 app.put("/mappings/:reqId", async (req, res) => {
-app.put('/mappings/:reqId', async (req, res) => {
   try {
     const { reqId } = req.params;
     const updatedRequest = req.body.request;
@@ -232,16 +191,11 @@ app.put('/mappings/:reqId', async (req, res) => {
     res.json({ success: true, updatedRequest: result });
   } catch (error) {
     res.status(500).json({ success: false, message: "Error updating mapping" });
-    res.status(500).json({ success: false, message: 'Error updating mapping' });
   }
 });
 
-
 // Uppdatera en respons
 app.put("/responses/:resId", async (req, res) => {
-  try {
-    const { resId } = req.params;
-app.put('/responses/:resId', async (req, res) => {
   try {
     const { resId } = req.params;
     console.log(`Received update request for response ID: ${resId}`);
@@ -256,32 +210,30 @@ app.put('/responses/:resId', async (req, res) => {
   }
 });
 
-// Ta bort mapping
-app.delete("/mappings/:reqId", async (req, res) => {
-  }
-});
-
-app.get('/responses/:resId', async (req, res) => {
+app.get("/responses/:resId", async (req, res) => {
   try {
     const { resId } = req.params;
     const responses = await getMappings(); // Fetch all mappings (which contain responses)
     const response = responses
-      .flatMap(m => m.responses)  // Extract responses from mappings
-      .find(r => r.dbId == resId);  // Match by resId
+      .flatMap((m) => m.responses) // Extract responses from mappings
+      .find((r) => r.dbId == resId); // Match by resId
 
     if (!response) {
-      return res.status(404).json({ success: false, message: "Response not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Response not found" });
     }
 
     res.json({ success: true, response });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Error fetching response" });
+    res
+      .status(500)
+      .json({ success: false, message: "Error fetching response" });
   }
 });
 
-
 // Ta bort mapping
-app.delete('/mappings/:reqId', async (req, res) => {
+app.delete("/mappings/:reqId", async (req, res) => {
   try {
     const { reqId } = req.params;
     await deleteMapping(reqId);
@@ -290,24 +242,6 @@ app.delete('/mappings/:reqId', async (req, res) => {
     res.status(500).json({ success: false, message: "Error deleting mapping" });
   }
 });
-
-app.post("/responses", (req, res) => {
-  const { reqId, resJson, timestamp } = req.body;
-  if (
-    !reqId ||
-    !resJson ||
-    !resJson.status ||
-    !resJson.headers ||
-    !resJson.body
-  ) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid data. Ensure reqId and resJson fields are valid.",
-    });
-    res.status(500).json({ success: false, message: 'Error deleting mapping' });
-  }
-});
-
 
 app.post("/responses", async (req, res) => {
   try {
@@ -324,7 +258,9 @@ app.post("/responses", async (req, res) => {
     res.json({ success: true, newResponse });
   } catch (error) {
     console.error("Error creating response:", error);
-    res.status(500).json({ success: false, message: "Failed to save response." });
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to save response." });
   }
 });
 
@@ -332,7 +268,7 @@ app.get("/traffic", async (req, res) => {
   try {
     // Read AMS mappings
     const storeRequests = JSON.parse(fs.readFileSync(requestsFile, "utf-8"));
-    c
+    c;
 
     const mappingLookup = storeRequests.reduce((lookup, mapping) => {
       lookup[mapping.wireMockId] = mapping;
@@ -392,184 +328,14 @@ app.get("/traffic", async (req, res) => {
   }
 });
 
-//Detta läser Scenarion från filen
-const readScenarios = () => {
-  if (!fs.existsSync(scenariosFile)) return [];
-  return JSON.parse(fs.readFileSync(scenariosFile, "utf-8"));
-};
-
-//Skriver Scenarion till filen
-const writeScenarios = (scenarios) => {
-  fs.writeFileSync(scenariosFile, JSON.stringify(scenarios, null, 2));
-};
-
-//Hämtar nästa scenarios Id
-const getNextScenarioId = (scenarios) => {
-  if (scenarios.length === 0) return "1";
-  const maxId = Math.max(...scenarios.map((s) => parseInt(s.id, 10)));
-  return String(maxId + 1);
-};
-
-//Gör GET anrop på /scenarios för att hämta alla scenarios
-app.get("/scenarios", (req, res) => {
-  const scenarios = readScenarios();
-  res.json({ scenarios });
-});
-
 //Detta läser Scenarion från file
 
 //Hämtar nästa scenarios Id
 //Skapar en ny scenario
 
-  // Ensure each mapping has both "request" and "response"
-  const cleanMappings =
-    scenario.mappings && Array.isArray(scenario.mappings)
-      ? scenario.mappings.map((mapping) => {
-          // Use mapping.id if available; otherwise, use mapping.ReqId from the front-end
-          const mappingId = mapping.id || mapping.ReqId;
-
-          // Destructure the response to extract its id and the remaining properties
-          const { id: responseId, ...restResponse } = mapping.response || {};
-          return {
-            // Set the top-level reqId if needed
-            request: {
-              reqId: mappingId, // Add reqId inside the request object
-            },
-            response:
-              Object.keys(mapping.response || {}).length > 0
-                ? {
-                    resId: responseId, // Rename the response id to resId   // Also include reqId in the response object
-                  }
-                : {},
-          };
-        })
-      : [];
-
-  // Build new scenario object with only the desired keys
-  const newScenario = {
-    id,
-    name: scenario.name,
-    mappings: cleanMappings,
-  };
-
-  scenarios.push(newScenario);
-  writeScenarios(scenarios);
-  res.json({ success: true, scenario: newScenario });
-});
-
-// Batch endpoint to send all mappings for a given scenario to WireMock
-app.post("/scenarios/:id/send", async (req, res) => {
-  const { id } = req.params;
-  let scenarios = readScenarios();
-  const scenarioIndex = scenarios.findIndex((s) => s.id === id);
-  if (scenarioIndex === -1) {
-    return res
-      .status(404)
-      .json({ success: false, message: "Scenario not found" });
-  }
-  const scenario = scenarios[scenarioIndex];
-
-  if (!scenario.mappings || scenario.mappings.length === 0) {
-    return res
-      .status(400)
-      .json({
-        success: false,
-        message: "No mappings to send for this scenario",
-      });
-  }
-
-  // Send each mapping concurrently using Promise.all
-  const results = await Promise.all(
-    scenario.mappings.map((mapping) => {
-      const mappingId = mapping.request.reqId;
-      return handleSendToWireMock(mappingId);
-    })
-  );
-
-  // Update each mapping with its WireMock ID
-  const updatedMappings = scenario.mappings.map((mapping, index) => {
-    const result = results[index];
-    return result && result.success
-      ? { ...mapping, wireMockId: result.wireMockId }
-      : mapping;
-  });
-  scenario.mappings = updatedMappings;
-
-  // Update the main requests file (by matching mapping IDs)
-  let requests = JSON.parse(fs.readFileSync(requestsFile, "utf-8"));
-  updatedMappings.forEach((updatedMapping) => {
-    const reqId = updatedMapping.request.reqId;
-    const reqIndex = requests.findIndex((r) => r.id === reqId);
-    if (reqIndex !== -1) {
-      requests[reqIndex].wireMockId =
-        updatedMapping.wireMockId || requests[reqIndex].wireMockId;
-    }
-  });
-  fs.writeFileSync(requestsFile, JSON.stringify(requests, null, 2));
-  writeScenarios(scenarios);
-
-  if (results.every((result) => result && result.success)) {
-    return res.json({ success: true, scenario });
-  } else {
-    return res.json({
-      success: false,
-      message: "Some mappings failed to send",
-      scenario,
-    });
-  }
-});
-  
-
 //Uppdaterar scenarios
-app.put("/scenarios/:id", (req, res) => {
-  const { id } = req.params;
-  let scenarios = readScenarios();
-  const index = scenarios.findIndex((s) => s.id === id);
-  if (index === -1) {
-    return res
-      .status(404)
-      .json({ success: false, message: "Scenario not found" });
-  }
-
-  // Get the new scenario data from the request body.
-  const updatedScenario = req.body.scenario;
-  if (!updatedScenario) {
-    return res
-      .status(400)
-      .json({ success: false, message: "No scenario data provided" });
-  }
-
-  const cleanMappings =
-    updatedScenario.mappings && Array.isArray(updatedScenario.mappings)
-      ? updatedScenario.mappings.map((mapping) => ({
-          request: { reqId: mapping.request.reqId },
-          response:
-            mapping.response && mapping.response.resId
-              ? { resId: mapping.response.resId }
-              : {},
-        }))
-      : [];
-
-  // Replace the existing scenario data with the new data.
-  scenarios[index] = {
-    id,
-    name: updatedScenario.name, // Use the updated name
-    mappings: updatedScenario.mappings, // Replace the mappings
-    // You can add responses if needed.
-  };
-
-  writeScenarios(scenarios);
-  res.json({ success: true, scenario: scenarios[index] });
-});
 
 //Tar bort scenarios
-app.delete("/scenarios/:id", (req, res) => {
-  const { id } = req.params;
-  let scenarios = readScenarios();
-  scenarios = scenarios.filter((s) => s.id !== id);
-  writeScenarios(scenarios);
-  res.json({ success: true });
-});
 
 app.listen(8080, () => {
   console.log("Server running on http://localhost:8080");

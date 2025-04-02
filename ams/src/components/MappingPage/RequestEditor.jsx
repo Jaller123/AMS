@@ -46,11 +46,7 @@ const RequestEditor = ({
         headers: JSON.stringify(editedRequest.headers || {}, null, 2),
         // If the request has a body stored in bodyPatterns, use that; otherwise, fallback to the body field.
         body: editedRequest.bodyPatterns
-          ? JSON.stringify(
-              editedRequest.bodyPatterns[0].equalToJson || {},
-              null,
-              2
-            )
+          ? JSON.stringify(editedRequest.bodyPatterns[0].equalToJson || {}, null, 2)
           : JSON.stringify(editedRequest.body || {}, null, 2),
       });
     }
