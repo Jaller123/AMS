@@ -8,9 +8,14 @@ const useMappingSearch = (mappings, initialSort = "") => {
     method: "",
   });
   const [sortCriterion, setSortCriterion] = useState(initialSort);
-  const [filteredMappings, setFilteredMappings] = useState(mappings);
+  const [filteredMappings, setFilteredMappings] = useState([]);
 
   useEffect(() => {
+    if (!Array.isArray(mappings)) {
+      // Om mappings inte är en array, sätt en tom array
+      mappings = [];
+    }
+
     let filtered = mappings.filter((mapping) => {
       const request = mapping.request || {};
       const title = (request.title || "").toLowerCase();
@@ -47,6 +52,7 @@ const useMappingSearch = (mappings, initialSort = "") => {
         return fieldA.localeCompare(fieldB);
       });
     }
+
     setFilteredMappings(filtered);
   }, [mappings, search, searchFilters, sortCriterion]);
 

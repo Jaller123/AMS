@@ -441,6 +441,101 @@ app.post("/scenarios", async (req, res) => {
 });
 
 //Uppdaterar scenarios
+app.put("/scenarios/:id", async (req, res) => {
+  const { id } = req.params; // Få id från URL
+  const { name, mappings } = req.body.scenario; // Hämta den nya informationen från request body
+
+  if (!name || !Array.isArray(mappings)) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid scenario format" });
+  }
+
+  try {
+    // Uppdatera scenariot i scenariotab
+    const [updateResult] = await connection.execute(
+      "UPDATE scenariotab SET title = ? WHERE id = ?",
+      [name, id]
+    );
+
+    if (updateResult.affectedRows === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Scenario not found" });
+    }
+
+    // Ta bort gamla mappningar från scenariorestab för detta scenario
+    await connection.execute(
+      "DELETE FROM scenariorestab WHERE scenario_Id = ?",
+      [id]
+    );
+
+    // Lägg till de nya mappningarna
+    for (const mapping of mappings) {
+      const { resId } = mapping;
+
+      if (resId) {
+        await connection.execute(
+          "INSERT INTO scenariorestab (scenario_Id, resId) VALUES (?, ?)",
+          [id, resId]
+        );
+      } else {
+        console.warn("⚠️ No resId found in mapping:", mapping);
+      }
+    }
+
+    // Hämta det uppdaterade scenariot och dess mappningar
+    const [scenarios] = await connection.execute(
+      "SELECT * FROM scenariotab WHERE id = ?",
+      [id]
+    );
+    const [links] = await connection.execute(
+      "SELECT * FROM scenariorestab WHERE scenario_Id = ?",
+      [id]
+    );
+    const [responses] = await connection.execute("SELECT * FROM restab");
+    const [requests] = await connection.execute("SELECT * FROM reqtab");
+
+    const updatedScenario = scenarios.map((s) => {
+      const linkedRes = links.filter((l) => l.scenario_Id === s.id);
+      const scenarioMappings = linkedRes
+        .map((link) => {
+          const response = responses.find((r) => r.resId === link.resId);
+          if (!response) return null;
+
+          const request = requests.find((req) => req.reqId === response.reqId);
+          if (!request) return null;
+
+          return {
+            resId: response.resId,
+            reqId: response.reqId,
+            request: {
+              id: request.reqId,
+              title: request.title,
+              ...JSON.parse(request.reqJson),
+            },
+            response: {
+              id: response.resId,
+              title: response.title,
+              ...JSON.parse(response.resJson),
+            },
+          };
+        })
+        .filter(Boolean);
+
+      return {
+        id: s.id,
+        name: s.title,
+        mappings: scenarioMappings,
+      };
+    })[0]; // Vi bör få enbart ett scenario om id är unikt.
+
+    return res.json({ success: true, scenario: updatedScenario });
+  } catch (error) {
+    console.error("Error updating scenario:", error);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+});
 
 //Tar bort scenarios
 app.delete("/scenarios/:id", async (req, res) => {
