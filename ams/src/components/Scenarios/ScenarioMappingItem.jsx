@@ -1,4 +1,5 @@
 import React from "react";
+import styles from "./CreateScenario.module.css";
 
 const ScenarioMappingItem = ({
   mapping,
@@ -34,8 +35,8 @@ const ScenarioMappingItem = ({
           ❌ Remove
         </button>
         <span>
-          <strong>{mapping.request?.reqJson?.method|| "METHOD"}</strong> |{" "}
-            {mapping.request?.reqJson?.url ||
+          <strong>{mapping.request?.reqJson?.method || "METHOD"}</strong> |{" "}
+          {mapping.request?.reqJson?.url ||
             mapping.request?.reqJson?.urlPath ||
             mapping.request?.reqJson?.urlPathPattern ||
             mapping.request?.reqJson?.urlPathTemplate ||

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 const ScenarioItem = ({
   scenario,
-  mappings = [], 
+  mappings = [],
   expanded,
   toggleScenarioDropdown,
   handleDeleteScenario,
@@ -27,26 +27,25 @@ const ScenarioItem = ({
         <div className={styles.scenarioDetails}>
           {scenario.mappings && scenario.mappings.length > 0 ? (
             scenario.mappings.map((mapping, index) => {
-              const request = mapping.request?.reqJson || mapping.request || {};
+              console.log("Scenario Data:", scenario);
+              console.log("Mappings:", scenario.mappings);
+              // 👈 Lägg till detta för att debugga
+              const request = mapping.request || {}; // Använd direkt, ingen reqJson
+
               return (
                 <div
                   key={`mapping-${scenario.id}-${index}`}
                   className={styles.mappingItem}
                 >
                   <p className={styles.scenarioMappingTitle}>
-                    {request?.title || "No Title"}
+                    {request.title || "No Title"}
                   </p>
                   <div className={styles.mappingInfo}>
                     <p>
-                      <strong>Method:</strong> {request?.method || "N/A"}
+                      <strong>Method:</strong> {request.method || "N/A"}
                     </p>
                     <p>
-                      <strong>URL:</strong>{" "}
-                      {request?.url ||
-                        request?.urlPath ||
-                        request?.urlPattern ||
-                        request?.urlPathTemplate ||
-                        "N/A"}
+                      <strong>URL:</strong> {request.url || "N/A"}
                     </p>
                   </div>
                 </div>
@@ -55,6 +54,7 @@ const ScenarioItem = ({
           ) : (
             <p>No mappings found.</p>
           )}
+
           <button
             onClick={() => navigate(`/edit-scenario/${scenario.id}`)}
             className={`${styles.button} ${styles.wireMockButton}`}

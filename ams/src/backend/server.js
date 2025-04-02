@@ -55,14 +55,18 @@ app.get("/mappings", async (req, res) => {
     const mappings = await getMappings();
 
     // Fetch actual WireMock mappings
-    const wireMockResponse = await fetch("http://localhost:8081/__admin/mappings");
+    const wireMockResponse = await fetch(
+      "http://localhost:8081/__admin/mappings"
+    );
     const wireMockData = await wireMockResponse.json();
     const wireMockIds = wireMockData.mappings.map((m) => m.id);
 
     // Mark mappings as matched or not
     const enrichedMappings = mappings.map((mapping) => ({
       ...mapping,
-      isMatched: mapping.wireMockId ? wireMockIds.includes(mapping.wireMockId) : false
+      isMatched: mapping.wireMockId
+        ? wireMockIds.includes(mapping.wireMockId)
+        : false,
     }));
 
     res.json({ mappings: enrichedMappings });
@@ -345,83 +349,131 @@ app.get("/traffic", async (req, res) => {
 //Hämtar nästa scenarios Id
 //Skapar en ny scenario
 app.get("/scenarios", async (req, res) => {
-  const [scenarios] = await connection.execute("SELECT * FROM scentab");
-  const [links] = await connection.execute("SELECT * FROM scenrestab");
+  const [scenarios] = await connection.execute("SELECT * FROM scenariotab");
+  const [links] = await connection.execute("SELECT * FROM scenariorestab");
   const [responses] = await connection.execute("SELECT * FROM restab");
   const [requests] = await connection.execute("SELECT * FROM reqtab");
 
+  console.log("🔍 Loaded responses from restab:", responses); // ✅ Kolla vad vi hämtar från restab
+
   const result = scenarios.map((s) => {
-    const linkedRes = links.filter((l) => l.scenId === s.id);
+    const linkedRes = links.filter((l) => l.scenario_Id === s.id);
+    console.log(`Scenario ${s.id} linked resources:`, linkedRes); // ✅ Kolla vilka resurser som är kopplade
+
     const scenarioMappings = linkedRes
-    .map((link) => {
-      const response = responses.find((r) => r.resId === link.resId);
-      if (!response) return null;
-  
-      const request = requests.find((req) => req.reqId === response.reqId);
-      if (!request) return null;
-  
-      return {
-        resId: response.resId,
-        reqId: response.reqId,
-        request: {
-          id: request.reqId,
-          title: request.title,
-          ...JSON.parse(request.reqJson),
-        },
-        response: {
-          id: response.resId,
-          title: response.title,
-          ...JSON.parse(response.resJson),
-        },
-      };
-    })
-    .filter(Boolean); // Remove nulls
-  
+      .map((link) => {
+        const response = responses.find((r) => r.resId === link.resId);
+        if (!response) {
+          console.log(`❌ No response found for resId: ${link.resId}`);
+          return null;
+        }
+
+        const request = requests.find((req) => req.reqId === response.reqId);
+        if (!request) {
+          console.log(`❌ No request found for reqId: ${response.reqId}`);
+          return null;
+        }
+
+        console.log(`✅ Found request for reqId: ${request.reqId}`);
+
+        return {
+          resId: response.resId,
+          reqId: response.reqId,
+          request: {
+            id: request.reqId,
+            title: request.title,
+            ...JSON.parse(request.reqJson),
+          },
+          response: {
+            id: response.resId,
+            title: response.title,
+            ...JSON.parse(response.resJson),
+          },
+        };
+      })
+      .filter(Boolean); // Remove nulls
 
     return {
       id: s.id,
       name: s.title,
-      mappings: scenarioMappings
+      mappings: scenarioMappings,
     };
   });
 
+  console.log("✅ Final Scenarios with Mappings:", result);
   res.json({ scenarios: result });
 });
 
-  
 // POST new scenario
 app.post("/scenarios", async (req, res) => {
   const { scenario } = req.body;
   const { name, mappings } = scenario;
 
-  if (!name || !mappings || !Array.isArray(mappings)) {
-    return res.status(400).json({ success: false, message: "Invalid scenario format" });
+  if (!name || !Array.isArray(mappings)) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid scenario format" });
   }
 
   const [insertResult] = await connection.execute(
-    "INSERT INTO scentab (title) VALUES (?)",
+    "INSERT INTO scenariotab (title) VALUES (?)",
     [name]
   );
   const scenId = insertResult.insertId;
 
   for (const mapping of mappings) {
-    const { resId } = mapping;
+    const resId = mapping.resId; // ✅ FIXED HERE
+
+    console.log("💾 Saving Scenario:", { scenId, name, mappings });
+    console.log("➡️ Trying to link resId:", resId, "to scenario_Id:", scenId);
+
     if (resId) {
       await connection.execute(
-        "INSERT INTO scenrestab (scenId, resId) VALUES (?, ?)",
+        "INSERT INTO scenariorestab (scenario_Id, resId) VALUES (?, ?)",
         [scenId, resId]
       );
-    }    
+    } else {
+      console.warn("⚠️ No resId found in mapping:", mapping);
+    }
   }
 
   res.json({ success: true, scenario: { id: scenId, name, mappings } });
 });
 
-
-
 //Uppdaterar scenarios
 
 //Tar bort scenarios
+app.delete("/scenarios/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Kontrollera om scenariot finns
+    const [existingScenario] = await connection.execute(
+      "SELECT * FROM scenariotab WHERE id = ?",
+      [id]
+    );
+
+    if (existingScenario.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Scenario not found" });
+    }
+
+    // Steg 1: Radera länkar i scenariorestab (om de finns)
+    await connection.execute(
+      "DELETE FROM scenariorestab WHERE scenario_Id = ?",
+      [id]
+    );
+
+    // Steg 2: Radera själva scenariot från scenariotab
+    await connection.execute("DELETE FROM scenariotab WHERE id = ?", [id]);
+
+    res.json({ success: true, message: "Scenario deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting scenario:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
 
 app.listen(8080, () => {
   console.log("Server running on http://localhost:8080");

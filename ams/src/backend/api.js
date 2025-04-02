@@ -27,13 +27,20 @@ export const fetchMappings = async () => {
     // Check if WireMock is running (optional)
     let wiremockRunning = false;
     try {
-      const healthResponse = await retryFetch(`${API_BASE_URL}/health`, 5, 1500);
+      const healthResponse = await retryFetch(
+        `${API_BASE_URL}/health`,
+        5,
+        1500
+      );
       wiremockRunning = healthResponse.wiremockRunning === true;
       console.log(healthResponse);
     } catch (error) {
-      console.log("🩺 WireMock Health Status:", wiremockRunning ? "Running ✅" : "Down ❌");
+      console.log(
+        "🩺 WireMock Health Status:",
+        wiremockRunning ? "Running ✅" : "Down ❌"
+      );
     }
-    
+
     // Fetch mappings from the backend
     const response = await fetch(`${API_BASE_URL}/mappings`);
     if (!response.ok) throw new Error("Failed to fetch mappings");
@@ -41,11 +48,11 @@ export const fetchMappings = async () => {
     console.log("Fetched mappings:", data.mappings);
 
     // Ensure each mapping has a responses array:
-    const mappings = (data.mappings || []).map(mapping => ({
+    const mappings = (data.mappings || []).map((mapping) => ({
       ...mapping,
       isActive: wiremockRunning && !!mapping.wireMockId,
       wireMockId: wiremockRunning ? mapping.wireMockId : null,
-      responses: mapping.responses || []
+      responses: mapping.responses || [],
     }));
 
     return { mappings, responses: [] };
@@ -146,9 +153,6 @@ export const handleSendScenarioToWireMock = async (scenarioId) => {
   }
 };
 
-
-
-
 //Mappings--------------------------------------------------------------------------------------------------------------------------------
 
 export const saveMapping = async (mapping) => {
@@ -160,28 +164,24 @@ export const saveMapping = async (mapping) => {
     });
     const data = await response.json();
     console.log("SaveMapping response data:", data);
-    
+
     // Ensure the mapping was returned
     if (!data.mapping) {
       throw new Error("Mapping was not returned from the server");
     }
-    
+
     const newMapping = data.mapping;
     return {
       id: newMapping.reqId, // using reqId from the backend object
       request: newMapping.request,
       wireMockId: newMapping.wireMockId,
-      responses: newMapping.response ? [newMapping.response] : [] // Always return an array!
+      responses: newMapping.response ? [newMapping.response] : [], // Always return an array!
     };
   } catch (error) {
     console.error("Error saving mapping:", error);
     throw error;
   }
 };
-
-
-
-
 
 export const saveResponse = async (response) => {
   try {
@@ -257,9 +257,6 @@ export const updateResponse = async (dbId, updatedResponse) => {
   }
 };
 
-
-
-
 // Scenarios ---------------------------------------------------------------------------------------------------------------------------
 
 export const fetchScenarios = async () => {
@@ -267,6 +264,7 @@ export const fetchScenarios = async () => {
     const response = await fetch(`${API_BASE_URL}/scenarios`);
     if (!response.ok) throw new Error("Failed to fetch scenarios");
     const data = await response.json();
+    console.log("Fetched scenarios data:", data); // 👈 Logga API-svaret
     return data.scenarios;
   } catch (error) {
     console.error("Error fetching scenarios:", error);
