@@ -33,6 +33,38 @@ const ScenarioMappingItem = ({
         >
           ❌ Remove
         </button>
+        <span>
+          <strong>{mapping.request?.reqJson?.method|| "METHOD"}</strong> |{" "}
+            {mapping.request?.reqJson?.url ||
+            mapping.request?.reqJson?.urlPath ||
+            mapping.request?.reqJson?.urlPathPattern ||
+            mapping.request?.reqJson?.urlPathTemplate ||
+            mapping.request?.reqJson?.urlPattern ||
+            "No URL"}{" "}
+          | {mapping.request?.title || "No Title"}
+        </span>
+        {handleAddToScenario && (
+          <button
+            className={styles.addToScenarioButton}
+            onClick={(e) => {
+              e.stopPropagation(); // Prevent expand toggle
+              handleAddToScenario(id); // Adds mapping to scenario
+            }}
+          >
+            Add to Scenario
+          </button>
+        )}
+        {handleRemoveMapping && (
+          <button
+            className={styles.removeMapping}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleRemoveMapping(id);
+            }}
+          >
+            ❌
+          </button>
+        )}
       </div>
 
       {expanded && (

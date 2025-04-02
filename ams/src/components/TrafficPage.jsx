@@ -17,6 +17,8 @@ const TrafficPage = ({ savedMappings }) => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
+  console.log("Saved mappings:", savedMappings.map(m => ({ id: m.id, wireMockId: m.wireMockId })));
+
   useEffect(() => {
     const state = location.state || {};
     setFilter(state.filterTraffic || "");
@@ -31,15 +33,26 @@ const TrafficPage = ({ savedMappings }) => {
       try {
         const data = await fetchWireMockTraffic();
         const joinedData = data.trafficData.map((item) => {
-          if (item.matchedStubId && savedMappings && savedMappings.length) {
+          if (item.matchedStubId && savedMappings && savedMappings.length) {   
             const foundMapping = savedMappings.find((mapping) => {
-              const mappingUuid = mapping.uuid || mapping.wireMockId;
+              console.log("Matching:", {
+                stubId: item.matchedStubId,
+                mappingId: mapping.wireMockId,
+                equal: mapping.wireMockId?.trim().toLowerCase() === item.matchedStubId?.trim().toLowerCase()
+              });
+              
               return (
-                mappingUuid &&
-                mappingUuid.trim().toLowerCase() ===
+                mapping.wireMockId &&
+                mapping.wireMockId.trim().toLowerCase() ===
                   item.matchedStubId.trim().toLowerCase()
+                  
               );
-            });
+            });  
+            console.log(`🧪 Comparing traffic.matchedStubId "${item.matchedStubId}" with mappings:`);
+savedMappings.forEach(m => {
+  console.log(`→ Mapping ${m.id}: wireMockId=${m.wireMockId}`);
+});
+          
             const newMappingId = foundMapping ? foundMapping.id : undefined;
             console.log(
               `For traffic item ${item.id}, matchedStubId: "${item.matchedStubId}" -> mappingId: "${newMappingId}"`
@@ -48,6 +61,7 @@ const TrafficPage = ({ savedMappings }) => {
           }
           return item;
         });
+        console.log("🚦 Final joined trafficData:", joinedData);
         setTrafficData(joinedData);
       } catch (err) {
         setError(err.message);
@@ -199,36 +213,37 @@ const TrafficPage = ({ savedMappings }) => {
               <span>{item?.response?.status || "N/A"}</span>
 
               <span>
-                {item?.matchedStubId && item.mappingId ? (
-                  <Link
-                    to="/"
-                    state={{ expandMappingId: item.mappingId }}
-                    onClick={() =>
-                      console.log("Navigating with mappingId:", item.mappingId)
-                    }
-                  >
-                    ✅ Matched
-                  </Link>
-                ) : (
-                  <Link
-                    to="/mappings"
-                    state={{
-                      prefillMapping: {
-                        url: item?.request.url,
-                        method: item?.request.method,
-                        headers: {
-                          "Content-Type": getHeaderValue(
-                            item?.request?.headers,
-                            "Content-Type"
-                          ),
-                        },
-                        body: item?.request.body,
-                      },
-                    }}
-                  >
-                    ❌ Unmatched
-                  </Link>
-                )}
+              {item.mappingId ? (
+            <Link
+              to="/"
+              state={{ expandMappingId: item.mappingId }}
+              onClick={() =>
+                console.log("Navigating with mappingId:", item.mappingId)
+              }
+            >
+              ✅ Matched
+            </Link>
+          ) : (
+            <Link
+              to="/mappings"
+              state={{
+                prefillMapping: {
+                  url: item?.request.url,
+                  method: item?.request.method,
+                  headers: {
+                    "Content-Type": getHeaderValue(
+                      item?.request?.headers,
+                      "Content-Type"
+                    ),
+                  },
+                  body: item?.request.body,
+                },
+              }}
+            >
+              ❌ Unmatched
+            </Link>
+          )}
+
               </span>
               <span>
                 {item.timestamp

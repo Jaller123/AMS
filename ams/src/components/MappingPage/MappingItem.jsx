@@ -40,7 +40,7 @@ const MappingItem = ({
   const mappingId = mapping.id || mapping.request.id;
   const [isActive, setIsActive] = useState(!!mapping.wireMockId);
 
-
+  
   useEffect(() => {
     setIsActive(!!mapping.wireMockId);
   }, [mapping.wireMockId]);
@@ -178,7 +178,7 @@ const MappingItem = ({
 
 <ResponseEditor
   mappingId={mappingId}
-  relevantResponses={responses.filter((res) => res.reqId === mappingId)}
+  relevantResponses={responses.filter(res => res.reqId === mappingId)} // ✅ This should be an array
   editedResponse={editedResponses[mappingId]}
   setEditedResponse={(data) =>
     setEditedResponses((prev) => ({ ...prev, [mappingId]: data }))
@@ -192,6 +192,7 @@ const MappingItem = ({
   }
   handleUpdateResponse={handleUpdateResponse}
 />
+
           {isActive && (
             <button
               className={styles.sendButton}

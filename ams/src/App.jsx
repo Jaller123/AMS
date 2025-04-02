@@ -36,6 +36,10 @@ const App = () => {
         setMappings(data.mappings || []);
         const allResponses = data.mappings.flatMap((m) => m.responses);
         setResponses(allResponses);
+        console.log("🧩 Final mappings structure:", data.mappings);
+        setMappings(data.mappings || []); 
+        const allResponses = data.mappings.flatMap(m => m.responses);
+        setResponses(allResponses); 
       } catch (error) {
         console.error("Failed to load mappings and responses:", error);
         alert("Failed to load data from the server. Please check the console.");
