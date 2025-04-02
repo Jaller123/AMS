@@ -105,10 +105,51 @@ const EditScenario = () => {
     }
   };
 
+  const handleDropOnDropZone = (e) => {
+    e.preventDefault();
+    setHighlighted(false);
+
+    const jsonData = e.dataTransfer.getData("application/json");
+    if (!jsonData) return;
+    const droppedMapping = JSON.parse(jsonData);
+
+    // Lägg till mappningen till det aktuella scenariot
+    setCurrentScenario((prevScenario) => {
+      // Kolla om mappningen redan är tillagd för att undvika duplicering
+      if (!prevScenario) return prevScenario;
+      if (prevScenario.mappings.some((m) => m.id === droppedMapping.id)) {
+        return prevScenario;
+      }
+
+      return {
+        ...prevScenario,
+        mappings: [...prevScenario.mappings, droppedMapping],
+      };
+    });
+
+    // Ta bort den tillagda mappningen från listan med sparade mappningar
+    setMappings((prevMappings) => {
+      return prevMappings.filter((m) => m.id !== droppedMapping.id);
+    });
+
+    // Lägg till den till den lista över redan tillagda mappningar för att förhindra att den dras till igen
+    setAddedMappings((prevAdded) => {
+      const newAdded = new Set(prevAdded);
+      newAdded.add(droppedMapping.id);
+      return newAdded;
+    });
+  };
+
   return (
     <div className={styles.container}>
       {/* LEFT PANEL: Edit Scenario */}
-      <div className={styles.leftPanel}>
+      <div
+        className={styles.leftPanel}
+        onDragOver={handleDragOverDropZone}
+        onDragLeave={handleDragLeaveDropZone}
+        onDrop={handleDropOnDropZone}
+        style={{ background: highlighted ? "#e6f7ff" : "transparent" }} // Säkerställ att det är ett korrekt stilobjekt
+      >
         <h1>Edit Scenario</h1>
         <input
           className={styles.inputTitle}
