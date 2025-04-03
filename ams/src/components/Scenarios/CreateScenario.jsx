@@ -104,10 +104,9 @@ const CreateScenario = () => {
     const newScenarioData = {
       name: scenarioName,
       mappings: newScenarioMappings.map((mapping) => {
-        const firstResponse = responses.find((res) => res.reqId === mapping.id);
         return {
           reqId: mapping.id,
-          resId: firstResponse?.resId || null, // 👈 this is what scenrestab expects
+          resId: mapping.responses?.[0]?.resId || null,
         };
       }),
     };

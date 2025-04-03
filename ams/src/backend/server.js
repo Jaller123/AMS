@@ -410,9 +410,7 @@ app.post("/scenarios", async (req, res) => {
   const { name, mappings } = scenario;
 
   if (!name || !Array.isArray(mappings)) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Invalid scenario format" });
+    return res.status(400).json({ success: false, message: "Invalid scenario format" });
   }
 
   const [insertResult] = await connection.execute(

@@ -10,33 +10,28 @@ const ScenarioMappingItem = ({
   handleDragStartMapping,
   handleDragEndMapping,
   handleRemoveMapping,
-  handleAddToScenario, // Function passed as prop
+  handleAddToScenario, // Passed as prop
 }) => {
+  const { id, request } = mapping;
+
   return (
-    <li className={styles.mappingItem}>
+    <li
+      className={styles.mappingItem}
+      draggable
+      onDragStart={(e) => handleDragStartMapping(e, mapping)}
+      onDragEnd={handleDragEndMapping}
+      style={{
+        cursor: "grab",
+        opacity: draggingMappingId === id ? 0.6 : 1,
+      }}
+    >
       <div
         className={styles.mappingHeader}
-        onClick={() => onToggleExpand(mapping.id)} // Expandera eller kollapsa mappning
-        draggable
-        onDragStart={(e) => handleDragStartMapping(e, mapping)}
-        onDragEnd={handleDragEndMapping}
+        onClick={() => onToggleExpand?.(id)}
       >
-        <span>{mapping.name}</span>
-        <button
-          className={styles.addButton}
-          onClick={() => handleAddToScenario(mapping.id)} // Lägg till mappning i scenario
-        >
-          + Add to Scenario
-        </button>
-        <button
-          className={styles.removeButton}
-          onClick={() => handleRemoveMapping(mapping.id)} // Ta bort mappning från scenario
-        >
-          ❌ Remove
-        </button>
         <span>
-          <strong>{mapping.request?.reqJson?.method || "METHOD"}</strong> |{" "}
-          {mapping.request?.reqJson?.url ||
+          <strong>{mapping.request?.reqJson?.method|| "METHOD"}</strong> |{" "}
+            {mapping.request?.reqJson?.url ||
             mapping.request?.reqJson?.urlPath ||
             mapping.request?.reqJson?.urlPathPattern ||
             mapping.request?.reqJson?.urlPathTemplate ||
@@ -70,13 +65,22 @@ const ScenarioMappingItem = ({
 
       {expanded && (
         <div className={styles.mappingDetails}>
-          <h3>Details for {mapping.name}</h3>
-          {/* Här kan du lägga till mer information om mappningen */}
-          <pre>{JSON.stringify(mapping, null, 2)}</pre>
+          <h3>Request</h3>
+          <pre className={styles.preFormatted}>
+            {JSON.stringify(request, null, 2)}
+          </pre>
+          <h3>Responses</h3>
+          {responses
+            .filter((res) => res.reqId === id)
+            .map((res) => (
+              <pre key={res.id} className={styles.preFormatted}>
+                {JSON.stringify(res, null, 2)}
+              </pre>
+            ))}
         </div>
       )}
     </li>
   );
 };
 
-export default ScenarioMappingItem;
+export default ScenarioMappingItem;  

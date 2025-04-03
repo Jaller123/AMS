@@ -25,6 +25,9 @@ const ScenarioItem = ({
 
       {expanded && (
         <div className={styles.scenarioDetails}>
+             {console.log("🔍 Scenario:", scenario.name)}
+              {console.log("📦 Mappings:", scenario.mappings)}
+
           {scenario.mappings && scenario.mappings.length > 0 ? (
             scenario.mappings.map((mapping, index) => {
               console.log("Scenario Data:", scenario);
