@@ -25,13 +25,10 @@ const ScenarioItem = ({
 
       {expanded && (
         <div className={styles.scenarioDetails}>
-             {console.log("🔍 Scenario:", scenario.name)}
-              {console.log("📦 Mappings:", scenario.mappings)}
+   
 
           {scenario.mappings && scenario.mappings.length > 0 ? (
             scenario.mappings.map((mapping, index) => {
-              console.log("Scenario Data:", scenario);
-              console.log("Mappings:", scenario.mappings);
               // 👈 Lägg till detta för att debugga
               const request = mapping.request || {}; // Använd direkt, ingen reqJson
 

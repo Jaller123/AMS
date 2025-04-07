@@ -45,7 +45,7 @@ export const fetchMappings = async () => {
     const response = await fetch(`${API_BASE_URL}/mappings`);
     if (!response.ok) throw new Error("Failed to fetch mappings");
     const data = await response.json();
-    console.log("Fetched mappings:", data.mappings);
+
 
     // Ensure each mapping has a responses array:
     const mappings = (data.mappings || []).map((mapping) => ({

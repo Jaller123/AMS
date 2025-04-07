@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { fetchMappings, fetchScenarios, saveScenario } from "../../backend/api";
+import { useParams } from "react-router-dom";
+import { fetchMappings, fetchScenarios, saveScenario, updateScenario } from "../../backend/api";
 import styles from "./CreateScenario.module.css";
 import ScenarioMappingList from "./ScenarioMappingList";
 
@@ -11,29 +12,143 @@ const EditScenario = () => {
   const [draggingMappingId, setDraggingMappingId] = useState(null);
   const [highlighted, setHighlighted] = useState(false); // För att markera drag-and-drop zon
   const [addedMappings, setAddedMappings] = useState(new Set()); // För att hålla koll på tillagda mappningar
+  const [expandMappingIdLeft, setExpandMappingIdLeft] = useState(null);
+  const [expandMappingIdRight, setExpandMappingIdRight] = useState(null);
+
+  const { scenarioId } = useParams()
 
   useEffect(() => {
+    console.log("🌀 useEffect triggered - loading mappings and scenarios");
+  
     const loadData = async () => {
       try {
-        const { mappings: loadedMappings, responses } = await fetchMappings();
-        setMappings(loadedMappings);
-        setResponses(responses);
-      } catch (error) {
-        console.error("Error fetching mappings:", error);
-      }
-
-      try {
+        console.log("📥 Fetching mappings...");
+        const { mappings: loadedMappings } = await fetchMappings();
+        console.log("✅ Fetched mappings:", loadedMappings);
+  
+        const normalizedMappings = loadedMappings.map((mapping) => {
+          console.log("🔧 Normalizing mapping:", mapping);
+          return {
+            ...mapping,
+            id: mapping.id,
+            request: {
+              ...mapping.request,
+              reqJson: mapping.request?.reqJson || mapping.request,
+            },
+            title: mapping.request?.title,
+            method: mapping.request?.reqJson?.method,
+            url: mapping.request?.reqJson?.url || "",
+          };
+        });
+  
+        setMappings(normalizedMappings);
+  
+        const allResponses = loadedMappings.flatMap((m) => m.responses || []);
+        console.log("📦 Collected all responses:", allResponses);
+        setResponses(allResponses);
+  
         const loadedScenarios = await fetchScenarios();
+        console.log("📦 Loaded scenarios:", loadedScenarios);
         setScenarios(loadedScenarios);
-        // Här sätter vi det första scenariot som vi ska editera om inget är valt
-        setCurrentScenario(loadedScenarios[0] || null);
+  
+        const matchedScenario = scenarios.find((s) => s.id == scenarioId);
+        console.log("🎯 Matched Scenario by ID:", matchedScenario);
+  
+        if (matchedScenario) {
+          const enrichedMappings = matchedScenario.mappings.map((entry) => {
+            const { request, response } = entry;
+            console.log("🔁 Processing mapping from scenario:", entry);
+  
+            const enriched = {
+              id: request?.id || entry.reqId,
+              request: {
+                ...request,
+                reqJson: request,
+              },
+              responses: response
+                ? [
+                    {
+                      id: response.id,
+                      resId: response.id,
+                      reqId: request.id,
+                      resJson: response,
+                      title: response.title,
+                    },
+                  ]
+                : [],
+            };
+  
+            console.log("✅ Enriched mapping:", enriched);
+            return enriched;
+          });
+  
+          console.log("🧩 Final enriched scenario mappings:", enrichedMappings);
+          setAddedMappings(new Set(enrichedMappings.map((m) => m.id)));
+  
+          setCurrentScenario({
+            ...matchedScenario,
+            mappings: enrichedMappings,
+          });
+        } else {
+          console.warn("⚠️ No matched scenario found");
+          setCurrentScenario(null);
+        }
       } catch (error) {
-        console.error("Error fetching scenarios:", error);
+        console.error("❌ Error loading data in useEffect:", error);
       }
     };
-
+  
     loadData();
   }, []);
+  
+  useEffect(() => {
+    if (scenarios.length === 0) return;
+  
+    console.log("🧩 Searching for scenario:", scenarioId);
+    const matchedScenario = scenarios.find((s) => s.id === parseInt(scenarioId));
+    console.log("🎯 Matched Scenario by ID:", matchedScenario);
+  
+    if (matchedScenario) {
+      const enrichedMappings = matchedScenario.mappings.map((entry) => {
+        const { request, response } = entry;
+        const enriched = {
+          id: request?.id || entry.reqId,
+          request: {
+            ...request,
+            reqJson: request,
+          },
+          responses: response
+            ? [
+                {
+                  id: response.id,
+                  resId: response.id,
+                  reqId: request.id,
+                  resJson: response,
+                  title: response.title,
+                },
+              ]
+            : [],
+        };
+        return enriched;
+      });
+  
+      setAddedMappings(new Set(enrichedMappings.map((m) => m.id)));
+      setCurrentScenario({ ...matchedScenario, mappings: enrichedMappings });
+    } else {
+      console.warn("⚠️ No matched scenario found for ID:", scenarioId);
+      setCurrentScenario(null);
+    }
+  }, [scenarios, scenarioId]);
+  
+  
+  
+  const toggleMappingDropdownLeft = (id) => {
+    setExpandMappingIdLeft((prev) => (prev === id ? null : id));
+  };
+
+  const toggleMappingDropdownRight = (id) => {
+    setExpandMappingIdRight((prev) => (prev === id ? null : id));
+  };
 
   // Funktioner för att hantera drag-and-drop
   const handleDragStartMapping = (e, mapping) => {
@@ -89,19 +204,25 @@ const EditScenario = () => {
   // Funktion för att spara scenariot
   const handleSaveScenario = async () => {
     if (!currentScenario) return;
-
-    const newScenarioData = {
+  
+    const scenarioPayload = {
       name: currentScenario.name,
       mappings: currentScenario.mappings.map((mapping) => ({
         reqId: mapping.id,
         resId: responses.find((res) => res.reqId === mapping.id)?.resId || null,
       })),
     };
-
-    const savedScenario = await saveScenario(newScenarioData);
-    if (savedScenario) {
+  
+    let saved;
+    if (currentScenario.id) {
+      saved = await updateScenario(currentScenario.id, scenarioPayload);
+    } else {
+      saved = await saveScenario(scenarioPayload);
+    }
+  
+    if (saved) {
       alert("Scenario saved successfully!");
-      setScenarios((prevScenarios) => [...prevScenarios, savedScenario]);
+      setCurrentScenario(saved); // Refresh local state with latest backend data
     }
   };
 
@@ -140,6 +261,8 @@ const EditScenario = () => {
     });
   };
 
+  console.log("CurrentScenario:", currentScenario)
+
   return (
     <div className={styles.container}>
       {/* LEFT PANEL: Edit Scenario */}
@@ -166,6 +289,8 @@ const EditScenario = () => {
         <ScenarioMappingList
           mappings={currentScenario ? currentScenario.mappings : []}
           responses={responses}
+          expandId={expandMappingIdLeft}
+          onToggleExpand={toggleMappingDropdownLeft}
           draggingMappingId={draggingMappingId}
           handleDragStartMapping={handleDragStartMapping}
           handleDragEndMapping={handleDragEndMapping}
@@ -180,10 +305,14 @@ const EditScenario = () => {
       <div className={styles.rightPanel}>
         <h2>Saved Mappings</h2>
         <ScenarioMappingList
-          mappings={mappings.filter(
-            (mapping) => !addedMappings.has(mapping.id) // Exclude mappings already added to the scenario
-          )}
+         mappings={
+          mappings.length && addedMappings.size
+            ? mappings.filter((m) => !addedMappings.has(m.id))
+            : mappings
+        }
           responses={responses}
+          expandId={expandMappingIdRight}
+          onToggleExpand={toggleMappingDropdownRight}
           draggingMappingId={draggingMappingId}
           handleDragStartMapping={handleDragStartMapping}
           handleDragEndMapping={handleDragEndMapping}
