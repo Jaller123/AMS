@@ -130,7 +130,7 @@ const MappingItem = ({
   
 
   const currentRequest = editedRequests[mappingId] || mapping.request.reqJson || {};
-  console.log(mapping)
+
   const displayURL = extractURLValue(currentRequest);
 
   return (
