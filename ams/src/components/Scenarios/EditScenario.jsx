@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { fetchMappings, fetchScenarios, saveScenario, updateScenario } from "../../backend/api";
+import {
+  fetchMappings,
+  fetchScenarios,
+  saveScenario,
+  updateScenario,
+} from "../../backend/api";
 import styles from "./CreateScenario.module.css";
 import ScenarioMappingList from "./ScenarioMappingList";
 
@@ -15,17 +20,17 @@ const EditScenario = () => {
   const [expandMappingIdLeft, setExpandMappingIdLeft] = useState(null);
   const [expandMappingIdRight, setExpandMappingIdRight] = useState(null);
 
-  const { scenarioId } = useParams()
+  const { scenarioId } = useParams();
 
   useEffect(() => {
     console.log("🌀 useEffect triggered - loading mappings and scenarios");
-  
+
     const loadData = async () => {
       try {
         console.log("📥 Fetching mappings...");
         const { mappings: loadedMappings } = await fetchMappings();
         console.log("✅ Fetched mappings:", loadedMappings);
-  
+
         const normalizedMappings = loadedMappings.map((mapping) => {
           console.log("🔧 Normalizing mapping:", mapping);
           return {
@@ -40,13 +45,13 @@ const EditScenario = () => {
             url: mapping.request?.reqJson?.url || "",
           };
         });
-  
+
         setMappings(normalizedMappings);
-  
+
         const allResponses = loadedMappings.flatMap((m) => m.responses || []);
         console.log("📦 Collected all responses:", allResponses);
         setResponses(allResponses);
-  
+
         const loadedScenarios = await fetchScenarios();
         console.log("📦 Loaded scenarios:", loadedScenarios);
         setScenarios(loadedScenarios);
@@ -60,15 +65,15 @@ const EditScenario = () => {
               }
             : null
         );
-  
+
         const matchedScenario = scenarios.find((s) => s.id == scenarioId);
         console.log("🎯 Matched Scenario by ID:", matchedScenario);
-  
+
         if (matchedScenario) {
           const enrichedMappings = matchedScenario.mappings.map((entry) => {
             const { request, response } = entry;
             console.log("🔁 Processing mapping from scenario:", entry);
-  
+
             const enriched = {
               id: request?.id || entry.reqId,
               request: {
@@ -87,14 +92,14 @@ const EditScenario = () => {
                   ]
                 : [],
             };
-  
+
             console.log("✅ Enriched mapping:", enriched);
             return enriched;
           });
-  
+
           console.log("🧩 Final enriched scenario mappings:", enrichedMappings);
           setAddedMappings(new Set(enrichedMappings.map((m) => m.id)));
-  
+
           setCurrentScenario({
             ...matchedScenario,
             mappings: enrichedMappings,
@@ -107,17 +112,19 @@ const EditScenario = () => {
         console.error("❌ Error loading data in useEffect:", error);
       }
     };
-  
+
     loadData();
   }, []);
-  
+
   useEffect(() => {
     if (scenarios.length === 0) return;
-  
+
     console.log("🧩 Searching for scenario:", scenarioId);
-    const matchedScenario = scenarios.find((s) => s.id === parseInt(scenarioId));
+    const matchedScenario = scenarios.find(
+      (s) => s.id === parseInt(scenarioId)
+    );
     console.log("🎯 Matched Scenario by ID:", matchedScenario);
-  
+
     if (matchedScenario) {
       const enrichedMappings = matchedScenario.mappings.map((entry) => {
         const { request, response } = entry;
@@ -141,7 +148,7 @@ const EditScenario = () => {
         };
         return enriched;
       });
-  
+
       setAddedMappings(new Set(enrichedMappings.map((m) => m.id)));
       setCurrentScenario({ ...matchedScenario, mappings: enrichedMappings });
     } else {
@@ -149,9 +156,7 @@ const EditScenario = () => {
       setCurrentScenario(null);
     }
   }, [scenarios, scenarioId]);
-  
-  
-  
+
   const toggleMappingDropdownLeft = (id) => {
     setExpandMappingIdLeft((prev) => (prev === id ? null : id));
   };
@@ -218,8 +223,6 @@ const EditScenario = () => {
 
     console.log("Current scenario before saving:", currentScenario);
 
-    const newScenarioData = {
-  
     const scenarioPayload = {
       name: currentScenario.name,
       mappings: currentScenario.mappings.map((mapping) => ({
@@ -228,21 +231,18 @@ const EditScenario = () => {
       })),
     };
 
-    console.log("Scenario data being saved:", newScenarioData);
+    console.log("Scenario data being saved:", scenarioPayload);
 
-    const savedScenario = await saveScenario(newScenarioData);
-    if (savedScenario) {
-  
     let saved;
     if (currentScenario.id) {
       saved = await updateScenario(currentScenario.id, scenarioPayload);
     } else {
       saved = await saveScenario(scenarioPayload);
     }
-  
+
     if (saved) {
       alert("Scenario saved successfully!");
-      setCurrentScenario(saved); // Refresh local state with latest backend data
+      setCurrentScenario(saved);
     }
   };
 
@@ -277,7 +277,7 @@ const EditScenario = () => {
     });
   };
 
-  console.log("CurrentScenario:", currentScenario)
+  console.log("CurrentScenario:", currentScenario);
 
   return (
     <div className={styles.container}>
@@ -319,14 +319,11 @@ const EditScenario = () => {
       <div className={styles.rightPanel}>
         <h2>Saved Mappings</h2>
         <ScenarioMappingList
-          mappings={mappings.filter(
-            (mapping) => !addedMappings.has(mapping.id)
-          )}
-         mappings={
-          mappings.length && addedMappings.size
-            ? mappings.filter((m) => !addedMappings.has(m.id))
-            : mappings
-        }
+          mappings={
+            mappings.length && addedMappings.size
+              ? mappings.filter((m) => !addedMappings.has(m.id))
+              : mappings
+          }
           responses={responses}
           expandId={expandMappingIdRight}
           onToggleExpand={toggleMappingDropdownRight}

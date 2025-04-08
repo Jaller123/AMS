@@ -17,7 +17,7 @@ const ResponseEditor = ({
   console.log("👀 mappingId:", mappingId);
   console.log("📦 relevantResponses:", relevantResponses);
   console.log("✅ selectedResponse:", selectedResponse);
-  
+
   const navigate = useNavigate();
 
   const goToDetails = (mappingId) => {
@@ -26,17 +26,27 @@ const ResponseEditor = ({
 
   // Initialize `localResponse` when `editedResponse` or `selectedResponse` changes
   useEffect(() => {
-    console.log("🔍 relevantResponses:", relevantResponses);
     const selectedRes =
-      relevantResponses.find((res) => String(res.resId) === String(selectedResponse)) || {};
-    console.log("🎯 selectedRes:", selectedRes);
-    setLocalResponse({
-      ...selectedRes.resJson,
-      headers: selectedRes.resJson?.headers || {},
-      body: selectedRes.resJson?.body || {},
+      relevantResponses.find(
+        (res) => String(res.resId) === String(selectedResponse)
+      ) || {};
+
+    // Endast om selectedRes ändras från tidigare, sätt nytt värde
+    setLocalResponse((prev) => {
+      const newResJson = selectedRes.resJson || {};
+      const newHeaders = newResJson.headers || {};
+      const newBody = newResJson.body || {};
+
+      if (
+        JSON.stringify(prev) !==
+        JSON.stringify({ ...newResJson, headers: newHeaders, body: newBody })
+      ) {
+        return { ...newResJson, headers: newHeaders, body: newBody };
+      }
+
+      return prev;
     });
-  }, [editedResponse, selectedResponse, relevantResponses]);
-  
+  }, [selectedResponse]);
 
   const saveResponse = () => {
     try {
@@ -51,10 +61,12 @@ const ResponseEditor = ({
             ? JSON.parse(localResponse.body)
             : localResponse.body,
       };
-      const dbId = relevantResponses.find(r => r.id === selectedResponse)?.resId || selectedResponse;
+      const dbId =
+        relevantResponses.find((r) => r.id === selectedResponse)?.resId ||
+        selectedResponse;
       handleUpdateResponse(dbId, updatedResponse);
       setIsEditing(false);
-      console.log("Updated Response;", updatedResponse)
+      console.log("Updated Response;", updatedResponse);
     } catch (error) {
       alert("Invalid JSON in headers or body.");
     }
@@ -97,38 +109,47 @@ const ResponseEditor = ({
               setLocalResponse({ ...localResponse, body: e.target.value })
             }
           />
-          <button className={styles.saveResponseButton} onClick={saveResponse}>Save Response</button>
+          <button className={styles.saveResponseButton} onClick={saveResponse}>
+            Save Response
+          </button>
         </div>
       ) : (
         <div>
-         // When setting the selected response:
-         <select
-  value={selectedResponse || ""}
-  onChange={(e) => {
-    const selectedId = Number(e.target.value);
-    const response = relevantResponses.find((res) => res.resId === selectedId);
-    setSelectedResponse(response?.resId || "");
-    setEditedResponse(response?.resJson || {});
-  }}
->
-  {relevantResponses.map((response) => (
-    <option key={response.resId} value={response.resId}>
-  {response.id} - {response.title || response.resJson?.status || "No Status"}
-    </option>
-
-  ))}
-</select>
-
-
-          <pre className={styles.preresponse}>{JSON.stringify(localResponse, null, 2)}</pre>
-          <div className={styles.buttonContainer}>
-           <button onClick={() => setIsEditing(true)} className={styles.ButtonEdit}>Edit Response</button>
-          <button
-            onClick={() => navigate(`/request/${mappingId}`)}
-            className={styles.detailsButton}
+          // When setting the selected response:
+          <select
+            value={selectedResponse || ""}
+            onChange={(e) => {
+              const selectedId = Number(e.target.value);
+              const response = relevantResponses.find(
+                (res) => res.resId === selectedId
+              );
+              setSelectedResponse(response?.resId || "");
+              setEditedResponse(response?.resJson || {});
+            }}
           >
-            Add New Response
-          </button>
+            {relevantResponses.map((response) => (
+              <option key={`response-${response.resId}`} value={response.resId}>
+                {response.id} -{" "}
+                {response.title || response.resJson?.status || "No Status"}
+              </option>
+            ))}
+          </select>
+          <pre className={styles.preresponse}>
+            {JSON.stringify(localResponse, null, 2)}
+          </pre>
+          <div className={styles.buttonContainer}>
+            <button
+              onClick={() => setIsEditing(true)}
+              className={styles.ButtonEdit}
+            >
+              Edit Response
+            </button>
+            <button
+              onClick={() => navigate(`/request/${mappingId}`)}
+              className={styles.detailsButton}
+            >
+              Add New Response
+            </button>
           </div>
         </div>
       )}
