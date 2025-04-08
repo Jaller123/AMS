@@ -535,6 +535,91 @@ app.put("/scenarios/:id", async (req, res) => {
   }
 });
 
+//Send Scenario to WireMock
+app.post("/scenarios/:id/send", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Fetch scenario from database
+    const [scenarios] = await connection.execute("SELECT * FROM scenariotab WHERE id = ?", [id]);
+    if (scenarios.length === 0) {
+      return res.status(404).json({ success: false, message: "Scenario not found" });
+    }
+
+    const [links] = await connection.execute("SELECT * FROM scenariorestab WHERE scenario_Id = ?", [id]);
+    const [responses] = await connection.execute("SELECT * FROM restab");
+    const [requests] = await connection.execute("SELECT * FROM reqtab");
+
+    const mappingsToSend = links.map(link => {
+      const response = responses.find(r => r.resId === link.resId);
+      const request = response ? requests.find(req => req.reqId === response.reqId) : null;
+
+      if (!request || !response) return null;
+
+      return {
+        reqId: request.reqId,
+        resId: response.resId,
+        request: {
+          ...JSON.parse(request.reqJson),
+        },
+        response: {
+          ...JSON.parse(response.resJson),
+        },
+      };
+    }).filter(Boolean);
+
+    const results = [];
+
+    for (const mapping of mappingsToSend) {
+      const payload = {
+        request: {
+          method: mapping.request.method,
+          url: mapping.request.url,
+          headers: Object.fromEntries(
+            Object.entries(mapping.request.headers || {}).map(([k, v]) => [k, { equalTo: v.equalTo || v }])
+          ),
+          bodyPatterns: mapping.request.bodyPatterns || [],
+        },
+        response: {
+          status: mapping.response.status,
+          headers: mapping.response.headers || {},
+          body: JSON.stringify(mapping.response.body || {}),
+        },
+      };
+
+      const wireMockResponse = await fetch(WIREMOCK_BASE_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await wireMockResponse.json();
+
+      if (!wireMockResponse.ok || !data.id) {
+        console.error(`❌ Failed to send mapping (reqId: ${mapping.reqId})`, data);
+        continue;
+      }
+
+      // Save wireMockId back to the database
+      await connection.execute(
+        "UPDATE reqtab SET wireMockId = ? WHERE reqId = ?",
+        [data.id, mapping.reqId]
+      );
+
+      results.push({
+        reqId: mapping.reqId,
+        wireMockId: data.id,
+      });
+    }
+
+    res.json({ success: true, results, message: `Sent ${results.length} mappings to WireMock.` });
+  } catch (error) {
+    console.error("❌ Error sending scenario to WireMock:", error);
+    res.status(500).json({ success: false, message: "Server error while sending scenario." });
+  }
+});
+
+
 //Tar bort scenarios
 app.delete("/scenarios/:id", async (req, res) => {
   const { id } = req.params;
