@@ -41,20 +41,24 @@ const ScenarioMappingList = ({
         setSearch={setSearch}
         sortCriterion={sortCriterion}
       />
-      {filteredMappings.map((mapping) => (
-        <ScenarioMappingItem
-          key={mapping.id}
-          mapping={mapping}
-          responses={responses}
-          expanded={expandId === mapping.id}
-          onToggleExpand={onToggleExpand}
-          draggingMappingId={draggingMappingId}
-          handleDragStartMapping={handleDragStartMapping}
-          handleDragEndMapping={handleDragEndMapping}
-          handleRemoveMapping={handleRemoveMapping}
-          handleAddToScenario={handleAddToScenario} // Pass function here
-        />
-      ))}
+      {Array.isArray(filteredMappings) &&
+        filteredMappings.map((mapping, index) => {
+          console.log(`Index: ${index}, Mapping ID:`, mapping.id);
+          return (
+            <ScenarioMappingItem
+              key={mapping.id || `fallback-key-${index}`} // Om ID saknas, använd ett fallback-värde
+              mapping={mapping}
+              responses={responses}
+              expanded={expandId === mapping.id}
+              onToggleExpand={onToggleExpand}
+              draggingMappingId={draggingMappingId}
+              handleDragStartMapping={handleDragStartMapping}
+              handleDragEndMapping={handleDragEndMapping}
+              handleRemoveMapping={handleRemoveMapping}
+              handleAddToScenario={handleAddToScenario}
+            />
+          );
+        })}
     </ul>
   );
 };

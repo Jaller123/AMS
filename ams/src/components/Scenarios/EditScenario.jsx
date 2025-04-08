@@ -25,8 +25,16 @@ const EditScenario = () => {
       try {
         const loadedScenarios = await fetchScenarios();
         setScenarios(loadedScenarios);
-        // Här sätter vi det första scenariot som vi ska editera om inget är valt
-        setCurrentScenario(loadedScenarios[0] || null);
+
+        // ✅ Säkerställ att currentScenario alltid har en mappings-array
+        setCurrentScenario(
+          loadedScenarios[0]
+            ? {
+                ...loadedScenarios[0],
+                mappings: loadedScenarios[0].mappings || [],
+              }
+            : null
+        );
       } catch (error) {
         console.error("Error fetching scenarios:", error);
       }
@@ -34,6 +42,10 @@ const EditScenario = () => {
 
     loadData();
   }, []);
+
+  useEffect(() => {
+    console.log("Updated scenarios:", scenarios);
+  }, [scenarios]);
 
   // Funktioner för att hantera drag-and-drop
   const handleDragStartMapping = (e, mapping) => {
@@ -55,7 +67,6 @@ const EditScenario = () => {
     setHighlighted(false);
   };
 
-  // Funktion för att lägga till mappningar till scenariot
   const handleAddMappingToScenario = (mappingId) => {
     const mappingToAdd = mappings.find((m) => m.id === mappingId);
     if (!mappingToAdd) return;
@@ -72,7 +83,6 @@ const EditScenario = () => {
     }));
   };
 
-  // Funktion för att ta bort en mappning från det aktuella scenariot
   const handleRemoveMappingFromScenario = (mappingId) => {
     setAddedMappings((prevAdded) => {
       const newAdded = new Set(prevAdded);
@@ -86,9 +96,10 @@ const EditScenario = () => {
     }));
   };
 
-  // Funktion för att spara scenariot
   const handleSaveScenario = async () => {
     if (!currentScenario) return;
+
+    console.log("Current scenario before saving:", currentScenario);
 
     const newScenarioData = {
       name: currentScenario.name,
@@ -97,6 +108,8 @@ const EditScenario = () => {
         resId: responses.find((res) => res.reqId === mapping.id)?.resId || null,
       })),
     };
+
+    console.log("Scenario data being saved:", newScenarioData);
 
     const savedScenario = await saveScenario(newScenarioData);
     if (savedScenario) {
@@ -113,9 +126,7 @@ const EditScenario = () => {
     if (!jsonData) return;
     const droppedMapping = JSON.parse(jsonData);
 
-    // Lägg till mappningen till det aktuella scenariot
     setCurrentScenario((prevScenario) => {
-      // Kolla om mappningen redan är tillagd för att undvika duplicering
       if (!prevScenario) return prevScenario;
       if (prevScenario.mappings.some((m) => m.id === droppedMapping.id)) {
         return prevScenario;
@@ -127,12 +138,10 @@ const EditScenario = () => {
       };
     });
 
-    // Ta bort den tillagda mappningen från listan med sparade mappningar
     setMappings((prevMappings) => {
       return prevMappings.filter((m) => m.id !== droppedMapping.id);
     });
 
-    // Lägg till den till den lista över redan tillagda mappningar för att förhindra att den dras till igen
     setAddedMappings((prevAdded) => {
       const newAdded = new Set(prevAdded);
       newAdded.add(droppedMapping.id);
@@ -142,13 +151,12 @@ const EditScenario = () => {
 
   return (
     <div className={styles.container}>
-      {/* LEFT PANEL: Edit Scenario */}
       <div
         className={styles.leftPanel}
         onDragOver={handleDragOverDropZone}
         onDragLeave={handleDragLeaveDropZone}
         onDrop={handleDropOnDropZone}
-        style={{ background: highlighted ? "#e6f7ff" : "transparent" }} // Säkerställ att det är ett korrekt stilobjekt
+        style={{ background: highlighted ? "#e6f7ff" : "transparent" }}
       >
         <h1>Edit Scenario</h1>
         <input
@@ -176,12 +184,11 @@ const EditScenario = () => {
         </button>
       </div>
 
-      {/* RIGHT PANEL: Saved Mappings */}
       <div className={styles.rightPanel}>
         <h2>Saved Mappings</h2>
         <ScenarioMappingList
           mappings={mappings.filter(
-            (mapping) => !addedMappings.has(mapping.id) // Exclude mappings already added to the scenario
+            (mapping) => !addedMappings.has(mapping.id)
           )}
           responses={responses}
           draggingMappingId={draggingMappingId}
