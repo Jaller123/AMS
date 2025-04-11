@@ -134,6 +134,36 @@ app.post("/mappings", async (req, res) => {
     res.status(500).json({ success: false, message: "Error creating mapping" });
   }
 });
+app.post("/api/mappings", async (req, res) => {
+  try {
+    console.log("Received mapping data:", req.body);
+
+    const { request, response, wireMockUuid } = req.body;
+
+    // Validering: Se till att request och response innehåller det som behövs
+    if (!request || !response) {
+      return res
+        .status(400)
+        .json({ error: "Missing request or response data" });
+    }
+
+    const { reqJson, title: reqTitle } = request;
+    const { title: resTitle, body } = response;
+
+    if (!reqJson || !reqTitle || !resTitle || !body) {
+      return res
+        .status(400)
+        .json({ error: "Invalid data structure: missing required fields" });
+    }
+
+    // Kontrollera om all data är korrekt innan vi skickar till databasen
+    const result = await createMapping(req.body); // Spara i databasen
+    res.json({ success: true, mapping: result });
+  } catch (err) {
+    console.error("Error importing mapping:", err);
+    res.status(500).json({ error: "Failed to import mapping" });
+  }
+});
 
 // POST /mappings/:id/send: Send a mapping to WireMock
 app.post("/mappings/:id/send", async (req, res) => {
@@ -411,7 +441,9 @@ app.post("/scenarios", async (req, res) => {
   const { name, mappings } = scenario;
 
   if (!name || !Array.isArray(mappings)) {
-    return res.status(400).json({ success: false, message: "Invalid scenario format" });
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid scenario format" });
   }
 
   const [insertResult] = await connection.execute(
@@ -542,32 +574,44 @@ app.post("/scenarios/:id/send", async (req, res) => {
 
   try {
     // Fetch scenario from database
-    const [scenarios] = await connection.execute("SELECT * FROM scenariotab WHERE id = ?", [id]);
+    const [scenarios] = await connection.execute(
+      "SELECT * FROM scenariotab WHERE id = ?",
+      [id]
+    );
     if (scenarios.length === 0) {
-      return res.status(404).json({ success: false, message: "Scenario not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Scenario not found" });
     }
 
-    const [links] = await connection.execute("SELECT * FROM scenariorestab WHERE scenario_Id = ?", [id]);
+    const [links] = await connection.execute(
+      "SELECT * FROM scenariorestab WHERE scenario_Id = ?",
+      [id]
+    );
     const [responses] = await connection.execute("SELECT * FROM restab");
     const [requests] = await connection.execute("SELECT * FROM reqtab");
 
-    const mappingsToSend = links.map(link => {
-      const response = responses.find(r => r.resId === link.resId);
-      const request = response ? requests.find(req => req.reqId === response.reqId) : null;
+    const mappingsToSend = links
+      .map((link) => {
+        const response = responses.find((r) => r.resId === link.resId);
+        const request = response
+          ? requests.find((req) => req.reqId === response.reqId)
+          : null;
 
-      if (!request || !response) return null;
+        if (!request || !response) return null;
 
-      return {
-        reqId: request.reqId,
-        resId: response.resId,
-        request: {
-          ...JSON.parse(request.reqJson),
-        },
-        response: {
-          ...JSON.parse(response.resJson),
-        },
-      };
-    }).filter(Boolean);
+        return {
+          reqId: request.reqId,
+          resId: response.resId,
+          request: {
+            ...JSON.parse(request.reqJson),
+          },
+          response: {
+            ...JSON.parse(response.resJson),
+          },
+        };
+      })
+      .filter(Boolean);
 
     const results = [];
 
@@ -577,7 +621,10 @@ app.post("/scenarios/:id/send", async (req, res) => {
           method: mapping.request.method,
           url: mapping.request.url,
           headers: Object.fromEntries(
-            Object.entries(mapping.request.headers || {}).map(([k, v]) => [k, { equalTo: v.equalTo || v }])
+            Object.entries(mapping.request.headers || {}).map(([k, v]) => [
+              k,
+              { equalTo: v.equalTo || v },
+            ])
           ),
           bodyPatterns: mapping.request.bodyPatterns || [],
         },
@@ -597,7 +644,10 @@ app.post("/scenarios/:id/send", async (req, res) => {
       const data = await wireMockResponse.json();
 
       if (!wireMockResponse.ok || !data.id) {
-        console.error(`❌ Failed to send mapping (reqId: ${mapping.reqId})`, data);
+        console.error(
+          `❌ Failed to send mapping (reqId: ${mapping.reqId})`,
+          data
+        );
         continue;
       }
 
@@ -613,13 +663,19 @@ app.post("/scenarios/:id/send", async (req, res) => {
       });
     }
 
-    res.json({ success: true, results, message: `Sent ${results.length} mappings to WireMock.` });
+    res.json({
+      success: true,
+      results,
+      message: `Sent ${results.length} mappings to WireMock.`,
+    });
   } catch (error) {
     console.error("❌ Error sending scenario to WireMock:", error);
-    res.status(500).json({ success: false, message: "Server error while sending scenario." });
+    res.status(500).json({
+      success: false,
+      message: "Server error while sending scenario.",
+    });
   }
 });
-
 
 //Tar bort scenarios
 app.delete("/scenarios/:id", async (req, res) => {

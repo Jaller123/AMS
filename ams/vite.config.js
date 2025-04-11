@@ -11,12 +11,12 @@ export default defineConfig({
     },
   },
   define: {
-    global: "window", // 👈 Definierar `global` för att undvika felet
+    global: "window",
   },
   optimizeDeps: {
     esbuildOptions: {
       define: {
-        global: "window", // 👈 Fixar kompatibilitet med Node.js-moduler
+        global: "window",
       },
       plugins: [
         NodeGlobalsPolyfillPlugin({
@@ -24,6 +24,11 @@ export default defineConfig({
           buffer: true,
         }),
       ],
+    },
+  },
+  server: {
+    proxy: {
+      "/api": "http://localhost:8080",
     },
   },
 });
