@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import styles from "./MappingsPage.module.css";
 import RequestEditor from "./RequestEditor";
 import ResponseEditor from "./ResponseEditor";
+import { saveAs } from 'file-saver';
 
 const extractURLValue = (reqObj) => {
   return (
@@ -118,6 +119,33 @@ const MappingItem = ({
     editedRequests[mappingId] || mapping.request.reqJson || {};
   const displayURL = extractURLValue(currentRequest);
 
+  const handleExportJson = () => {
+    // Kontrollera om selectedResponse finns
+    const selectedResponse = responses.find(
+      (response) => response.resId === selectedResponses[mappingId]
+    );
+
+    if (!selectedResponse) {
+      alert("No response selected for export.");
+      return;
+    }
+
+    // Format JSON för export
+    const mappingJson = {
+      request: mapping.request,
+      response: selectedResponse.resJson, // Exportera det valda svaret
+      wireMockUuid: mapping.wireMockId,
+    };
+
+    // Skapa en Blob med JSON-innehållet och använd FileSaver för att exportera den
+    const jsonBlob = new Blob([JSON.stringify(mappingJson, null, 2)], {
+      type: "application/json",
+    });
+
+    // Exportera filen
+    saveAs(jsonBlob, `${mappingId}-mapping.json`);
+  };
+
   return (
     <li
       className={styles.mappingItem}
@@ -193,6 +221,10 @@ const MappingItem = ({
               Traffic
             </button>
           )}
+
+          <button onClick={handleExportJson} className={styles.sendButton} >
+            Export as JSON
+          </button>
 
           <button
             onClick={async () => {

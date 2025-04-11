@@ -275,17 +275,7 @@ const App = () => {
             </div>
           }
         />
-        <Route
-          path="/mapping/:mappingId"
-          element={
-            <MappingDetailPage
-              mappings={mappings}
-              responses={responses}
-              handleUpdate={handleUpdateMapping}
-              handleDelete={handleDeleteMapping}
-            />
-          }
-        />
+       
         <Route
           path="/request/:mappingId"
           element={
