@@ -43,7 +43,7 @@ const MappingsPage = ({
       setMappings((prevMappings) =>
         prevMappings.map((mapping) =>
           mapping.id === mappingId
-            ? { ...mapping, isActive: true, wireMockId: data.wireMockId,  }
+            ? { ...mapping, isActive: true, wireMockId: data.wireMockId }
             : mapping
         )
       );
@@ -124,6 +124,51 @@ const MappingsPage = ({
   // (Your filtering and sorting useEffects remain unchanged)
   // …
 
+  const handleImportJson = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    try {
+      const text = await file.text();
+      const json = JSON.parse(text);
+
+      // Debugging: Logga innehållet innan vi skickar det
+      console.log("Imported JSON:", json);
+
+      // Validering: Kolla att alla nödvändiga fält finns
+      if (
+        !json.request ||
+        !json.response ||
+        !json.request.reqJson ||
+        !json.response.body
+      ) {
+        alert(
+          "Invalid mapping format. Must include 'request', 'response' and valid nested fields."
+        );
+        return;
+      }
+
+      // Validera att request har de rätta värdena
+      if (!json.request.title || !json.response.title) {
+        alert("Both request and response should have a valid title.");
+        return;
+      }
+
+      const response = await fetch("/api/mappings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(json),
+      });
+
+      if (!response.ok) throw new Error("Failed to import mapping");
+
+      alert("Mapping imported successfully!");
+    } catch (err) {
+      console.error("Failed to import JSON:", err);
+      alert("Error reading or importing file.");
+    }
+  };
+
   return (
     <div className={styles.sectionContainer}>
       <section className={styles.section}>
@@ -166,6 +211,16 @@ const MappingsPage = ({
           sendToWireMockAndUpdateUI={sendToWireMockAndUpdateUI}
           autoExpandMappingId={autoExpandMappingId} // Pass the auto-expand id down
         />
+        <input
+          type="file"
+          accept="application/json"
+          onChange={handleImportJson}
+          style={{ display: "none" }}
+          id="import-json"
+        />
+        <label htmlFor="import-json" className={styles.sendButton}>
+          Import JSON
+        </label>
 
         <div className={styles.createMappingContainer}>
           <button
