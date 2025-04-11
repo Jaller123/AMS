@@ -40,6 +40,16 @@ const Navbar = () => {
             Scenarios
           </NavLink>
         </li>
+        <li className={styles.menuItem}>
+          <NavLink
+            to="/mock-controller"
+            className={({ isActive }) =>
+              isActive ? `${styles.link} ${styles.active}` : styles.link
+            }
+          >
+            Mock Controller
+          </NavLink>
+        </li>
       </ul>
     </nav>
   );

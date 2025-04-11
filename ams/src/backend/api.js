@@ -317,3 +317,11 @@ export const deleteScenario = async (scenarioId) => {
     return false;
   }
 };
+
+export const toggleWireMock = async () => {
+  const res = await fetch("http://localhost:8080/mock-control/toggle", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+  })
+  return await res.json()
+}

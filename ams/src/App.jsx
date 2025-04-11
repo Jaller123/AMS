@@ -11,7 +11,7 @@ import ReqDetailPage from "./components/ReqDetailPage";
 import ScenariosPage from "./components/Scenarios/ScenariosPage.jsx";
 import CreateScenario from "./components/Scenarios/CreateScenario.jsx";
 import EditScenario from "./components/Scenarios/EditScenario.jsx";
-import Button from "./components/Button.jsx";
+import MockController from "./components/Mock Controller/MockController";
 import {
   fetchMappings,
   saveMapping,
@@ -21,6 +21,7 @@ import {
 } from "./backend/api.js";
 import Home from "../src/components/Home.jsx"; // Import den nya komponenten
 import ScenarioList from "./components/Scenarios/ScenarioList.jsx";
+
 
 const App = () => {
   const [mappings, setMappings] = useState([]);
@@ -305,6 +306,8 @@ const App = () => {
         />
         <Route path="/create-scenario" element={<CreateScenario />} />/
         <Route path="/edit-scenario/:scenarioId" element={<EditScenario />} />
+        <Route
+          path="/mock-controller" element={<MockController />} />
       </Routes>
     </Router>
   );
