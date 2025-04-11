@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import styles from "./MappingDetailPage.module.css";
+import { saveAs } from 'file-saver'; // Importera file-saver
 
 const MappingDetailPage = ({
   mappings,
@@ -84,6 +85,22 @@ const MappingDetailPage = ({
     navigate("/");
   };
 
+  // Funktion för att exportera mappningen som en JSON-fil
+  const handleExportJson = () => {
+    const mappingJson = {
+      request: mapping.request,
+      response: selectedResponse?.resJson, // Exportera det valda svaret
+      wireMockUuid: mapping.wireMockId,
+    };
+
+    // Skapa en Blob med JSON-innehållet och använd FileSaver för att exportera den
+    const jsonBlob = new Blob([JSON.stringify(mappingJson, null, 2)], {
+      type: "application/json",
+    });
+
+    saveAs(jsonBlob, `${mappingId}-mapping.json`);
+  };
+
   if (!mapping) {
     return <p>No mapping found for ID: {mappingId}</p>;
   }
@@ -135,6 +152,11 @@ const MappingDetailPage = ({
       </div>
       <button onClick={handleDeleteClick} className={styles.deleteButton}>
         Delete Mapping
+      </button>
+      
+      {/* Knappen för att exportera till JSON */}
+      <button onClick={handleExportJson} className={styles.exportButton}>
+        Export as JSON
       </button>
     </div>
   );
