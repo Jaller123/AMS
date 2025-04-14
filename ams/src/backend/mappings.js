@@ -1,4 +1,3 @@
-import e from "express";
 import connection from "./db.js";
 
 function parseJsonField(field) {
@@ -25,55 +24,22 @@ export async function getMappings() {
         .filter((res) => res.reqId === req.reqId)
         .map((res, index) => ({
           id: `${req.reqId}.${index + 1}`, // composite id for display
-          resId: res.resId,
+          dbId: res.resId,
           reqId: res.reqId,
-          title: res.title || `Response ${index + 1}`,
-          resJson:
-            typeof res.resJson === "string"
-              ? JSON.parse(res.resJson)
-              : res.resJson, // parse JSON if stored as string
+          resJson: JSON.parse(res.resJson), // parse JSON if stored as string
           timestamp: res.timestamp,
         }));
       const parsedReqJson =
         typeof req.reqJson === "string" ? JSON.parse(req.reqJson) : req.reqJson;
-
       return {
         id: req.reqId,
-        request: {
-          id: req.reqId,
-          title: req.title,
-          reqJson: parsedReqJson,
-        },
+        request: { reqJson: parsedReqJson },
         wireMockId: req.wireMockId,
         responses,
+        title: req.title,
       };
     });
 
-    const mappings = reqRows.map(req => {
-        const responses = resRows
-          .filter(res => res.reqId === req.reqId)
-          .map((res, index) => ({
-            id: `${req.reqId}.${index + 1}`, // composite id for display
-            resId: res.resId,               
-            reqId: res.reqId,
-            title: res.title || `Response ${index + 1}`,
-            resJson: typeof res.resJson === "string" ? JSON.parse(res.resJson) : res.resJson, // parse JSON if stored as string
-            timestamp: res.timestamp,
-          }));
-        const parsedReqJson = typeof req.reqJson === "string" ? JSON.parse(req.reqJson) : req.reqJson;
-      
-        return {
-          id: req.reqId,
-          request: { 
-            id: req.reqId,
-            title: req.title,
-            reqJson: parsedReqJson },
-          wireMockId: req.wireMockId,
-          responses,
-        };
-      });
-      
-    
     return mappings;
   } catch (error) {
     console.error("Error fetching mappings:", error);
@@ -81,159 +47,42 @@ export async function getMappings() {
   }
 }
 
-function formatMySQLDate(date) {
-  return date.toISOString().slice(0, 19).replace("T", " ");
-}
-  
-  
-function formatMySQLDate(date) {
-  return date.toISOString().slice(0, 19).replace('T', ' ')
-}
-
 export async function createMapping(mapping) {
   try {
-    const rawRequest = { ...mapping.request };
-
-    const title = mapping.title || rawRequest.title || null; // Fallback in case title is nested
-
-    delete rawRequest.title;
-
-    const transformedHeaders = {};
-    if (rawRequest.headers) {
-      for (const [key, value] of Object.entries(rawRequest.headers)) {
-        transformedHeaders[key] = { equalTo: value };
-      }
-    }
-
-    const bodyPatterns = rawRequest.body
-      ? [{ equalToJson: rawRequest.body }]
-      : undefined;
-
-    const wireMockRequest = {
-      method: rawRequest.method,
-      url: rawRequest.url,
-      headers: transformedHeaders,
-      bodyPatterns,
-    };
-    const rawRequest = {...mapping.request}
-
-    const title = mapping.title || rawRequest.title || null; // Fallback in case title is nested
-
-    delete rawRequest.title
-
-    const transformedHeaders = {} 
-    if (rawRequest.headers) {
-      for (const [key, value] of Object.entries(rawRequest.headers)) {
-        transformedHeaders[key] = {equalTo: value}
-      }
-    }
-
-    const bodyPatterns = rawRequest.body
-    ? [{equalToJson: rawRequest.body}]
-    : undefined
-
-    const wireMockRequest = {
-      method: rawRequest.method,
-      url: rawRequest.url,
-      headers: transformedHeaders,
-      bodyPatterns,
-    }
+    // Steg 1: Infoga i reqtab och få reqId
     const [reqResult] = await connection.execute(
-      "INSERT INTO reqtab (title, reqJson, wireMockId) VALUES (?, ?, ?)",
-      [title, JSON.stringify(wireMockRequest), mapping.wireMockId || null]
-      'INSERT INTO reqtab (title, reqJson, wireMockId) VALUES (?, ?, ?)',
-      [title, JSON.stringify(wireMockRequest), mapping.wireMockId || null]
+      "INSERT INTO reqtab (reqJson, wireMockId, title) VALUES (?, ?, ?)",
+      [
+        JSON.stringify(mapping.request), // reqJson som JSON-sträng
+        mapping.wireMockId || null, // wireMockId eller null
+        mapping.title || "Unknown", // title eller "Unknown"
+      ]
     );
 
-    const reqId = reqResult.insertId;
-    const reqId = reqResult.insertId;
+    const reqId = reqResult.insertId; // Få det nyligen infogade reqId
 
+    // Steg 2: Om en response finns, infoga den i restab och koppla till reqId
     let newResponse = null;
     if (mapping.response) {
-      const resJson = mapping.response;
-      const resTitle = mapping.response.title || "Untitled Response";
-      const resJson = mapping.response;
-      const resTitle = mapping.response.title || "Untitled Response";
+      const resJson = JSON.stringify(mapping.response); // Response som JSON-sträng
       const [resResult] = await connection.execute(
-        "INSERT INTO restab (resJson, reqId, title, timestamp) VALUES (?, ?, ?, ?)",
-        [JSON.stringify(resJson), reqId, resTitle, formatMySQLDate(new Date())]
-        'INSERT INTO restab (resJson, reqId, title, timestamp) VALUES (?, ?, ?, ?)',
-        [
-          JSON.stringify(resJson),
-          reqId,
-          resTitle,
-          formatMySQLDate(new Date()),
-        ]
+        "INSERT INTO restab (resJson, reqId, title) VALUES (?, ?, ?)",
+        [resJson, reqId, mapping.title || "Unknown"] // Du kan ändra title om det är relevant
       );
+
+      // Skapa ett nytt response-objekt baserat på infogad respons
       newResponse = {
-        dbId: resResult.insertId,
-        dbId: resResult.insertId,
+        dbId: resResult.insertId, // Det infogade resId
         reqId,
-        resJson: mapping.response,
-        title: resTitle,
-        resJson: mapping.response,
-        title: resTitle
+        resJson: mapping.response, // Response som JSON
       };
     }
 
+    // Returnera reqId, request och eventuellt det nya svaret
     return { reqId, request: mapping.request, response: newResponse };
   } catch (error) {
     console.error("Error creating mapping:", error);
-    throw error;
-  }
-}
-
-export async function createResponse(reqId, resJson) {
-  try {
-    const resTitle = resJson.title || "Untitled";
-    const timestamp = formatMySQLDate(new Date());
-
-    const [existingRows] = await connection.execute(
-      "SELECT COUNT(*) as count FROM restab WHERE reqId = ?",
-      [reqId]
-    );
-    const index = existingRows[0].count;
-
-    const [result] = await connection.execute(
-      "INSERT INTO restab (resJson, reqId, title, timestamp) VALUES (?, ?, ?, ?)",
-      [JSON.stringify(resJson), reqId, resTitle, timestamp]
-    );
-
-    return {
-      id: `${reqId}.${index + 1}`,
-      resId: result.insertId,
-      reqId,
-      resJson,
-      title: resTitle,
-      timestamp,
-    };
-  } catch (error) {
-    console.error("Error creating response:", error);
-    throw error;
-  }
-}
-
-export async function saveWireMockToMapping(reqId, wireMockId) {
-  try {
-    const [result] = await connection.execute(
-      "UPDATE reqtab SET wireMockId = ? WHERE reqId = ?",
-      [wireMockId, reqId]
-    );
-    return result.affectedRows > 0;
-  } catch (error) {
-    console.error("Error saving WireMock ID to mapping:", error);
-    throw error;
-  }
-}
-
-export async function clearWireMockIds() {
-  try {
-    const [result] = await connection.execute(
-      "UPDATE reqtab SET wireMockId = NULL WHERE wireMockId IS NOT NULL"
-    );
-    console.log(`✅ Cleared ${result.affectedRows} wireMockIds from reqtab`);
-  } catch (error) {
-    console.error("❌ Failed to clear wireMockIds:", error);
+    throw error; // Kasta felet för vidare hantering
   }
 }
 
@@ -258,34 +107,14 @@ export async function updateMappingRequest(reqId, updatedRequest) {
 // Update a response (in the restab table)
 export async function updateMappingResponse(resId, updatedResponse) {
   try {
-    if (isNaN(parseInt(resId))) {
-      // ✅ Ensure resId is a valid integer
-      throw new Error(`Invalid resId: ${resId}`);
-    }
-
-    console.log(`Updating response with resId: ${resId}`); // Debugging log
-    if (isNaN(parseInt(resId))) {  // ✅ Ensure resId is a valid integer
-      throw new Error(`Invalid resId: ${resId}`);
-    }
-
-    console.log(`Updating response with resId: ${resId}`);  // Debugging log
     const resJson = JSON.stringify(updatedResponse);
-
-
     const [result] = await connection.execute(
       "UPDATE restab SET resJson = ? WHERE resId = ?",
-      [resJson, parseInt(resId)] // ✅ Ensure resId is an integer
-      'UPDATE restab SET resJson = ? WHERE resId = ?',
-      [resJson, parseInt(resId)]  // ✅ Ensure resId is an integer
+      [resJson, resId]
     );
-
-
     if (result.affectedRows === 0) {
-      throw new Error(`Response not found for resId: ${resId}`);
-      throw new Error(`Response not found for resId: ${resId}`);
+      throw new Error("Response not found.");
     }
-
-
     return updatedResponse;
   } catch (error) {
     console.error("Error updating response:", error);
