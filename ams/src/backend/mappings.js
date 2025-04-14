@@ -1,4 +1,3 @@
-import e from "express";
 import connection from "./db.js";
 
 function parseJsonField(field) {
@@ -25,27 +24,19 @@ export async function getMappings() {
         .filter((res) => res.reqId === req.reqId)
         .map((res, index) => ({
           id: `${req.reqId}.${index + 1}`, // composite id for display
-          resId: res.resId,
+          dbId: res.resId,
           reqId: res.reqId,
-          title: res.title || `Response ${index + 1}`,
-          resJson:
-            typeof res.resJson === "string"
-              ? JSON.parse(res.resJson)
-              : res.resJson, // parse JSON if stored as string
+          resJson: JSON.parse(res.resJson), // parse JSON if stored as string
           timestamp: res.timestamp,
         }));
       const parsedReqJson =
         typeof req.reqJson === "string" ? JSON.parse(req.reqJson) : req.reqJson;
-
       return {
         id: req.reqId,
-        request: {
-          id: req.reqId,
-          title: req.title,
-          reqJson: parsedReqJson,
-        },
+        request: { reqJson: parsedReqJson },
         wireMockId: req.wireMockId,
         responses,
+        title: req.title,
       };
     });
 
@@ -54,10 +45,6 @@ export async function getMappings() {
     console.error("Error fetching mappings:", error);
     throw error;
   }
-}
-
-function formatMySQLDate(date) {
-  return date.toISOString().slice(0, 19).replace("T", " ");
 }
 
 export async function createMapping(mapping) {
@@ -101,9 +88,17 @@ export async function createMapping(mapping) {
     const [reqResult] = await connection.execute(
       "INSERT INTO reqtab (title, reqJson, wireMockId) VALUES (?, ?, ?)",
       [title, JSON.stringify(wireMockRequest), mapping.wireMockUuid || null]
+    // Steg 1: Infoga i reqtab och få reqId
+    const [reqResult] = await connection.execute(
+      "INSERT INTO reqtab (reqJson, wireMockId, title) VALUES (?, ?, ?)",
+      [
+        JSON.stringify(mapping.request), // reqJson som JSON-sträng
+        mapping.wireMockId || null, // wireMockId eller null
+        mapping.title || "Unknown", // title eller "Unknown"
+      ]
     );
 
-    const reqId = reqResult.insertId;
+    const reqId = reqResult.insertId; // Få det nyligen infogade reqId
 
     // Spara responsen
     let newResponse = null;
@@ -111,13 +106,18 @@ export async function createMapping(mapping) {
       const resJson = mapping.response;
       const resTitle = resJson.title || "Untitled Response";
 
+    // Steg 2: Om en response finns, infoga den i restab och koppla till reqId
+    let newResponse = null;
+    if (mapping.response) {
+      const resJson = JSON.stringify(mapping.response); // Response som JSON-sträng
       const [resResult] = await connection.execute(
-        "INSERT INTO restab (resJson, reqId, title, timestamp) VALUES (?, ?, ?, ?)",
-        [JSON.stringify(resJson), reqId, resTitle, formatMySQLDate(new Date())]
+        "INSERT INTO restab (resJson, reqId, title) VALUES (?, ?, ?)",
+        [resJson, reqId, mapping.title || "Unknown"] // Du kan ändra title om det är relevant
       );
 
+      // Skapa ett nytt response-objekt baserat på infogad respons
       newResponse = {
-        dbId: resResult.insertId,
+        dbId: resResult.insertId, // Det infogade resId
         reqId,
         resJson,
         title: resTitle,
@@ -191,6 +191,15 @@ export async function clearWireMockIds() {
     console.log(`✅ Cleared ${result.affectedRows} wireMockIds from reqtab`);
   } catch (error) {
     console.error("❌ Failed to clear wireMockIds:", error);
+        resJson: mapping.response, // Response som JSON
+      };
+    }
+
+    // Returnera reqId, request och eventuellt det nya svaret
+    return { reqId, request: mapping.request, response: newResponse };
+  } catch (error) {
+    console.error("Error creating mapping:", error);
+    throw error; // Kasta felet för vidare hantering
   }
 }
 
@@ -215,23 +224,14 @@ export async function updateMappingRequest(reqId, updatedRequest) {
 // Update a response (in the restab table)
 export async function updateMappingResponse(resId, updatedResponse) {
   try {
-    if (isNaN(parseInt(resId))) {
-      // ✅ Ensure resId is a valid integer
-      throw new Error(`Invalid resId: ${resId}`);
-    }
-
-    console.log(`Updating response with resId: ${resId}`); // Debugging log
     const resJson = JSON.stringify(updatedResponse);
-
     const [result] = await connection.execute(
       "UPDATE restab SET resJson = ? WHERE resId = ?",
-      [resJson, parseInt(resId)] // ✅ Ensure resId is an integer
+      [resJson, resId]
     );
-
     if (result.affectedRows === 0) {
-      throw new Error(`Response not found for resId: ${resId}`);
+      throw new Error("Response not found.");
     }
-
     return updatedResponse;
   } catch (error) {
     console.error("Error updating response:", error);

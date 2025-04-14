@@ -5,6 +5,7 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import path from "path";
 import fetch from "node-fetch";
+import { exec } from "child_process"
 import { handleSendToWireMock } from "./api.js";
 import {
   getMappings,
@@ -712,3 +713,37 @@ app.delete("/scenarios/:id", async (req, res) => {
 app.listen(8080, () => {
   console.log("Server running on http://localhost:8080");
 });
+
+
+app.post("/mock-control/toggle", async (req, res) => {
+try {
+  exec("docker ps --filter name=wiremock --format '{{.ID}}'", (checkErr, containerId) => {
+    if (checkErr) {
+      console.error("Error checking Docker containers:", checkErr);
+      return res.status(500).json({ success: false, message: checkErr.message });
+    }
+    if (containerId.trim()) {
+      exec("docker stop wiremock", (stopErr, stdout) => {
+        if (stopErr) {
+          console.error("Error stopping WireMock:", stopErr);
+          return res.status(500).json({ success: false, message: stopErr.message });
+        }
+        console.log("✅ WireMock stopped:", stdout);
+        res.json({ success: true, status: "stopped" });
+      });
+    } else {
+      exec("docker run -d --rm --name wiremock -p 8081:8080 wiremock/wiremock", (startErr, startOutput) => {
+        if (startErr) {
+          console.error("Error starting WireMock:", startErr);
+          return res.status(500).json({ success: false, message: startErr.message });
+        }
+        console.log("✅ WireMock started:", startOutput);
+        res.json({ success: true, status: "started" });
+      });
+    }
+  })
+} catch (error) {
+  console.error("❌ Unexpected error:", error);
+  res.status(500).json({ success: false, message: error.message });
+  }
+})
