@@ -132,37 +132,27 @@ const MappingsPage = ({
       const text = await file.text();
       const json = JSON.parse(text);
 
-      // Debugging: Logga innehållet innan vi skickar det
+      // Logga hela JSON för att säkerställa att den innehåller det vi behöver
       console.log("Imported JSON:", json);
 
-      // Validering: Kolla att alla nödvändiga fält finns
-      if (
-        !json.request ||
-        !json.response ||
-        !json.request.reqJson ||
-        !json.response.body
-      ) {
-        alert(
-          "Invalid mapping format. Must include 'request', 'response' and valid nested fields."
-        );
+      // Validering för att säkerställa att både request och response finns
+      if (!json.request || !json.response) {
+        alert("Invalid mapping format. Must include 'request' and 'response'.");
         return;
       }
 
-      // Validera att request har de rätta värdena
-      if (!json.request.title || !json.response.title) {
-        alert("Both request and response should have a valid title.");
-        return;
-      }
-
+      // Skicka till backend för att skapa mapping
       const response = await fetch("/api/mappings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(json),
       });
 
+      // Kontrollera om responsen är okej
       if (!response.ok) throw new Error("Failed to import mapping");
 
       alert("Mapping imported successfully!");
+      // Här kan du trigga en reload av mappings om det behövs
     } catch (err) {
       console.error("Failed to import JSON:", err);
       alert("Error reading or importing file.");
