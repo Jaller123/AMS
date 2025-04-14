@@ -63,54 +63,79 @@ function formatMySQLDate(date) {
 export async function createMapping(mapping) {
   try {
     const rawRequest = { ...mapping.request };
-
-    const title = mapping.title || rawRequest.title || null; // Fallback in case title is nested
+    const reqJson = rawRequest.reqJson || {};
+    const title = mapping.title || rawRequest.title || null;
 
     delete rawRequest.title;
 
+    // Hantera headers
     const transformedHeaders = {};
-    if (rawRequest.headers) {
-      for (const [key, value] of Object.entries(rawRequest.headers)) {
-        transformedHeaders[key] = { equalTo: value };
+    if (reqJson.headers) {
+      for (const [key, value] of Object.entries(reqJson.headers)) {
+        if (typeof value === "object" && value.equalTo) {
+          transformedHeaders[key] = value;
+        } else {
+          transformedHeaders[key] = { equalTo: value };
+        }
       }
     }
 
-    const bodyPatterns = rawRequest.body
-      ? [{ equalToJson: rawRequest.body }]
-      : undefined;
+    // 🔥 FIX: Extrahera body från bodyPatterns[0].equalToJson om body saknas
+    let extractedBody = reqJson.body;
+    if (!extractedBody && Array.isArray(reqJson.bodyPatterns)) {
+      const firstPattern = reqJson.bodyPatterns[0];
+      if (firstPattern && firstPattern.equalToJson) {
+        extractedBody = firstPattern.equalToJson;
+      }
+    }
 
     const wireMockRequest = {
-      method: rawRequest.method,
-      url: rawRequest.url,
+      method: reqJson.method,
+      url: reqJson.url,
       headers: transformedHeaders,
-      bodyPatterns,
+      ...(extractedBody && {
+        bodyPatterns: [{ equalToJson: extractedBody }],
+      }),
     };
+
     const [reqResult] = await connection.execute(
       "INSERT INTO reqtab (title, reqJson, wireMockId) VALUES (?, ?, ?)",
-      [title, JSON.stringify(wireMockRequest), mapping.wireMockId || null]
+      [title, JSON.stringify(wireMockRequest), mapping.wireMockUuid || null]
     );
 
     const reqId = reqResult.insertId;
 
+    // Spara responsen
     let newResponse = null;
     if (mapping.response) {
       const resJson = mapping.response;
-      const resTitle = mapping.response.title || "Untitled Response";
+      const resTitle = resJson.title || "Untitled Response";
+
       const [resResult] = await connection.execute(
         "INSERT INTO restab (resJson, reqId, title, timestamp) VALUES (?, ?, ?, ?)",
         [JSON.stringify(resJson), reqId, resTitle, formatMySQLDate(new Date())]
       );
+
       newResponse = {
         dbId: resResult.insertId,
         reqId,
-        resJson: mapping.response,
+        resJson,
         title: resTitle,
       };
     }
 
-    return { reqId, request: mapping.request, response: newResponse };
+    return {
+      reqId,
+      request: {
+        id: reqId,
+        title,
+        reqJson: wireMockRequest,
+      },
+      response: newResponse,
+      wireMockUuid: mapping.wireMockUuid || null,
+    };
   } catch (error) {
-    console.error("Error creating mapping:", error);
+    console.error("❌ Error creating mapping:", error);
     throw error;
   }
 }
