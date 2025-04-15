@@ -42,12 +42,12 @@ const Navbar = () => {
         </li>
         <li className={styles.menuItem}>
           <NavLink
-            to="/mock-controller"
+            to="/infrastructure"
             className={({ isActive }) =>
               isActive ? `${styles.link} ${styles.active}` : styles.link
             }
           >
-            Mock Controller
+            Infrastructure
           </NavLink>
         </li>
       </ul>

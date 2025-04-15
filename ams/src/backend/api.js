@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:8080";
+import { getBackendAddress } from './backendContextHelper.js';
 const API_WIREMOCK_URL = "http://localhost:8081/__admin";
 
 //AMS/WireMock--------------------------------------------------------------------------------------------------------------------------------
@@ -28,7 +28,7 @@ export const fetchMappings = async () => {
     let wiremockRunning = false;
     try {
       const healthResponse = await retryFetch(
-        `${API_BASE_URL}/health`,
+        `${getBackendAddress()}/health`,
         5,
         1500
       );
@@ -42,7 +42,7 @@ export const fetchMappings = async () => {
     }
 
     // Fetch mappings from the backend
-    const response = await fetch(`${API_BASE_URL}/mappings`);
+    const response = await fetch(`${getBackendAddress()}/mappings`);
     if (!response.ok) throw new Error("Failed to fetch mappings");
     const data = await response.json();
 
@@ -108,7 +108,7 @@ export const fetchWireMockTraffic = async () => {
 export const handleSendToWireMock = async (mappingId) => {
   try {
     const response = await fetch(
-      `http://localhost:8080/mappings/${mappingId}/send`,
+      `${getBackendAddress()}/mappings/${mappingId}/send`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -133,7 +133,7 @@ export const handleSendToWireMock = async (mappingId) => {
 export const handleSendScenarioToWireMock = async (scenarioId) => {
   try {
     const response = await fetch(
-      `http://localhost:8080/scenarios/${scenarioId}/send`,
+      `${getBackendAddress()}/scenarios/${scenarioId}/send`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -157,7 +157,7 @@ export const handleSendScenarioToWireMock = async (scenarioId) => {
 
 export const saveMapping = async (mapping) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/mappings`, {
+    const response = await fetch(`${getBackendAddress()}/mappings`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(mapping),
@@ -185,7 +185,7 @@ export const saveMapping = async (mapping) => {
 
 export const saveResponse = async (response) => {
   try {
-    const res = await fetch(`${API_BASE_URL}/responses`, {
+    const res = await fetch(`${getBackendAddress()}/responses`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(response),
@@ -205,7 +205,7 @@ export const saveResponse = async (response) => {
 
 export const deleteMapping = async (id) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/mappings/${id}`, {
+    const response = await fetch(`${getBackendAddress()}/mappings/${id}`, {
       method: "DELETE",
     });
     console.log("Response status:", response.status);
@@ -223,7 +223,7 @@ export const deleteMapping = async (id) => {
 
 export const updateRequest = async (requestId, updatedRequest) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/requests/${requestId}`, {
+    const response = await fetch(`${getBackendAddress()}/requests/${requestId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ resJson: updatedRequest }),
@@ -242,7 +242,7 @@ export const updateRequest = async (requestId, updatedRequest) => {
 
 export const updateResponse = async (dbId, updatedResponse) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/responses/${dbId}`, {
+    const response = await fetch(`${getBackendAddress()}/responses/${dbId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ resJson: updatedResponse }),
@@ -261,7 +261,7 @@ export const updateResponse = async (dbId, updatedResponse) => {
 
 export const fetchScenarios = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/scenarios`);
+    const response = await fetch(`${getBackendAddress()}/scenarios`);
     if (!response.ok) throw new Error("Failed to fetch scenarios");
     const data = await response.json();
     console.log("Fetched scenarios data:", data); // 👈 Logga API-svaret
@@ -274,7 +274,7 @@ export const fetchScenarios = async () => {
 
 export const saveScenario = async (scenario) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/scenarios`, {
+    const response = await fetch(`${getBackendAddress()}/scenarios`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ scenario }),
@@ -290,7 +290,7 @@ export const saveScenario = async (scenario) => {
 
 export const updateScenario = async (scenarioId, scenario) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/scenarios/${scenarioId}`, {
+    const response = await fetch(`${getBackendAddress()}/scenarios/${scenarioId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ scenario }),
@@ -306,7 +306,7 @@ export const updateScenario = async (scenarioId, scenario) => {
 
 export const deleteScenario = async (scenarioId) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/scenarios/${scenarioId}`, {
+    const response = await fetch(`${getBackendAddress()}/scenarios/${scenarioId}`, {
       method: "DELETE",
     });
     if (!response.ok) throw new Error("Failed to delete scenario");

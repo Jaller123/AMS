@@ -11,7 +11,7 @@ import ReqDetailPage from "./components/ReqDetailPage";
 import ScenariosPage from "./components/Scenarios/ScenariosPage.jsx";
 import CreateScenario from "./components/Scenarios/CreateScenario.jsx";
 import EditScenario from "./components/Scenarios/EditScenario.jsx";
-import MockController from "./components/Mock Controller/MockController";
+import InfraController from "./components/InfraController/InfraController";
 import {
   fetchMappings,
   saveMapping,
@@ -297,7 +297,7 @@ const App = () => {
         <Route path="/create-scenario" element={<CreateScenario />} />/
         <Route path="/edit-scenario/:scenarioId" element={<EditScenario />} />
         <Route
-          path="/mock-controller" element={<MockController />} />
+          path="/infrastructure" element={<InfraController />} />
       </Routes>
     </Router>
   );
