@@ -120,31 +120,37 @@ const MappingItem = ({
   const displayURL = extractURLValue(currentRequest);
 
   const handleExportJson = () => {
-    // Kontrollera om selectedResponse finns
     const selectedResponse = responses.find(
       (response) => response.resId === selectedResponses[mappingId]
     );
-
+  
     if (!selectedResponse) {
       alert("No response selected for export.");
       return;
     }
-
-    // Format JSON för export
-    const mappingJson = {
-      request: mapping.request,
-      response: selectedResponse.resJson, // Exportera det valda svaret
-      wireMockUuid: mapping.wireMockId,
+  
+    const uuid = mapping.wireMockId || mapping.id;
+  
+    const cleanResponse = {
+      status: Number(selectedResponse.resJson.status), // konvertera till nummer
+      body: JSON.stringify(selectedResponse.resJson.body || {}),
+      headers: selectedResponse.resJson.headers || {},
     };
-
-    // Skapa en Blob med JSON-innehållet och använd FileSaver för att exportera den
-    const jsonBlob = new Blob([JSON.stringify(mappingJson, null, 2)], {
+  
+    const exportMapping = {
+      id: uuid,
+      request: mapping.request.reqJson || {},
+      response: cleanResponse,
+      uuid: uuid,
+    };
+  
+    const jsonBlob = new Blob([JSON.stringify(exportMapping, null, 2)], {
       type: "application/json",
     });
-
-    // Exportera filen
-    saveAs(jsonBlob, `${mappingId}-mapping.json`);
+  
+    saveAs(jsonBlob, `mapping-${uuid}.json`);
   };
+  
 
   return (
     <li
