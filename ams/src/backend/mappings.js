@@ -63,29 +63,26 @@ function formatMySQLDate(date) {
 export async function createMapping(mapping) {
   try {
     const rawRequest = { ...mapping.request };
-    const reqJson = rawRequest.reqJson || {};
-    const title = mapping.title || rawRequest.title || null;
+    const reqJson = rawRequest.reqJson || rawRequest; // Support both flat and nested format
+    const title = rawRequest.title || mapping.title || null;
 
-    delete rawRequest.title;
-
-    // Hantera headers
+    // Normalize headers
     const transformedHeaders = {};
     if (reqJson.headers) {
       for (const [key, value] of Object.entries(reqJson.headers)) {
-        if (typeof value === "object" && value.equalTo) {
-          transformedHeaders[key] = value;
-        } else {
-          transformedHeaders[key] = { equalTo: value };
-        }
+        transformedHeaders[key] =
+          typeof value === "object" && value.equalTo
+            ? value
+            : { equalTo: value };
       }
     }
 
-    // 🔥 FIX: Extrahera body från bodyPatterns[0].equalToJson om body saknas
+    // Extract body if missing but inside bodyPatterns
     let extractedBody = reqJson.body;
     if (!extractedBody && Array.isArray(reqJson.bodyPatterns)) {
-      const firstPattern = reqJson.bodyPatterns[0];
-      if (firstPattern && firstPattern.equalToJson) {
-        extractedBody = firstPattern.equalToJson;
+      const pattern = reqJson.bodyPatterns[0];
+      if (pattern?.equalToJson) {
+        extractedBody = pattern.equalToJson;
       }
     }
 
@@ -100,12 +97,15 @@ export async function createMapping(mapping) {
 
     const [reqResult] = await connection.execute(
       "INSERT INTO reqtab (title, reqJson, wireMockId) VALUES (?, ?, ?)",
-      [title, JSON.stringify(wireMockRequest), mapping.wireMockUuid || null]
+      [
+        title,
+        JSON.stringify(wireMockRequest),
+        mapping.wireMockId || mapping.wireMockUuid || null,
+      ]
     );
 
     const reqId = reqResult.insertId;
 
-    // Spara responsen
     let newResponse = null;
     if (mapping.response) {
       const resJson = mapping.response;
@@ -132,7 +132,7 @@ export async function createMapping(mapping) {
         reqJson: wireMockRequest,
       },
       response: newResponse,
-      wireMockUuid: mapping.wireMockUuid || null,
+      wireMockId: mapping.wireMockId || mapping.wireMockUuid || null,
     };
   } catch (error) {
     console.error("❌ Error creating mapping:", error);
