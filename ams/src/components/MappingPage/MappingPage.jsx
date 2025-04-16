@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import styles from "./MappingsPage.module.css";
 import SortControls from "./SortControls";
 import MappingList from "./MappingList";
@@ -15,6 +14,8 @@ const MappingsPage = ({
   handleSendToWireMock,
 }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+
   const [expandedMappings, setExpandedMappings] = useState({});
   const [selectedResponses, setSelectedResponses] = useState({});
   const [editedRequests, setEditedRequests] = useState({});
@@ -28,18 +29,28 @@ const MappingsPage = ({
   const [filteredMappings, setFilteredMappings] = useState(mappings);
   const [search, setSearch] = useState("");
 
-  const location = useLocation();
+  // ✅ Lägg upp variabeln tidigt
+  const autoExpandMappingId = location.state?.expandMappingId;
+  console.log("Auto-expand mapping id from location:", autoExpandMappingId);
 
-  // ✅ Call handleSendToWireMock directly instead of defining it again
+  useEffect(() => {
+    if (autoExpandMappingId) {
+      setExpandedMappings((prev) => ({
+        ...prev,
+        [autoExpandMappingId]: true,
+      }));
+    }
+  }, [autoExpandMappingId]);
+
   const sendToWireMockAndUpdateUI = async (mappingId) => {
     if (!handleSendToWireMock) {
       console.error("❌ handleSendToWireMock is not defined");
       return;
     }
 
-    const data = await handleSendToWireMock(mappingId); // ✅ Ensure it is used properly
+    const data = await handleSendToWireMock(mappingId);
 
-    if (data && data.success) {
+    if (data?.success) {
       setMappings((prevMappings) =>
         prevMappings.map((mapping) =>
           mapping.id === mappingId
@@ -59,21 +70,19 @@ const MappingsPage = ({
   };
 
   useEffect(() => {
-    // Uppdatera val av responses när mappings ändras
     const initialSelections = {};
     mappings.forEach((mapping) => {
       const relevantResponses = responses.filter(
         (res) => res.reqId === mapping.id
       );
       if (relevantResponses.length > 0) {
-        initialSelections[mapping.id] = relevantResponses[0].resId; // ✅ use resId, not response.id
+        initialSelections[mapping.id] = relevantResponses[0].resId;
       }
     });
     setSelectedResponses(initialSelections);
   }, [mappings, responses]);
 
   useEffect(() => {
-    // Filter och sortera mappings
     let filtered = mappings.filter((mapping) => {
       const request = mapping.request || {};
       const title = (request.title || "").toLowerCase();
@@ -105,7 +114,6 @@ const MappingsPage = ({
       );
     });
 
-    // Apply sorting
     if (sortCriterion) {
       filtered = filtered.sort((a, b) => {
         const fieldA = (a.request?.[sortCriterion] || "").toLowerCase();
@@ -117,13 +125,6 @@ const MappingsPage = ({
     setFilteredMappings(filtered);
   }, [mappings, search, searchFilters, sortCriterion]);
 
-  // Read the mapping id to auto-expand from location.state (if provided)
-  const autoExpandMappingId = location.state?.expandMappingId;
-  console.log("Auto-expand mapping id from location:", autoExpandMappingId);
-
-  // (Your filtering and sorting useEffects remain unchanged)
-  // …
-
   const handleImportJson = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -132,27 +133,17 @@ const MappingsPage = ({
       const text = await file.text();
       const json = JSON.parse(text);
 
-      // Logga hela JSON för att säkerställa att den innehåller det vi behöver
-      console.log("Imported JSON:", json);
-
-      // Validering för att säkerställa att både request och response finns
       if (!json.request || !json.response) {
         alert("Invalid mapping format. Must include 'request' and 'response'.");
         return;
       }
 
-      // Skicka till backend för att skapa mapping
-      const response = await fetch("/api/mappings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(json),
+      navigate("/mappings", {
+        state: {
+          prefillRequest: json.request,
+          prefillResponse: json.response,
+        },
       });
-
-      // Kontrollera om responsen är okej
-      if (!response.ok) throw new Error("Failed to import mapping");
-
-      alert("Mapping imported successfully!");
-      // Här kan du trigga en reload av mappings om det behövs
     } catch (err) {
       console.error("Failed to import JSON:", err);
       alert("Error reading or importing file.");
@@ -170,7 +161,7 @@ const MappingsPage = ({
           >
             <input
               type="text"
-              placeholder="Search "
+              placeholder="Search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               data-testid="search-input"
@@ -184,6 +175,7 @@ const MappingsPage = ({
           searchFilters={searchFilters}
           setSearchFilters={setSearchFilters}
         />
+
         <MappingList
           mappings={filteredMappings}
           responses={responses}
@@ -199,8 +191,9 @@ const MappingsPage = ({
           handleUpdateRequest={handleUpdateRequest}
           handleUpdateResponse={handleUpdateResponse}
           sendToWireMockAndUpdateUI={sendToWireMockAndUpdateUI}
-          autoExpandMappingId={autoExpandMappingId} // Pass the auto-expand id down
+          autoExpandMappingId={autoExpandMappingId}
         />
+
         <input
           type="file"
           accept="application/json"
