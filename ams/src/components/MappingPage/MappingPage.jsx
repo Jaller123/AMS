@@ -140,7 +140,11 @@ const MappingsPage = ({
 
       navigate("/mappings", {
         state: {
-          prefillRequest: json.request,
+          prefillRequest: {
+            ...json.request.reqJson,
+            title: json.request.title || "",
+            body: json.request.reqJson?.bodyPatterns?.[0]?.equalToJson || {},
+          },
           prefillResponse: json.response,
         },
       });
