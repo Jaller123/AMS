@@ -141,9 +141,11 @@ const MappingsPage = ({
       navigate("/mappings", {
         state: {
           prefillRequest: {
-            ...json.request.reqJson,
-            title: json.request.title || "",
-            body: json.request.reqJson?.bodyPatterns?.[0]?.equalToJson || {},
+            method: json.request.method || "",
+            url: json.request.url || "",
+            headers: json.request.headers || {},
+            title: "", // Din JSON har inget title, så tomt fält
+            body: json.request.bodyPatterns?.[0]?.equalToJson || {},
           },
           prefillResponse: json.response,
         },
