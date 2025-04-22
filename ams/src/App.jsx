@@ -28,7 +28,7 @@ const App = () => {
   const [responses, setResponses] = useState([]);
   const [requestData, setRequestData] = useState(null);
   const [responseData, setResponseData] = useState(null);
-  const [resetForm, setResetForm] = useState(false);
+  const [resetCounter, setResetCounter] = useState(0);
 
   useEffect(() => {
     const loadMappingsAndResponses = async () => {
@@ -78,7 +78,7 @@ const App = () => {
     }
   };
 
-  const handleSaveMapping = async () => {
+  const handleSaveMapping = async (requestData, responseData) => {
     if (requestData && responseData) {
       try {
         // ✅ Call saveMapping
@@ -96,7 +96,7 @@ const App = () => {
             request,
             wireMockId: wireMockUuid,
             isActive: true,
-            responses: responses || (response ? [response] : []),
+            responses: responses || [],
           },
         ]);
 
@@ -113,9 +113,8 @@ const App = () => {
 
         // ✅ **Clear input fields**
         setRequestData(null);
-        setResponseData(null);
-        setResetForm(true); // ✅ Reset form state
-        setTimeout(() => setResetForm(false), 0); // ✅ Ensure UI updates
+        setResponseData(null); // ✅ Reset form state
+        setResetCounter(prev => prev + 1);
 
         // ✅ Fetch mappings after a short delay
         setTimeout(async () => {
@@ -264,13 +263,19 @@ const App = () => {
               <div className="formWrapper">
                 <ReqForm
                   setRequestData={setRequestData}
-                  resetForm={resetForm}
+                  resetCounter={resetCounter}
                 />
                 <ResForm
-                  setResponseData={setResponseData}
-                  resetForm={resetForm}
-                  onSave={handleSaveMapping}
-                />
+              resetCounter={resetCounter}
+              onSave={(data) => {
+                if (requestData) {
+                  handleSaveMapping(requestData, data); // ✅ use `data` directly
+                  setResponseData(data); // (optional) still store it if needed elsewhere
+                } else {
+                  toast.warn("Please fill in the request first.");
+                }
+              }}
+            />
               </div>
               <ToastContainer pauseOnHover={false} />
             </div>

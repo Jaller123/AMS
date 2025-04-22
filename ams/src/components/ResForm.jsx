@@ -13,7 +13,7 @@ const isValidJson = (jsonString) => {
   }
 };
 
-const ResForm = ({ setResponseData, resetForm, onSave }) => {
+const ResForm = ({ setResponseData, resetCounter, onSave }) => {
   const location = useLocation();
   const prefillData = location.state?.prefillResponse || {};
 
@@ -31,36 +31,28 @@ const ResForm = ({ setResponseData, resetForm, onSave }) => {
       setHeaders(JSON.stringify(prefillData.headers || {}, null, 2));
       setBody(JSON.stringify(prefillData.body || {}, null, 2));
     }
-  }, [prefillData]);
+  }, [resetCounter]);
 
   useEffect(() => {
     const headersValid = isValidJson(headers);
     const bodyValid = isValidJson(body);
-
+  
     setErrors({
       headers: !headersValid,
       body: !bodyValid,
     });
-
-    if (headersValid && bodyValid) {
-      setResponseData({
-        title,
-        status,
-        headers: headers ? JSON.parse(headers) : {},
-        body: body ? JSON.parse(body) : {},
-      });
-    }
-  }, [title, status, headers, body, setResponseData]);
+  }, [headers, body]);
+  
 
   useEffect(() => {
-    if (resetForm) {
+    if (resetCounter) {
       setTitle("");
       setStatus("");
       setHeaders("");
       setBody("");
       setErrors({ headers: false, body: false });
     }
-  }, [resetForm]);
+  }, [resetCounter]);
 
   return (
     <div className={styles.ResForm}>
@@ -118,7 +110,17 @@ const ResForm = ({ setResponseData, resetForm, onSave }) => {
           )}
         </div>
 
-        <Button onClick={onSave}>Save Mapping</Button>
+        <Button onClick={() => {
+    if (!errors.headers && !errors.body) {
+      const data ={
+        title,
+        status,
+        headers: headers ? JSON.parse(headers) : {},
+        body: body ? JSON.parse(body) : {},
+      };
+      onSave(data);
+    }
+  }}  >Save Mapping</Button>
       </section>
     </div>
   );
