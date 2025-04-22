@@ -51,20 +51,23 @@ const handleConnect = (newAddress) => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.btn}>WireMock is currently: {wireMockPower ? "Running ✅" : "OFF ❌"} 
-      <button onClick={handleToggle}>{wireMockPower ? true : false}Restart WireMock</button>
+      <div className={styles.section}>
+      <h3>Infrastructure Controller</h3>
+      <p>Please refresh the page for the backend/wiremock to take effect.</p>
+      <div className={styles.wireMockStatus}>WireMock is currently: {wireMockPower ? "Running ✅" : "OFF ❌"} 
+      <button className={styles.btn} onClick={handleToggle}>{wireMockPower ? true : false}WireMock Power</button>
+      </div>
       </div>
 
       <div className={styles.section}>
+      <div className={styles.backendPortText}>
       <h2>Backend Address</h2>
       <p><strong>Address:</strong> {backendAddress}</p>
       <p>Status: <span className={backendStatus === "Active" ? styles.active : styles.inactive}>{backendStatus}</span></p>
-      <button onClick={() => setShowModal(true)} className={styles.connectBtn}>
+      <button onClick={() => setShowModal(true)} className={styles.backendBtn}>
         Connect to another backend port
       </button>
-      <button onClick={checkBackend} className={styles.restartBtn}>
-        🔄 Refresh Backend
-      </button>
+      </div>
     </div>
 
     {showModal && (

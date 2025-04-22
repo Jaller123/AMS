@@ -71,10 +71,30 @@
   border-radius: 20px;
 }
 
-.btn {
+.wireMockStatus {
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
   position: relative;
+  z-index: 0;
+}
+
+.btn {
+  width: 10%;
+  height: 70%;
+  font-size: 1.0em;
+}
+
+.backendBtn {
+  width: 25%;
+  height: 50%;
+  font-size: 1.0em;
+  position: relative;
+  left: 38%;
+}
+
+.backendPortText {
+  position: relative;
+  bottom: 15%;
 }
