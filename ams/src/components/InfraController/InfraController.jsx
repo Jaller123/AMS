@@ -54,6 +54,7 @@ const handleConnect = (newAddress) => {
       <div className={styles.section}>
       <h3>Infrastructure Controller</h3>
       <p>Please refresh the page for the backend/wiremock to take effect.</p>
+      <h2 style={{color: "red"}}>This requires Docker to be up and running.</h2>
       <div className={styles.wireMockStatus}>WireMock is currently: {wireMockPower ? "Running ✅" : "OFF ❌"} 
       <button className={styles.btn} onClick={handleToggle}>{wireMockPower ? true : false}WireMock Power</button>
       </div>
