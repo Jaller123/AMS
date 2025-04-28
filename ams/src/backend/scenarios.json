@@ -1,0 +1,28 @@
+[
+  {
+    "id": "1",
+    "name": "ScenarioTest",
+    "mappings": [
+      {
+        "request": {
+          "reqId": "1"
+        },
+        "response": {}
+      },
+      {
+        "request": {
+          "reqId": "2"
+        },
+        "response": {},
+        "wireMockId": "1a58c20f-197b-458b-bcd6-c8e36b223659"
+      },
+      {
+        "request": {
+          "reqId": "3"
+        },
+        "response": {},
+        "wireMockId": "6d64592c-60ba-47f7-9331-f492ea06393a"
+      }
+    ]
+  }
+]

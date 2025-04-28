@@ -36,6 +36,7 @@ const ScenarioItem = ({
                 <div
                   key={`mapping-${scenario.id}-${index}`}
                   className={styles.mappingItem}
+                  data-testid="mappingItem"
                 >
                   <p className={styles.scenarioMappingTitle}>
                     {request.title || "No Title"}
@@ -63,6 +64,7 @@ const ScenarioItem = ({
           </button>
           {handleSendScenario && (
             <button
+              data-testid="sendToWireMockButton"
               onClick={() => handleSendScenario(scenario.id)}
               className={`${styles.button} ${styles.wireMockButton}`}
             >

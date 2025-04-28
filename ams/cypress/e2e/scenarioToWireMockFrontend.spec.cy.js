@@ -18,6 +18,11 @@ describe("Send Scenario to WireMock via UI", () => {
       }
     }).as("getScenarios");
 
+    cy.intercept("POST", "http://localhost:8080/scenarios/1/send", {
+      statusCode: 200,
+      body: { success: true },
+    }).as("sendScenario");
+
     cy.visit("http://localhost:5173/scenarios");
     cy.wait("@getScenarios");
   });
@@ -31,14 +36,17 @@ describe("Send Scenario to WireMock via UI", () => {
 
     // Then find the parent element (with placeholder="mappingItem") and click the button
     cy.contains("TestingScenarios")
-      .parents('[placeholder="mappingItem"]')
-      .within(() => {
-        cy.contains("Send to WireMock").click();
-      });
+      cy.get('[data-testid="mappingItem"]').should("exist")
+      cy.get('[data-testid="sendToWireMockButton"]').should("exist");
+   
     
     // Optionally, check for the success alert
     cy.on("window:alert", (text) => {
       expect(text).to.contain("Scenario sent successfully!");
     });
+
+    cy.get('[data-testid="sendToWireMockButton"]').click();
+
+    cy.wait("@sendScenario");
   });
 });
